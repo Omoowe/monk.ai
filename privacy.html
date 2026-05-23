@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Monk.ai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { lime: '#b8f058', muted: '#555' },
+          fontFamily: {
+            syne: ['Syne', 'sans-serif'],
+            mono: ['"DM Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { background: #0a0a0a; color: #d0d0d0; }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022; pointer-events: none; z-index: 9999;
+    }
+    h2 { font-family: 'Syne', sans-serif; font-weight: 900; color: #fff; }
+    h3 { font-family: 'Syne', sans-serif; font-weight: 800; color: #e0e0e0; }
+    p, li { line-height: 1.75; color: #888; }
+    a { color: #b8f058; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: #ccc; font-weight: 700; }
+    ul { list-style: none; padding: 0; }
+    ul li::before { content: '—'; color: #333; margin-right: 10px; }
+    hr { border: none; border-top: 1px solid #1a1a1a; margin: 2.5rem 0; }
+    .section-num { font-family: 'DM Mono', monospace; font-size: 11px; color: #b8f058; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: #b8f058; }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-40 border-b border-[#141414]" style="background: rgba(10,10,10,0.9); backdrop-filter: blur(20px);">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="monk-landing.html" class="flex items-center gap-2 no-underline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.4">
+          <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+        </svg>
+        <span class="font-syne font-black text-sm text-lime tracking-tight">MONK.AI</span>
+      </a>
+      <div class="flex items-center gap-5 text-xs font-mono text-[#444]">
+        <span class="text-[#b8f058]">Privacy</span>
+        <a href="terms.html" class="hover:text-white transition-colors no-underline">Terms</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-6 py-16 pb-32">
+
+    <!-- Header -->
+    <div class="mb-16">
+      <span class="font-mono text-[10px] text-lime uppercase tracking-[0.2em] block mb-4">Legal</span>
+      <h1 class="font-syne font-black text-4xl md:text-5xl text-white tracking-tight leading-tight mb-4">
+        Privacy Policy
+      </h1>
+      <p class="text-[#555] text-sm font-mono">Last updated: May 2026 &nbsp;·&nbsp; Effective immediately</p>
+    </div>
+
+    <!-- Intro -->
+    <p class="text-[#666] text-base leading-relaxed mb-8">
+      Monk.ai ("<strong>Monk</strong>", "<strong>we</strong>", "<strong>us</strong>") is an AI-powered accountability coaching application. This Privacy Policy explains what data we collect, why we collect it, how it is used, and your rights over it. We keep this plain — no jargon designed to confuse.
+    </p>
+
+    <hr>
+
+    <!-- 1 -->
+    <section class="mb-10">
+      <span class="section-num">01</span>
+      <h2 class="text-2xl mb-4">What We Collect</h2>
+
+      <h3 class="text-base mb-3 mt-6">Account Data</h3>
+      <ul class="space-y-2 mb-4">
+        <li>Email address (used for authentication)</li>
+        <li>Display name (provided by you during onboarding)</li>
+        <li>Password (stored as a secure hash — we never see it in plaintext)</li>
+      </ul>
+
+      <h3 class="text-base mb-3 mt-6">Coaching & Usage Data</h3>
+      <ul class="space-y-2 mb-4">
+        <li>Habits: names, emoji, completion history, streak counts</li>
+        <li>Goals: name, category, progress, target, deadline</li>
+        <li>Check-ins: morning missions, evening debriefs, energy levels, self-reported distractions</li>
+        <li>Chat messages sent to and received from your AI coach</li>
+        <li>Coach memory: a short text summary your coach builds over time from your conversations</li>
+        <li>Identity statement: the personal mantra you set during onboarding</li>
+        <li>Chosen coach personality, Monk Mode status, dopamine score, streak</li>
+      </ul>
+
+      <h3 class="text-base mb-3 mt-6">Technical Data</h3>
+      <ul class="space-y-2">
+        <li>Device type and operating system (mobile app only)</li>
+        <li>App version</li>
+        <li>Anonymised crash and error logs</li>
+        <li>Daily message count (used to enforce free-tier limits)</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 2 -->
+    <section class="mb-10">
+      <span class="section-num">02</span>
+      <h2 class="text-2xl mb-4">How We Use It</h2>
+      <ul class="space-y-3">
+        <li><strong>To deliver coaching</strong> — your habits, goals, check-ins, and memory are sent to our AI system to generate personalised, contextual coaching responses.</li>
+        <li><strong>To calculate your stats</strong> — streak, dopamine score, and completion rates are computed from your habit and check-in data.</li>
+        <li><strong>To enforce subscription limits</strong> — free-tier message limits are tracked server-side.</li>
+        <li><strong>To maintain your account</strong> — authentication, session management, and account deletion.</li>
+        <li><strong>To improve Monk</strong> — aggregated, anonymised usage patterns (never individual content) may inform product decisions.</li>
+      </ul>
+      <p class="mt-4 text-sm"><strong>We do not sell your data.</strong> We do not run ads. We do not use your coaching conversations for marketing.</p>
+    </section>
+
+    <hr>
+
+    <!-- 3 -->
+    <section class="mb-10">
+      <span class="section-num">03</span>
+      <h2 class="text-2xl mb-4">AI Processing</h2>
+      <p class="mb-4">Your coaching conversations are processed by <strong>Anthropic</strong> (Claude AI) via our server-side Supabase Edge Functions. This means:</p>
+      <ul class="space-y-2 mb-4">
+        <li>Your messages and context are sent to Anthropic's API to generate a response.</li>
+        <li>Anthropic processes this data under their own <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</li>
+        <li>Your Anthropic API key is never stored in or exposed to the client app — all AI calls go through our secure backend.</li>
+        <li>We only send the minimum context needed: your name, active habits/goals, today's mission, and coach memory.</li>
+      </ul>
+      <p class="text-sm text-[#555]">Anthropic's enterprise API does not use customer inputs to train models by default. See their privacy documentation for current commitments.</p>
+    </section>
+
+    <hr>
+
+    <!-- 4 -->
+    <section class="mb-10">
+      <span class="section-num">04</span>
+      <h2 class="text-2xl mb-4">Third-Party Services</h2>
+
+      <div class="space-y-6">
+        <div class="bg-[#0e0e0e] border border-[#1a1a1a] rounded-2xl p-5">
+          <h3 class="text-sm font-syne font-black text-white mb-1">Supabase</h3>
+          <p class="text-sm text-[#555] mb-2">Database, authentication, and edge function hosting. All user data is stored in Supabase-managed PostgreSQL. Data may reside in the US or EU depending on your project region.</p>
+          <a href="https://supabase.com/privacy" target="_blank" rel="noopener" class="text-xs font-mono">supabase.com/privacy →</a>
+        </div>
+
+        <div class="bg-[#0e0e0e] border border-[#1a1a1a] rounded-2xl p-5">
+          <h3 class="text-sm font-syne font-black text-white mb-1">RevenueCat</h3>
+          <p class="text-sm text-[#555] mb-2">Subscription and in-app purchase management. RevenueCat processes your purchase history and entitlement status. They do not receive your coaching data.</p>
+          <a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener" class="text-xs font-mono">revenuecat.com/privacy →</a>
+        </div>
+
+        <div class="bg-[#0e0e0e] border border-[#1a1a1a] rounded-2xl p-5">
+          <h3 class="text-sm font-syne font-black text-white mb-1">Anthropic</h3>
+          <p class="text-sm text-[#555] mb-2">Large language model API used to power your AI coach. Coaching context is sent per-request; no persistent user profiles are maintained by Anthropic on our behalf.</p>
+          <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener" class="text-xs font-mono">anthropic.com/privacy →</a>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- 5 -->
+    <section class="mb-10">
+      <span class="section-num">05</span>
+      <h2 class="text-2xl mb-4">Data Retention</h2>
+      <ul class="space-y-2">
+        <li>Account and coaching data is retained as long as your account is active.</li>
+        <li>If you delete your account, all associated data — habits, goals, check-ins, chat history, coach memory — is permanently deleted from our database within 30 days.</li>
+        <li>Anonymised aggregate statistics may be retained indefinitely.</li>
+        <li>Backups are purged on a rolling 30-day cycle.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 6 -->
+    <section class="mb-10">
+      <span class="section-num">06</span>
+      <h2 class="text-2xl mb-4">Your Rights</h2>
+      <p class="mb-4">Depending on your location, you may have the following rights:</p>
+      <ul class="space-y-2 mb-4">
+        <li><strong>Access</strong> — request a copy of the data we hold about you.</li>
+        <li><strong>Correction</strong> — update inaccurate data directly in the app or by contacting us.</li>
+        <li><strong>Deletion</strong> — delete your account and all associated data via Settings → Delete Account inside the app.</li>
+        <li><strong>Portability</strong> — request an export of your data in a machine-readable format.</li>
+        <li><strong>Objection</strong> — object to certain processing activities.</li>
+      </ul>
+      <p class="text-sm">To exercise any right not available in-app, email us at <a href="mailto:privacy@monk.ai">privacy@monk.ai</a>. We respond within 30 days.</p>
+    </section>
+
+    <hr>
+
+    <!-- 7 -->
+    <section class="mb-10">
+      <span class="section-num">07</span>
+      <h2 class="text-2xl mb-4">Security</h2>
+      <ul class="space-y-2">
+        <li>All data is transmitted over HTTPS/TLS.</li>
+        <li>Passwords are hashed — never stored in plaintext.</li>
+        <li>API keys (Anthropic, RevenueCat) are stored exclusively in server-side environment variables.</li>
+        <li>Row-level security (RLS) policies on Supabase ensure users can only access their own data.</li>
+        <li>Webhook signatures are verified using constant-time comparison to prevent timing attacks.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 8 -->
+    <section class="mb-10">
+      <span class="section-num">08</span>
+      <h2 class="text-2xl mb-4">Children</h2>
+      <p>Monk.ai is not directed at children under 13 (or 16 in the EU/EEA). We do not knowingly collect personal data from minors. If you believe a child has created an account, contact us at <a href="mailto:privacy@monk.ai">privacy@monk.ai</a> and we will delete the account immediately.</p>
+    </section>
+
+    <hr>
+
+    <!-- 9 -->
+    <section class="mb-10">
+      <span class="section-num">09</span>
+      <h2 class="text-2xl mb-4">Changes to This Policy</h2>
+      <p>We may update this policy as the product evolves. Material changes will be communicated via in-app notification or email at least 14 days before they take effect. Continued use of Monk.ai after the effective date constitutes acceptance.</p>
+    </section>
+
+    <hr>
+
+    <!-- 10 -->
+    <section class="mb-10">
+      <span class="section-num">10</span>
+      <h2 class="text-2xl mb-4">Contact</h2>
+      <p class="mb-3">Questions or concerns? We're accountable too.</p>
+      <div class="bg-[#0e0e0e] border border-[#1a1a1a] rounded-2xl p-5">
+        <p class="text-sm text-[#666] mb-1">Data controller: Monk.ai</p>
+        <p class="text-sm text-[#666] mb-1">Email: <a href="mailto:privacy@monk.ai">privacy@monk.ai</a></p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="mt-16 pt-8 border-t border-[#141414] flex items-center justify-between">
+      <a href="monk-landing.html" class="text-xs text-[#444] hover:text-white transition-colors font-mono no-underline">← Back to Monk</a>
+      <a href="terms.html" class="text-xs text-[#444] hover:text-white transition-colors font-mono no-underline">Terms of Service →</a>
+    </div>
+
+  </main>
+</body>
+</html>

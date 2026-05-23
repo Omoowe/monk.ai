@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service — Monk.ai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { lime: '#b8f058' },
+          fontFamily: {
+            syne: ['Syne', 'sans-serif'],
+            mono: ['"DM Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { background: #0a0a0a; color: #d0d0d0; }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022; pointer-events: none; z-index: 9999;
+    }
+    h2 { font-family: 'Syne', sans-serif; font-weight: 900; color: #fff; }
+    h3 { font-family: 'Syne', sans-serif; font-weight: 800; color: #e0e0e0; }
+    p, li { line-height: 1.75; color: #888; }
+    a { color: #b8f058; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: #ccc; font-weight: 700; }
+    ul { list-style: none; padding: 0; }
+    ul li::before { content: '—'; color: #333; margin-right: 10px; }
+    hr { border: none; border-top: 1px solid #1a1a1a; margin: 2.5rem 0; }
+    .section-num { font-family: 'DM Mono', monospace; font-size: 11px; color: #b8f058; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .warning-box { background: rgba(240,96,96,0.06); border: 1px solid rgba(240,96,96,0.15); border-radius: 14px; padding: 16px 20px; margin: 16px 0; }
+    .warning-box p { color: #c0786a; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: #b8f058; }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-40 border-b border-[#141414]" style="background: rgba(10,10,10,0.9); backdrop-filter: blur(20px);">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="monk-landing.html" class="flex items-center gap-2 no-underline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.4">
+          <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+        </svg>
+        <span class="font-syne font-black text-sm text-lime tracking-tight">MONK.AI</span>
+      </a>
+      <div class="flex items-center gap-5 text-xs font-mono text-[#444]">
+        <a href="privacy.html" class="hover:text-white transition-colors no-underline">Privacy</a>
+        <span class="text-[#b8f058]">Terms</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-6 py-16 pb-32">
+
+    <!-- Header -->
+    <div class="mb-16">
+      <span class="font-mono text-[10px] text-lime uppercase tracking-[0.2em] block mb-4">Legal</span>
+      <h1 class="font-syne font-black text-4xl md:text-5xl text-white tracking-tight leading-tight mb-4">
+        Terms of Service
+      </h1>
+      <p class="text-[#555] text-sm font-mono">Last updated: May 2026 &nbsp;·&nbsp; Effective immediately</p>
+    </div>
+
+    <!-- Intro -->
+    <p class="text-[#666] text-base leading-relaxed mb-4">
+      By creating a Monk.ai account or using any Monk.ai service (web app, mobile app, or related APIs), you agree to these Terms of Service ("<strong>Terms</strong>"). Read them. They matter.
+    </p>
+    <p class="text-[#555] text-sm mb-8">
+      These Terms form a binding legal agreement between you and Monk.ai ("<strong>Monk</strong>", "<strong>we</strong>", "<strong>us</strong>"). If you do not agree, do not use the service.
+    </p>
+
+    <hr>
+
+    <!-- 1 -->
+    <section class="mb-10">
+      <span class="section-num">01</span>
+      <h2 class="text-2xl mb-4">The Service</h2>
+      <p class="mb-3">Monk.ai provides an AI-powered personal accountability coaching platform. The service includes:</p>
+      <ul class="space-y-2 mb-4">
+        <li>AI coaching conversations powered by large language models (currently Anthropic Claude)</li>
+        <li>Habit tracking with streak and completion history</li>
+        <li>Goal setting and progress tracking</li>
+        <li>Morning and evening check-in rituals</li>
+        <li>Weekly AI-generated performance reviews</li>
+        <li>Monk Mode — an intensive focus and accountability feature</li>
+        <li>Social accountability challenges (where available)</li>
+      </ul>
+      <p>We reserve the right to modify, suspend, or discontinue any feature at any time with reasonable notice.</p>
+    </section>
+
+    <hr>
+
+    <!-- 2 -->
+    <section class="mb-10">
+      <span class="section-num">02</span>
+      <h2 class="text-2xl mb-4">Eligibility</h2>
+      <ul class="space-y-2">
+        <li>You must be at least 13 years old to use Monk.ai (16 in the EU/EEA).</li>
+        <li>You must provide accurate information when creating your account.</li>
+        <li>One person, one account. You may not create accounts on behalf of others without their consent.</li>
+        <li>If you are using Monk.ai on behalf of an organization, you represent that you have authority to bind that organization to these Terms.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 3 -->
+    <section class="mb-10">
+      <span class="section-num">03</span>
+      <h2 class="text-2xl mb-4">Your Account</h2>
+      <ul class="space-y-2 mb-4">
+        <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+        <li>You are responsible for all activity that occurs under your account.</li>
+        <li>Notify us immediately at <a href="mailto:security@monk.ai">security@monk.ai</a> if you suspect unauthorized access.</li>
+        <li>We are not liable for losses caused by unauthorized account use where you failed to safeguard your credentials.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 4 -->
+    <section class="mb-10">
+      <span class="section-num">04</span>
+      <h2 class="text-2xl mb-4">Subscriptions & Billing</h2>
+
+      <h3 class="text-base mb-3">Free Tier</h3>
+      <ul class="space-y-2 mb-5">
+        <li>1 coach personality, 10 AI messages per day, up to 3 habits and 2 goals.</li>
+        <li>Free forever. No credit card required.</li>
+      </ul>
+
+      <h3 class="text-base mb-3">Pro Subscription</h3>
+      <ul class="space-y-2 mb-5">
+        <li>All 6 coach personalities, unlimited messages, unlimited habits and goals, weekly AI review, full Monk Mode access.</li>
+        <li>Billed monthly or annually. Price shown at checkout.</li>
+        <li>Subscriptions auto-renew until cancelled. You may cancel at any time — cancellation takes effect at the end of the current billing period.</li>
+        <li>No partial refunds for unused time within a billing period, except where required by applicable law.</li>
+        <li>In-app purchases on iOS and Android are processed by Apple/Google and subject to their refund policies.</li>
+        <li>Web subscriptions are managed via Stripe. Contact <a href="mailto:billing@monk.ai">billing@monk.ai</a> for billing issues.</li>
+      </ul>
+
+      <h3 class="text-base mb-3">Price Changes</h3>
+      <p>We may change subscription pricing with 30 days' notice. Existing subscribers are notified by email before any price change applies to their renewal.</p>
+    </section>
+
+    <hr>
+
+    <!-- 5 -->
+    <section class="mb-10">
+      <span class="section-num">05</span>
+      <h2 class="text-2xl mb-4">Acceptable Use</h2>
+      <p class="mb-4">You agree not to:</p>
+      <ul class="space-y-2 mb-4">
+        <li>Use Monk.ai to harass, threaten, or harm any person.</li>
+        <li>Attempt to extract, reverse-engineer, or circumvent any AI model, API key, or backend system.</li>
+        <li>Share account credentials or sell access to your account.</li>
+        <li>Use automated tools to interact with the coaching system in ways that exceed normal human usage.</li>
+        <li>Submit false, misleading, or illegal content.</li>
+        <li>Attempt to manipulate the streak, score, or leaderboard systems artificially.</li>
+        <li>Use the service for any unlawful purpose or in violation of any applicable regulation.</li>
+      </ul>
+      <p>Violations may result in immediate account suspension or termination without notice.</p>
+    </section>
+
+    <hr>
+
+    <!-- 6 -->
+    <section class="mb-10">
+      <span class="section-num">06</span>
+      <h2 class="text-2xl mb-4">AI Coaching — Important Limitations</h2>
+
+      <div class="warning-box mb-5">
+        <p class="text-sm"><strong style="color: #f06060;">Monk.ai is not a licensed therapist, psychologist, medical professional, or crisis counsellor.</strong> AI coaching is for motivation and accountability only. Do not rely on it for mental health treatment, medical advice, or crisis intervention.</p>
+      </div>
+
+      <ul class="space-y-2 mb-4">
+        <li>If you are experiencing a mental health crisis, please contact a qualified professional or emergency services.</li>
+        <li>AI-generated coaching may be inaccurate, incomplete, or contextually inappropriate. Use your own judgment.</li>
+        <li>Coach memory and context windows are limited — your coach may not recall all prior conversations accurately.</li>
+        <li>We make no guarantee that AI coaching will produce specific personal outcomes, habit changes, or performance improvements.</li>
+        <li>Monk.ai coaching personas (Drill Sergeant, Stoic Mentor, etc.) are fictional archetypes, not real individuals.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 7 -->
+    <section class="mb-10">
+      <span class="section-num">07</span>
+      <h2 class="text-2xl mb-4">Your Content</h2>
+      <p class="mb-4">You own the content you create in Monk.ai — your habits, goals, check-in responses, and chat messages.</p>
+      <ul class="space-y-2 mb-4">
+        <li>By using Monk.ai, you grant us a limited, non-exclusive license to process and store your content solely to operate the service.</li>
+        <li>We do not claim ownership over your personal data.</li>
+        <li>You are responsible for the content you submit. Do not input content that is illegal, violates third-party rights, or would expose us to liability.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 8 -->
+    <section class="mb-10">
+      <span class="section-num">08</span>
+      <h2 class="text-2xl mb-4">Intellectual Property</h2>
+      <ul class="space-y-2">
+        <li>The Monk.ai name, logo, design system, coaching personas, and product interface are our intellectual property.</li>
+        <li>You may not copy, distribute, modify, or create derivative works of any Monk.ai IP without written permission.</li>
+        <li>AI-generated responses are provided as part of the service and are not independently copyrighted works of authorship.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 9 -->
+    <section class="mb-10">
+      <span class="section-num">09</span>
+      <h2 class="text-2xl mb-4">Termination</h2>
+      <ul class="space-y-2 mb-4">
+        <li>You may terminate your account at any time via Settings → Delete Account inside the app.</li>
+        <li>We may suspend or terminate your account for violations of these Terms, with or without notice depending on severity.</li>
+        <li>On termination, your license to use the service ceases immediately.</li>
+        <li>Provisions that by nature survive termination (limitations of liability, dispute resolution, intellectual property) remain in effect.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 10 -->
+    <section class="mb-10">
+      <span class="section-num">10</span>
+      <h2 class="text-2xl mb-4">Disclaimer of Warranties</h2>
+      <div class="warning-box">
+        <p class="text-sm leading-relaxed">
+          <strong style="color: #c0786a;">Monk.ai is provided "as is" and "as available" without warranties of any kind, express or implied.</strong> We do not warrant that the service will be uninterrupted, error-free, or that AI outputs will be accurate or suitable for any purpose. To the fullest extent permitted by law, we disclaim all warranties, including fitness for a particular purpose and non-infringement.
+        </p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- 11 -->
+    <section class="mb-10">
+      <span class="section-num">11</span>
+      <h2 class="text-2xl mb-4">Limitation of Liability</h2>
+      <p class="mb-3">To the maximum extent permitted by applicable law:</p>
+      <ul class="space-y-2 mb-4">
+        <li>Monk.ai's total liability to you for any claim arising from use of the service shall not exceed the amount you paid us in the 12 months preceding the claim.</li>
+        <li>We are not liable for indirect, incidental, special, consequential, or punitive damages — including loss of data, loss of revenue, or loss of opportunity — even if we have been advised of the possibility of such damages.</li>
+        <li>We are not liable for the actions or content of third-party services (Anthropic, Supabase, RevenueCat, Apple, Google).</li>
+      </ul>
+      <p class="text-sm text-[#555]">Some jurisdictions do not allow certain limitations of liability. If applicable law in your jurisdiction overrides any of the above, that provision is modified only to the extent necessary to comply.</p>
+    </section>
+
+    <hr>
+
+    <!-- 12 -->
+    <section class="mb-10">
+      <span class="section-num">12</span>
+      <h2 class="text-2xl mb-4">Dispute Resolution</h2>
+      <ul class="space-y-2 mb-4">
+        <li><strong>Informal resolution first.</strong> Before filing any legal claim, contact us at <a href="mailto:legal@monk.ai">legal@monk.ai</a>. We will attempt to resolve disputes informally within 30 days.</li>
+        <li><strong>Governing law.</strong> These Terms are governed by the laws of England and Wales (or your jurisdiction if mandatory consumer protection laws apply).</li>
+        <li><strong>No class actions.</strong> Any dispute must be resolved individually. You waive the right to participate in class-action proceedings to the fullest extent permitted by law.</li>
+        <li><strong>EU users.</strong> If you are located in the EU, you may also submit a complaint to your local data protection authority or use the EU Online Dispute Resolution platform at <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- 13 -->
+    <section class="mb-10">
+      <span class="section-num">13</span>
+      <h2 class="text-2xl mb-4">Changes to These Terms</h2>
+      <p>We may update these Terms. Material changes are communicated via in-app notification or email at least 14 days before they take effect. Continued use after the effective date constitutes acceptance. If you do not agree to updated Terms, you must stop using Monk.ai and may delete your account.</p>
+    </section>
+
+    <hr>
+
+    <!-- 14 -->
+    <section class="mb-10">
+      <span class="section-num">14</span>
+      <h2 class="text-2xl mb-4">Entire Agreement</h2>
+      <p>These Terms, together with our <a href="privacy.html">Privacy Policy</a>, constitute the entire agreement between you and Monk.ai regarding the service and supersede any prior agreements. If any provision is found unenforceable, the remaining provisions remain in full effect.</p>
+    </section>
+
+    <hr>
+
+    <!-- Contact -->
+    <section class="mb-10">
+      <span class="section-num">15</span>
+      <h2 class="text-2xl mb-4">Contact</h2>
+      <div class="bg-[#0e0e0e] border border-[#1a1a1a] rounded-2xl p-5">
+        <p class="text-sm text-[#666] mb-1">Monk.ai</p>
+        <p class="text-sm text-[#666] mb-1">Legal: <a href="mailto:legal@monk.ai">legal@monk.ai</a></p>
+        <p class="text-sm text-[#666] mb-1">Billing: <a href="mailto:billing@monk.ai">billing@monk.ai</a></p>
+        <p class="text-sm text-[#666]">Privacy: <a href="mailto:privacy@monk.ai">privacy@monk.ai</a></p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="mt-16 pt-8 border-t border-[#141414] flex items-center justify-between">
+      <a href="monk-landing.html" class="text-xs text-[#444] hover:text-white transition-colors font-mono no-underline">← Back to Monk</a>
+      <a href="privacy.html" class="text-xs text-[#444] hover:text-white transition-colors font-mono no-underline">Privacy Policy →</a>
+    </div>
+
+  </main>
+</body>
+</html>

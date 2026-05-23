@@ -77,17 +77,50 @@
     textarea:focus { outline: none; }
     input:focus { outline: none; }
 
-    .chat-input:focus { border-color: rgba(184,240,88,0.3); }
+    .chat-input:focus-within { border-color: rgba(184,240,88,0.25); }
 
     .typing span {
       display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-      background: #555; animation: bounce 1.2s infinite;
+      background: #666; animation: bounce 1.2s infinite;
     }
     .typing span:nth-child(2) { animation-delay: 0.18s; }
     .typing span:nth-child(3) { animation-delay: 0.36s; }
     @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
 
     .score-ring { transition: stroke-dashoffset 0.8s cubic-bezier(0.25,0.46,0.45,0.94); }
+
+    /* Noise texture — matches landing page premium feel */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Loading skeleton pulse */
+    .skeleton { background: linear-gradient(90deg, #141414 25%, #1c1c1c 50%, #141414 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    /* Sidebar active accent */
+    .sidebar-btn.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 25%;
+      height: 50%;
+      width: 2px;
+      border-radius: 0 2px 2px 0;
+      background: var(--coach-color, #b8f058);
+    }
+
+    /* Dot matrix bg on auth */
+    .dot-bg {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
 
     @media (max-width: 768px) {
       .desktop-only { display: none !important; }
@@ -131,9 +164,21 @@
     </div>
   </div>
 
+  <!-- ─── LOADING ─── -->
+  <div v-else-if="view === 'loading'" class="min-h-screen flex items-center justify-center">
+    <div class="text-center">
+      <svg class="mx-auto mb-4 animate-pulse" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.2">
+        <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+      </svg>
+      <div class="text-muted text-xs font-mono uppercase tracking-widest">Loading</div>
+    </div>
+  </div>
+
   <!-- ─── AUTH ─── -->
-  <div v-else-if="view === 'auth'" class="min-h-screen flex items-center justify-center px-4" style="background: radial-gradient(ellipse 60% 60% at 60% 40%, rgba(184,240,88,0.04) 0%, transparent 60%);">
-    <div class="w-full max-w-sm">
+  <div v-else-if="view === 'auth'" class="min-h-screen flex items-center justify-center px-4 dot-bg" style="background-color: #0a0a0a;">
+    <!-- Strong ambient glow -->
+    <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 55% 55% at 65% 45%, rgba(184,240,88,0.07) 0%, transparent 60%), radial-gradient(ellipse 35% 40% at 20% 70%, rgba(123,106,240,0.04) 0%, transparent 60%);"></div>
+    <div class="w-full max-w-sm relative z-10">
       <!-- Logo -->
       <div class="text-center mb-8">
         <div class="inline-flex items-center gap-2 mb-4">
@@ -170,7 +215,115 @@
         </button>
       </div>
 
-      <p class="text-center text-muted text-xs mt-6">No excuses on price. Free forever to start.</p>
+      <!-- Differentiators (competitor contrast) -->
+      <div class="mt-8 space-y-2">
+        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
+          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
+          <div>
+            <div class="text-xs font-bold text-white/70">Not a game. Not a gentle nudge.</div>
+            <div class="text-[11px] text-muted leading-relaxed">Habitica gamifies. Fabulous whispers. Monk holds you accountable.</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
+          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
+          <div>
+            <div class="text-xs font-bold text-white/70">AI that remembers everything.</div>
+            <div class="text-[11px] text-muted leading-relaxed">Your excuses, patterns, missed sessions — your coach builds a model of you.</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
+          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
+          <div>
+            <div class="text-xs font-bold text-white/70">6 coaching philosophies. Zero tolerance.</div>
+            <div class="text-[11px] text-muted leading-relaxed">Drill Sergeant to Stoic Mentor — pick the voice that breaks your patterns.</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-center text-muted text-xs mt-6">Free forever to start. No excuses on price.</p>
+    </div>
+  </div>
+
+  <!-- ─── ONBOARDING ─── -->
+  <div v-else-if="view === 'onboarding'" class="min-h-screen flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-lg">
+      <div class="text-center mb-8">
+        <div class="text-[11px] font-mono text-muted uppercase tracking-widest mb-3">Step {{ onboardStep }}/3</div>
+        <div class="h-1 bg-bg2 rounded-full mb-6 max-w-xs mx-auto overflow-hidden">
+          <div class="h-full bg-lime rounded-full transition-all duration-500" :style="`width: ${(onboardStep/3)*100}%`"></div>
+        </div>
+      </div>
+
+      <!-- Step 1: pick coach -->
+      <div v-if="onboardStep===1" class="fade-in">
+        <h2 class="font-syne font-black text-2xl text-white text-center mb-2 tracking-tight">Choose your coach.</h2>
+        <p class="text-muted text-sm text-center mb-8">Different voices for different people. You can switch anytime.</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button v-for="(c, id) in coaches" :key="id" @click="onboardCoach=id"
+            :class="['flex items-start gap-3 p-4 rounded-2xl border text-left transition-all', onboardCoach===id ? 'border-current' : 'border-border bg-bg2 hover:border-white/10']"
+            :style="onboardCoach===id ? `background: ${c.color}12; border-color: ${c.color}40; color: ${c.color}` : ''">
+            <span class="text-2xl flex-shrink-0">{{ c.emoji }}</span>
+            <div>
+              <div class="text-xs font-black text-white">{{ c.name }}</div>
+              <div class="text-[10px] text-muted leading-relaxed mt-0.5">{{ c.tagline }}</div>
+            </div>
+          </button>
+        </div>
+        <button @click="onboardStep=2" :disabled="!onboardCoach" class="w-full mt-6 py-4 rounded-2xl font-syne font-black text-sm transition-all disabled:opacity-30"
+          :style="onboardCoach ? `background: ${coaches[onboardCoach]?.color}; color: #0a0a0a` : 'background: #1a1a1a; color: #555'">
+          Continue →
+        </button>
+      </div>
+
+      <!-- Step 2: identity statement -->
+      <div v-if="onboardStep===2" class="fade-in">
+        <h2 class="font-syne font-black text-2xl text-white text-center mb-2 tracking-tight">Who are you becoming?</h2>
+        <p class="text-muted text-sm text-center mb-2">Your coach will use this to hold you to your own standard.</p>
+        <p class="text-[11px] text-muted text-center mb-8">e.g. "I am the type of person who never misses a workout."</p>
+        <div class="bg-bg2 border border-border rounded-2xl p-5">
+          <label class="text-[9px] font-mono text-muted uppercase tracking-widest block mb-2">Identity Statement</label>
+          <textarea v-model="onboardIdentity" placeholder="I am the type of person who..." rows="3"
+            class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors leading-relaxed"></textarea>
+          <p class="text-[10px] text-muted mt-2">Your coach references this when you're slipping. Make it true enough to hurt.</p>
+        </div>
+        <div class="flex gap-3 mt-4">
+          <button @click="onboardStep=1" class="px-6 py-4 rounded-2xl border border-border text-muted text-sm font-bold hover:text-white transition-colors">← Back</button>
+          <button @click="onboardStep=3" class="flex-1 py-4 rounded-2xl font-syne font-black text-sm transition-all"
+            :style="`background: ${coaches[onboardCoach]?.color || '#b8f058'}; color: #0a0a0a`">
+            Continue →
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: commitment -->
+      <div v-if="onboardStep===3" class="fade-in">
+        <h2 class="font-syne font-black text-2xl text-white text-center mb-2 tracking-tight">Make the commitment.</h2>
+        <p class="text-muted text-sm text-center mb-8">Your coach is watching. This is where it starts.</p>
+        <div class="bg-bg2 border border-border rounded-2xl p-6 space-y-4 mb-6">
+          <div class="flex items-center gap-4">
+            <span class="text-3xl">{{ coaches[onboardCoach]?.emoji }}</span>
+            <div>
+              <div class="text-xs font-mono text-muted uppercase tracking-widest">Your coach</div>
+              <div class="font-bold text-white">{{ coaches[onboardCoach]?.name }}</div>
+            </div>
+          </div>
+          <div class="border-t border-border pt-4">
+            <div class="text-[9px] font-mono text-muted uppercase tracking-widest mb-1">Your identity</div>
+            <div class="text-sm text-white/70 italic">"{{ onboardIdentity || 'I am the type of person who shows up.' }}"</div>
+          </div>
+          <div class="border-t border-border pt-4">
+            <div class="text-[9px] font-mono text-muted uppercase tracking-widest mb-1">What this means</div>
+            <div class="text-xs text-muted leading-relaxed">Your coach remembers everything. Every missed habit. Every excuse. Every win. No hiding.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button @click="onboardStep=2" class="px-6 py-4 rounded-2xl border border-border text-muted text-sm font-bold hover:text-white transition-colors">← Back</button>
+          <button @click="finishOnboarding" :disabled="onboardingLoading" class="flex-1 py-4 rounded-2xl font-syne font-black text-sm transition-all"
+            :style="`background: ${coaches[onboardCoach]?.color || '#b8f058'}; color: #0a0a0a`">
+            {{ onboardingLoading ? 'Setting up...' : "I'm ready. Let's go." }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -188,14 +341,25 @@
 
       <!-- Nav buttons -->
       <template v-for="nav in navItems" :key="nav.id">
-        <button @click="setView(nav.id)" :class="['sidebar-btn w-full flex items-center justify-center h-10 rounded-xl mx-1', view===nav.id ? 'active' : '']" style="width: 48px;">
-          <span class="text-lg" :style="view===nav.id ? `filter: drop-shadow(0 0 6px ${coaches[personality]?.color || '#b8f058'}40)` : ''">{{ nav.icon }}</span>
+        <button @click="setView(nav.id)"
+          :class="['sidebar-btn flex items-center justify-center h-10 rounded-xl', view===nav.id ? 'active' : '']"
+          style="width: 48px;"
+          :style="view===nav.id ? `--coach-color: ${coaches[personality]?.color || '#b8f058'}` : ''">
+          <span class="text-lg" :style="view===nav.id ? `filter: drop-shadow(0 0 8px ${coaches[personality]?.color || '#b8f058'}50)` : 'opacity: 0.45'">{{ nav.icon }}</span>
           <span class="tooltip">{{ nav.label }}</span>
         </button>
       </template>
 
       <!-- Spacer -->
       <div class="flex-1"></div>
+
+      <!-- Monk Mode toggle -->
+      <button @click="toggleMonkMode" :class="['sidebar-btn w-12 h-12 rounded-xl flex items-center justify-center mb-1 transition-all', monkMode ? 'bg-purple/15' : '']"
+        :style="monkMode ? 'border: 1px solid rgba(123,106,240,0.3)' : ''"
+        title="Monk Mode">
+        <span class="text-lg" :style="monkMode ? 'filter: drop-shadow(0 0 6px #7b6af0)' : ''">🧘</span>
+        <span class="tooltip">{{ monkMode ? 'Monk Mode ON' : 'Monk Mode' }}</span>
+      </button>
 
       <!-- Score pill -->
       <div class="text-center mb-3">
@@ -253,31 +417,46 @@
   <!-- Profile sheet -->
   <div v-if="showProfile" @click.self="showProfile=false" class="fixed inset-0 z-40 flex items-end justify-center" style="background: rgba(0,0,0,0.7);">
     <div class="bg-bg2 border-t border-border rounded-t-3xl w-full max-w-sm p-6 pb-10 fade-in">
-      <div class="w-8 h-1 bg-border rounded-full mx-auto mb-5"></div>
-      <div class="flex items-center gap-4 mb-6">
-        <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black" :style="`background: ${coaches[personality]?.color || '#b8f058'}20; color: ${coaches[personality]?.color || '#b8f058'}`">
-          {{ userName.slice(0,1).toUpperCase() }}
+      <div class="w-8 h-1 bg-border rounded-full mx-auto mb-6"></div>
+
+      <!-- Score ring + identity -->
+      <div class="flex items-center gap-5 mb-6">
+        <!-- SVG score ring -->
+        <div class="relative flex-shrink-0">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#1e1e1e" stroke-width="5"/>
+            <circle cx="32" cy="32" r="26" fill="none" :stroke="scoreColor" stroke-width="5"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              :stroke-dashoffset="163.4 - (163.4 * dopamineScore / 100)"
+              transform="rotate(-90 32 32)" class="score-ring"/>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="font-mono font-bold text-sm" :style="`color: ${scoreColor}`">{{ dopamineScore }}</span>
+          </div>
         </div>
-        <div>
-          <div class="font-syne font-black text-white">{{ userName }}</div>
-          <div class="text-muted text-xs">{{ userEmail }}</div>
+        <div class="flex-1">
+          <div class="font-syne font-black text-white text-base">{{ userName }}</div>
+          <div class="text-muted text-xs mb-1">{{ userEmail }}</div>
+          <div class="flex items-center gap-2">
+            <span class="text-gold text-xs font-mono font-bold">🔥 {{ streak }} day</span>
+            <span class="text-border">·</span>
+            <span class="text-xs font-mono" :style="`color: ${coaches[personality]?.color || '#b8f058'}`">{{ coaches[personality]?.name }}</span>
+          </div>
         </div>
       </div>
-      <div class="flex gap-6 mb-6 border-b border-border pb-6">
-        <div class="text-center">
-          <div class="font-mono font-bold text-white text-lg">{{ streak }}</div>
-          <div class="text-[9px] text-muted uppercase tracking-widest">Streak</div>
+
+      <!-- Habits today bar -->
+      <div class="mb-5">
+        <div class="flex justify-between text-[10px] mb-1.5">
+          <span class="text-muted font-mono uppercase tracking-widest">Today</span>
+          <span class="font-mono" :style="`color: ${coaches[personality]?.color || '#b8f058'}`">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }} habits</span>
         </div>
-        <div class="text-center">
-          <div class="font-mono font-bold text-lg" :style="`color: ${scoreColor}`">{{ dopamineScore }}</div>
-          <div class="text-[9px] text-muted uppercase tracking-widest">Score</div>
-        </div>
-        <div class="text-center">
-          <div class="font-mono font-bold text-white text-lg">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }}</div>
-          <div class="text-[9px] text-muted uppercase tracking-widest">Today</div>
+        <div class="h-1.5 bg-bg3 rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-700" :style="`width: ${habits.length ? Math.round(habits.filter(h=>h.completedToday).length/habits.length*100) : 0}%; background: ${coaches[personality]?.color || '#b8f058'}`"></div>
         </div>
       </div>
-      <button @click="signOut" class="w-full border border-border text-muted py-3 rounded-xl text-sm font-bold hover:text-white hover:border-white/20 transition-all">
+
+      <button @click="signOut" class="w-full border border-border text-muted py-3 rounded-xl text-sm font-bold hover:text-white hover:border-white/15 transition-all">
         Sign Out
       </button>
     </div>
@@ -309,13 +488,15 @@ const NAV_ITEMS = [
 ];
 
 // ─── Supabase singleton ─────────────────────────────────────────────────────
-let sbClient = null;
+const SUPABASE_URL = 'https://ecknypzdpovzzmvedsuw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVja255cHpkcG92enptdmVkc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDM1NTEsImV4cCI6MjA5NDYxOTU1MX0.9wWs_ridrkWmhAT3of2aZMf-C4vr6owU9wS4rijm6Ic';
+let sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function getSB() { return sbClient; }
 
 // ─── Shared state (poor-man's store) ────────────────────────────────────────
 const state = {
   user: ref(null),
-  view: ref('auth'),
+  view: ref('loading'),
   userName: ref(''),
   userEmail: ref(''),
   personality: ref('stoic_mentor'),
@@ -334,7 +515,7 @@ const state = {
 // ─── Root app ───────────────────────────────────────────────────────────────
 const app = createApp({
   setup() {
-    const supabaseConfigured = ref(false);
+    const supabaseConfigured = ref(true);
     const configUrl = ref('');
     const configKey = ref('');
     const authTab = ref('login');
@@ -344,6 +525,10 @@ const app = createApp({
     const authError = ref('');
     const authLoading = ref(false);
     const showProfile = ref(false);
+    const onboardStep = ref(1);
+    const onboardCoach = ref('stoic_mentor');
+    const onboardIdentity = ref('');
+    const onboardingLoading = ref(false);
 
     const coaches = COACHES;
     const navItems = NAV_ITEMS;
@@ -358,12 +543,7 @@ const app = createApp({
       return '#f06060';
     });
 
-    function initSupabase() {
-      if (!configUrl.value || !configKey.value) return;
-      sbClient = supabase.createClient(configUrl.value.trim(), configKey.value.trim());
-      supabaseConfigured.value = true;
-      listenAuth();
-    }
+    function initSupabase() { listenAuth(); }
 
     function listenAuth() {
       const sb = getSB();
@@ -372,7 +552,6 @@ const app = createApp({
         state.user.value = session?.user ?? null;
         if (state.user.value) {
           await loadUserData();
-          view.value = 'coach';
         } else {
           view.value = 'auth';
         }
@@ -380,7 +559,9 @@ const app = createApp({
       sb.auth.getSession().then(({ data }) => {
         if (data.session) {
           state.user.value = data.session.user;
-          loadUserData().then(() => { view.value = 'coach'; });
+          loadUserData();
+        } else {
+          view.value = 'auth';
         }
       });
     }
@@ -409,6 +590,12 @@ const app = createApp({
         state.monkMode.value = profile.monk_mode || false;
         state.identityStatement.value = profile.identity_statement || '';
         state.coachMemory.value = profile.coach_memory || '';
+        // New user: no name set → onboarding
+        if (!profile.name) { view.value = 'onboarding'; return; }
+        view.value = 'coach';
+      } else {
+        // Profile row doesn't exist yet → onboarding
+        view.value = 'onboarding'; return;
       }
 
       // Habits with today's completions
@@ -452,6 +639,26 @@ const app = createApp({
       }
     }
 
+    async function finishOnboarding() {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid) return;
+      onboardingLoading.value = true;
+      const name = authName.value || state.user.value.email?.split('@')[0] || 'Monk';
+      await sb.from('users').upsert({
+        id: uid, name, personality: onboardCoach.value,
+        identity_statement: onboardIdentity.value,
+        streak: 0, dopamine_score: 50, monk_mode: false,
+      });
+      state.userName.value = name;
+      state.personality.value = onboardCoach.value;
+      state.identityStatement.value = onboardIdentity.value;
+      state.streak.value = 0;
+      state.dopamineScore.value = 50;
+      onboardingLoading.value = false;
+      view.value = 'coach';
+    }
+
     async function signOut() {
       showProfile.value = false;
       await getSB()?.auth.signOut();
@@ -459,12 +666,23 @@ const app = createApp({
 
     function setView(v) { view.value = v; showProfile.value = false; }
 
+    async function toggleMonkMode() {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      state.monkMode.value = !state.monkMode.value;
+      if (sb && uid) await sb.from('users').update({ monk_mode: state.monkMode.value }).eq('id', uid);
+    }
+
+    onMounted(() => listenAuth());
+
     return {
       supabaseConfigured, configUrl, configKey, initSupabase,
       authTab, authEmail, authPassword, authName, authError, authLoading, authSubmit,
       view, setView, coaches, navItems,
       userName, userEmail, personality, monkMode, streak, dopamineScore, habits, goals,
       morningDone, eveningDone, scoreColor, showProfile, signOut,
+      onboardStep, onboardCoach, onboardIdentity, onboardingLoading, finishOnboarding,
+      toggleMonkMode,
     };
   }
 });
@@ -585,7 +803,7 @@ app.component('coach-screen', {
   <div class="flex h-full overflow-hidden">
 
     <!-- Chat area -->
-    <div class="flex flex-col flex-1 min-w-0">
+    <div class="flex flex-col flex-1 min-w-0 relative">
 
       <!-- Chat header -->
       <div class="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
@@ -611,7 +829,7 @@ app.component('coach-screen', {
       </div>
 
       <!-- Coach selector dropdown -->
-      <div v-if="showCoachSelect" class="absolute top-[114px] left-[80px] z-30 bg-bg2 border border-border rounded-2xl p-3 shadow-2xl w-72 fade-in desktop-only">
+      <div v-if="showCoachSelect" class="absolute top-14 left-4 z-30 bg-bg2 border border-border rounded-2xl p-3 shadow-2xl w-72 fade-in" style="box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);">
         <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-2 px-1">Select Coach</div>
         <div class="space-y-1">
           <button v-for="(c, id) in coaches" :key="id" @click="changeCoach(id)"
@@ -690,7 +908,7 @@ app.component('coach-screen', {
             </div>
             <div class="w-px bg-border"></div>
             <div class="text-center flex-1">
-              <div class="font-mono font-bold text-xl" :style="\`color: \${streak > 7 ? '#b8f058' : '#f5c840'}\`">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }}</div>
+              <div class="font-mono font-bold text-xl" :style="\`color: \${coach.color}\`">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }}</div>
               <div class="text-[9px] text-muted uppercase tracking-widest mt-0.5">Habits</div>
             </div>
           </div>
@@ -710,9 +928,13 @@ app.component('coach-screen', {
         </div>
 
         <!-- Coach memory -->
-        <div v-if="coachMemory" class="bg-bg2 border border-border rounded-2xl p-4">
-          <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-2">Coach Remembers</div>
-          <p class="text-xs text-white/40 leading-relaxed italic">"{{ coachMemory.slice(0, 140) }}{{ coachMemory.length > 140 ? '…' : '' }}"</p>
+        <div class="bg-bg2 border border-border rounded-2xl p-4">
+          <div class="flex items-center gap-1.5 mb-2">
+            <div class="w-1.5 h-1.5 rounded-full" :style="\`background: \${coach.color}; opacity: \${coachMemory ? '1' : '0.3'}\`"></div>
+            <div class="text-[9px] text-muted uppercase tracking-widest font-mono">Coach Remembers</div>
+          </div>
+          <p v-if="coachMemory" class="text-xs text-white/40 leading-relaxed italic">"{{ coachMemory.slice(0, 150) }}{{ coachMemory.length > 150 ? '…' : '' }}"</p>
+          <p v-else class="text-xs text-white/20 leading-relaxed">Memory builds as you talk. Chat more to give your coach context.</p>
         </div>
 
       </div>
@@ -805,8 +1027,10 @@ app.component('habits-screen', {
 
     <!-- Habit list -->
     <div class="space-y-2">
-      <div v-if="!habits.length" class="text-center py-16 text-muted text-sm">
-        No habits yet. Add your first one above.
+      <div v-if="!habits.length" class="text-center py-16">
+        <div class="text-3xl mb-3">📋</div>
+        <div class="text-white/50 text-sm font-bold mb-1">No habits tracked yet.</div>
+        <div class="text-muted text-xs max-w-xs mx-auto leading-relaxed">Every elite performer tracks the fundamentals. Add your first habit above and start the streak.</div>
       </div>
       <div v-for="habit in habits" :key="habit.id" class="habit-row flex items-center gap-3 bg-bg2 border border-border rounded-2xl px-4 py-4 group transition-all">
         <button @click="toggle(habit)" class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
@@ -891,7 +1115,11 @@ app.component('goals-screen', {
 
     <!-- Goals -->
     <div class="space-y-3">
-      <div v-if="!goals.length" class="text-center py-16 text-muted text-sm">No goals yet. Set one above.</div>
+      <div v-if="!goals.length" class="text-center py-16">
+        <div class="text-3xl mb-3">🎯</div>
+        <div class="text-white/50 text-sm font-bold mb-1">No goals. No direction.</div>
+        <div class="text-muted text-xs max-w-xs mx-auto leading-relaxed">Your coach needs targets to hold you to. Set a goal above — be specific enough that failing it would sting.</div>
+      </div>
       <div v-for="goal in goals" :key="goal.id" class="bg-bg2 border border-border rounded-2xl p-5 group transition-all hover:border-white/5">
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
