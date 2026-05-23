@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monk.ai — AI Accountability Coach</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg:     '#0a0a0a',
+            bg2:    '#111111',
+            bg3:    '#171717',
+            border: '#1e1e1e',
+            muted:  '#555555',
+            lime:   '#b8f058',
+            crimson:'#f06060',
+            purple: '#7b6af0',
+            gold:   '#f5c840',
+            teal:   '#40f5c8',
+            amber:  '#f0a060',
+          },
+          fontFamily: {
+            syne: ['Syne', 'sans-serif'],
+            mono: ['"DM Mono"', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { background: #0a0a0a; color: #f0f0f0; height: 100%; margin: 0; }
+    #app { height: 100dvh; }
+
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #252525; border-radius: 2px; }
+
+    .msg-enter { animation: msgIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both; }
+    @keyframes msgIn { from { opacity:0; transform: translateY(10px) scale(0.97); } to { opacity:1; transform: none; } }
+
+    .fade-in { animation: fadeIn 0.3s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; } }
+
+    .coach-pill { transition: all 0.2s; cursor: pointer; }
+    .coach-pill:hover { transform: translateY(-1px); }
+
+    .habit-row { transition: background 0.15s; }
+    .habit-row:hover { background: #161616; }
+
+    .sidebar-btn { transition: all 0.15s; position: relative; }
+    .sidebar-btn:hover { background: #161616; }
+    .sidebar-btn.active { background: #1a1a1a; }
+    .sidebar-btn .tooltip {
+      position: absolute; left: 72px; top: 50%; transform: translateY(-50%);
+      background: #1e1e1e; border: 1px solid #2a2a2a; color: #e0e0e0;
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s;
+      z-index: 99; letter-spacing: 0.04em;
+    }
+    .sidebar-btn:hover .tooltip { opacity: 1; }
+
+    .progress-bar { transition: width 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
+
+    textarea { resize: none; }
+    textarea:focus { outline: none; }
+    input:focus { outline: none; }
+
+    .chat-input:focus { border-color: rgba(184,240,88,0.3); }
+
+    .typing span {
+      display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+      background: #555; animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.18s; }
+    .typing span:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+    .score-ring { transition: stroke-dashoffset 0.8s cubic-bezier(0.25,0.46,0.45,0.94); }
+
+    @media (max-width: 768px) {
+      .desktop-only { display: none !important; }
+    }
+    @media (min-width: 769px) {
+      .mobile-only { display: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ─── CONFIG BANNER ─── -->
+  <div v-if="!supabaseConfigured" class="fixed inset-0 z-50 flex items-center justify-center bg-bg px-4">
+    <div class="bg-bg2 border border-border rounded-2xl p-8 max-w-md w-full">
+      <div class="flex items-center gap-3 mb-6">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.2">
+          <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+        </svg>
+        <span class="font-syne font-black text-xl text-lime tracking-tight">MONK.AI</span>
+      </div>
+      <p class="text-sm text-muted mb-5 leading-relaxed">
+        Paste your Supabase project URL and anon key below. Find these in your Supabase dashboard → Settings → API.
+      </p>
+      <div class="space-y-3">
+        <div>
+          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Project URL</label>
+          <input v-model="configUrl" placeholder="https://xxxxxxxxxxxx.supabase.co"
+            class="w-full bg-bg3 border border-border rounded-lg px-3 py-2.5 text-sm text-white font-mono focus:border-lime/30 transition-colors" />
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Anon Key</label>
+          <input v-model="configKey" placeholder="eyJhbGciOi..."
+            class="w-full bg-bg3 border border-border rounded-lg px-3 py-2.5 text-sm text-white font-mono focus:border-lime/30 transition-colors" />
+        </div>
+      </div>
+      <button @click="initSupabase" class="mt-5 w-full bg-lime text-bg font-syne font-black py-3 rounded-xl text-sm hover:bg-white transition-colors">
+        Connect
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── AUTH ─── -->
+  <div v-else-if="view === 'auth'" class="min-h-screen flex items-center justify-center px-4" style="background: radial-gradient(ellipse 60% 60% at 60% 40%, rgba(184,240,88,0.04) 0%, transparent 60%);">
+    <div class="w-full max-w-sm">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.2">
+            <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+          </svg>
+          <span class="font-syne font-black text-2xl text-lime tracking-tight">MONK.AI</span>
+        </div>
+        <p class="text-muted text-sm">The AI coach that doesn't let you off the hook.</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex bg-bg2 border border-border rounded-xl p-1 mb-6">
+        <button @click="authTab='login'" :class="authTab==='login' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Sign In</button>
+        <button @click="authTab='register'" :class="authTab==='register' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Create Account</button>
+      </div>
+
+      <div class="bg-bg2 border border-border rounded-2xl p-6 space-y-4">
+        <div v-if="authTab==='register'">
+          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Your Name</label>
+          <input v-model="authName" placeholder="e.g. Jordan" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" />
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Email</label>
+          <input v-model="authEmail" type="email" placeholder="you@example.com" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Password</label>
+          <input v-model="authPassword" type="password" placeholder="••••••••" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+        </div>
+        <p v-if="authError" class="text-crimson text-xs py-1">{{ authError }}</p>
+        <button @click="authSubmit" :disabled="authLoading" class="w-full bg-lime text-bg font-syne font-black py-3.5 rounded-xl text-sm hover:bg-white transition-colors disabled:opacity-50">
+          {{ authLoading ? '...' : authTab==='login' ? 'Sign In' : 'Create Account' }}
+        </button>
+      </div>
+
+      <p class="text-center text-muted text-xs mt-6">No excuses on price. Free forever to start.</p>
+    </div>
+  </div>
+
+  <!-- ─── MAIN APP ─── -->
+  <div v-else class="flex h-full">
+
+    <!-- Sidebar (desktop) -->
+    <aside class="desktop-only flex-shrink-0 w-[64px] flex flex-col items-center border-r border-border py-4 gap-1">
+      <!-- Logo -->
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style="background: rgba(184,240,88,0.08); border: 1px solid rgba(184,240,88,0.15);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="personality ? coaches[personality]?.color : '#b8f058'" stroke-width="2.4">
+          <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+        </svg>
+      </div>
+
+      <!-- Nav buttons -->
+      <template v-for="nav in navItems" :key="nav.id">
+        <button @click="setView(nav.id)" :class="['sidebar-btn w-full flex items-center justify-center h-10 rounded-xl mx-1', view===nav.id ? 'active' : '']" style="width: 48px;">
+          <span class="text-lg" :style="view===nav.id ? `filter: drop-shadow(0 0 6px ${coaches[personality]?.color || '#b8f058'}40)` : ''">{{ nav.icon }}</span>
+          <span class="tooltip">{{ nav.label }}</span>
+        </button>
+      </template>
+
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+
+      <!-- Score pill -->
+      <div class="text-center mb-3">
+        <div class="font-mono text-xs font-bold" :style="`color: ${scoreColor}`">{{ dopamineScore }}</div>
+        <div class="text-[8px] text-muted uppercase tracking-widest">score</div>
+      </div>
+
+      <!-- Profile -->
+      <button @click="showProfile=true" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black" :style="`background: ${coaches[personality]?.color || '#b8f058'}20; color: ${coaches[personality]?.color || '#b8f058'}`">
+        {{ userName.slice(0,1).toUpperCase() }}
+      </button>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+      <!-- Mobile header -->
+      <div class="mobile-only flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="coaches[personality]?.color || '#b8f058'" stroke-width="2.4">
+            <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+          </svg>
+          <span class="font-syne font-black text-base tracking-tight" :style="`color: ${coaches[personality]?.color || '#b8f058'}`">MONK</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs font-bold text-gold">🔥 {{ streak }}</span>
+          <span class="font-mono text-xs font-bold" :style="`color: ${scoreColor}`">{{ dopamineScore }}</span>
+          <button @click="showProfile=true" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black" :style="`background: ${coaches[personality]?.color || '#b8f058'}20; color: ${coaches[personality]?.color || '#b8f058'}`">
+            {{ userName.slice(0,1).toUpperCase() }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Views -->
+      <div class="flex-1 overflow-hidden">
+        <coach-screen   v-if="view==='coach'"   :key="'coach'" />
+        <habits-screen  v-if="view==='habits'"  :key="'habits'" />
+        <goals-screen   v-if="view==='goals'"   :key="'goals'" />
+        <checkin-screen v-if="view==='checkin'" :key="'checkin'" />
+        <stats-screen   v-if="view==='stats'"   :key="'stats'" />
+        <review-screen  v-if="view==='review'"  :key="'review'" />
+      </div>
+
+      <!-- Mobile bottom nav -->
+      <nav class="mobile-only flex border-t border-border flex-shrink-0" style="padding-bottom: env(safe-area-inset-bottom, 0);">
+        <button v-for="nav in navItems" :key="nav.id" @click="setView(nav.id)"
+          :class="['flex-1 flex flex-col items-center py-2.5 gap-0.5', view===nav.id ? 'text-white' : 'text-muted']">
+          <span class="text-base">{{ nav.icon }}</span>
+          <span class="text-[9px] font-bold uppercase tracking-widest">{{ nav.label.slice(0,4) }}</span>
+        </button>
+      </nav>
+    </main>
+  </div>
+
+  <!-- Profile sheet -->
+  <div v-if="showProfile" @click.self="showProfile=false" class="fixed inset-0 z-40 flex items-end justify-center" style="background: rgba(0,0,0,0.7);">
+    <div class="bg-bg2 border-t border-border rounded-t-3xl w-full max-w-sm p-6 pb-10 fade-in">
+      <div class="w-8 h-1 bg-border rounded-full mx-auto mb-5"></div>
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black" :style="`background: ${coaches[personality]?.color || '#b8f058'}20; color: ${coaches[personality]?.color || '#b8f058'}`">
+          {{ userName.slice(0,1).toUpperCase() }}
+        </div>
+        <div>
+          <div class="font-syne font-black text-white">{{ userName }}</div>
+          <div class="text-muted text-xs">{{ userEmail }}</div>
+        </div>
+      </div>
+      <div class="flex gap-6 mb-6 border-b border-border pb-6">
+        <div class="text-center">
+          <div class="font-mono font-bold text-white text-lg">{{ streak }}</div>
+          <div class="text-[9px] text-muted uppercase tracking-widest">Streak</div>
+        </div>
+        <div class="text-center">
+          <div class="font-mono font-bold text-lg" :style="`color: ${scoreColor}`">{{ dopamineScore }}</div>
+          <div class="text-[9px] text-muted uppercase tracking-widest">Score</div>
+        </div>
+        <div class="text-center">
+          <div class="font-mono font-bold text-white text-lg">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }}</div>
+          <div class="text-[9px] text-muted uppercase tracking-widest">Today</div>
+        </div>
+      </div>
+      <button @click="signOut" class="w-full border border-border text-muted py-3 rounded-xl text-sm font-bold hover:text-white hover:border-white/20 transition-all">
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const { createApp, ref, computed, watch, onMounted, inject, provide, nextTick } = Vue;
+
+// ─── Constants ─────────────────────────────────────────────────────────────
+
+const COACHES = {
+  drill_sergeant: { name: 'Drill Sergeant', emoji: '🎖️', color: '#f06060', tagline: 'No excuses. No mercy.' },
+  stoic_mentor:   { name: 'Stoic Mentor',   emoji: '🏛️', color: '#b8f058', tagline: 'Wisdom through consistent action.' },
+  anime_sensei:   { name: 'Anime Sensei',   emoji: '⚡', color: '#7b6af0', tagline: 'This is your training arc.' },
+  goggins:        { name: 'Stay Hard',       emoji: '🔥', color: '#f5c840', tagline: 'Callus the mind.' },
+  ceo_coach:      { name: 'CEO Coach',       emoji: '📈', color: '#40f5c8', tagline: 'Your habits are your P&L.' },
+  calm_therapist: { name: 'Calm Therapist', emoji: '🌿', color: '#f0a060', tagline: 'Compassionate but firm.' },
+};
+
+const NAV_ITEMS = [
+  { id: 'coach',   icon: '🤖', label: 'Coach'   },
+  { id: 'checkin', icon: '☀️', label: 'Check-in' },
+  { id: 'habits',  icon: '✓',  label: 'Habits'  },
+  { id: 'goals',   icon: '🎯', label: 'Goals'   },
+  { id: 'stats',   icon: '📊', label: 'Stats'   },
+  { id: 'review',  icon: '⭐', label: 'Review'  },
+];
+
+// ─── Supabase singleton ─────────────────────────────────────────────────────
+let sbClient = null;
+function getSB() { return sbClient; }
+
+// ─── Shared state (poor-man's store) ────────────────────────────────────────
+const state = {
+  user: ref(null),
+  view: ref('auth'),
+  userName: ref(''),
+  userEmail: ref(''),
+  personality: ref('stoic_mentor'),
+  monkMode: ref(false),
+  streak: ref(0),
+  dopamineScore: ref(0),
+  habits: ref([]),
+  goals: ref([]),
+  morningDone: ref(false),
+  eveningDone: ref(false),
+  morningMission: ref(''),
+  coachMemory: ref(''),
+  identityStatement: ref(''),
+};
+
+// ─── Root app ───────────────────────────────────────────────────────────────
+const app = createApp({
+  setup() {
+    const supabaseConfigured = ref(false);
+    const configUrl = ref('');
+    const configKey = ref('');
+    const authTab = ref('login');
+    const authEmail = ref('');
+    const authPassword = ref('');
+    const authName = ref('');
+    const authError = ref('');
+    const authLoading = ref(false);
+    const showProfile = ref(false);
+
+    const coaches = COACHES;
+    const navItems = NAV_ITEMS;
+
+    // Mirror shared state into template
+    const { user, view, userName, userEmail, personality, monkMode, streak, dopamineScore, habits, goals, morningDone, eveningDone } = state;
+
+    const scoreColor = computed(() => {
+      const s = dopamineScore.value;
+      if (s >= 80) return '#b8f058';
+      if (s >= 50) return '#f5c840';
+      return '#f06060';
+    });
+
+    function initSupabase() {
+      if (!configUrl.value || !configKey.value) return;
+      sbClient = supabase.createClient(configUrl.value.trim(), configKey.value.trim());
+      supabaseConfigured.value = true;
+      listenAuth();
+    }
+
+    function listenAuth() {
+      const sb = getSB();
+      if (!sb) return;
+      sb.auth.onAuthStateChange(async (event, session) => {
+        state.user.value = session?.user ?? null;
+        if (state.user.value) {
+          await loadUserData();
+          view.value = 'coach';
+        } else {
+          view.value = 'auth';
+        }
+      });
+      sb.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          state.user.value = data.session.user;
+          loadUserData().then(() => { view.value = 'coach'; });
+        }
+      });
+    }
+
+    async function loadUserData() {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid) return;
+
+      const today = new Date().toISOString().split('T')[0];
+
+      const [profileRes, habitsRes, goalsRes, checkinRes] = await Promise.all([
+        sb.from('users').select('name, personality, streak, dopamine_score, monk_mode, identity_statement, coach_memory').eq('id', uid).single(),
+        sb.from('habits').select('id, name, emoji, streak_days').eq('user_id', uid),
+        sb.from('goals').select('id, name, category, progress, target, deadline').eq('user_id', uid),
+        sb.from('check_ins').select('type, mission, completed').eq('user_id', uid).eq('date', today),
+      ]);
+
+      const profile = profileRes.data;
+      if (profile) {
+        state.userName.value = profile.name || state.user.value.email?.split('@')[0] || 'You';
+        state.userEmail.value = state.user.value.email || '';
+        state.personality.value = profile.personality || 'stoic_mentor';
+        state.streak.value = profile.streak || 0;
+        state.dopamineScore.value = profile.dopamine_score || 0;
+        state.monkMode.value = profile.monk_mode || false;
+        state.identityStatement.value = profile.identity_statement || '';
+        state.coachMemory.value = profile.coach_memory || '';
+      }
+
+      // Habits with today's completions
+      const rawHabits = habitsRes.data || [];
+      if (rawHabits.length > 0) {
+        const { data: comps } = await sb.from('habit_completions').select('habit_id').eq('date', today).in('habit_id', rawHabits.map(h => h.id));
+        const doneSet = new Set((comps || []).map(c => c.habit_id));
+        state.habits.value = rawHabits.map(h => ({ ...h, completedToday: doneSet.has(h.id) }));
+      } else {
+        state.habits.value = [];
+      }
+
+      state.goals.value = goalsRes.data || [];
+
+      const checkins = checkinRes.data || [];
+      state.morningDone.value = checkins.some(c => c.type === 'morning');
+      state.eveningDone.value = checkins.some(c => c.type === 'evening');
+      state.morningMission.value = checkins.find(c => c.type === 'morning')?.mission || '';
+    }
+
+    async function authSubmit() {
+      const sb = getSB();
+      if (!sb) return;
+      authError.value = '';
+      authLoading.value = true;
+      try {
+        if (authTab.value === 'login') {
+          const { error } = await sb.auth.signInWithPassword({ email: authEmail.value, password: authPassword.value });
+          if (error) throw error;
+        } else {
+          const { data, error } = await sb.auth.signUp({ email: authEmail.value, password: authPassword.value });
+          if (error) throw error;
+          if (data.user) {
+            await sb.from('users').upsert({ id: data.user.id, name: authName.value || 'Monk', personality: 'stoic_mentor', streak: 0, dopamine_score: 50 });
+          }
+        }
+      } catch (e) {
+        authError.value = e.message;
+      } finally {
+        authLoading.value = false;
+      }
+    }
+
+    async function signOut() {
+      showProfile.value = false;
+      await getSB()?.auth.signOut();
+    }
+
+    function setView(v) { view.value = v; showProfile.value = false; }
+
+    return {
+      supabaseConfigured, configUrl, configKey, initSupabase,
+      authTab, authEmail, authPassword, authName, authError, authLoading, authSubmit,
+      view, setView, coaches, navItems,
+      userName, userEmail, personality, monkMode, streak, dopamineScore, habits, goals,
+      morningDone, eveningDone, scoreColor, showProfile, signOut,
+    };
+  }
+});
+
+// ─── Coach Screen ────────────────────────────────────────────────────────────
+app.component('coach-screen', {
+  setup() {
+    const { view, userName, personality, monkMode, streak, dopamineScore, habits, goals, morningDone, eveningDone, morningMission, coachMemory, identityStatement } = state;
+    const messages = ref([]);
+    const inputText = ref('');
+    const sending = ref(false);
+    const chatEl = ref(null);
+    const isPro = ref(false);
+    const showCoachSelect = ref(false);
+
+    const coaches = COACHES;
+    const coach = computed(() => coaches[personality.value] || coaches.stoic_mentor);
+
+    const quickChips = computed(() => {
+      const missed = habits.value.filter(h => !h.completedToday).map(h => h.name);
+      const chips = [];
+      if (missed.length > 0) chips.push({ label: `❌ ${missed[0]}`, msg: `I haven't done ${missed[0]}. I keep putting it off.` });
+      if (state.morningMission.value) chips.push({ label: '🎯 Mission check', msg: `How am I doing on my mission: "${state.morningMission.value}"?` });
+      chips.push({ label: '💪 Push me', msg: "I need a push right now. Don't be gentle." });
+      chips.push({ label: '🌙 End of day', msg: 'Help me close today properly and set up tomorrow.' });
+      return chips.slice(0, 4);
+    });
+
+    function buildContext() {
+      const today = new Date().toISOString().split('T')[0];
+      const doneHabits = habits.value.filter(h => h.completedToday).map(h => h.name);
+      const missedHabits = habits.value.filter(h => !h.completedToday).map(h => h.name);
+      return {
+        userName: userName.value,
+        streak: streak.value,
+        dopamineScore: dopamineScore.value,
+        doneHabits,
+        missedHabits,
+        morningMission: state.morningMission.value,
+        identityStatement: identityStatement.value,
+        goals: goals.value.map(g => ({ name: g.name, progress: g.progress, daysSince: 0 })),
+        personality: personality.value,
+        monkMode: monkMode.value,
+        coachMemory: coachMemory.value,
+      };
+    }
+
+    async function send(text) {
+      const t = (text || inputText.value).trim();
+      if (!t || sending.value) return;
+      inputText.value = '';
+
+      messages.value.push({ id: Date.now(), role: 'user', text: t });
+      sending.value = true;
+      scrollToBottom();
+
+      try {
+        const sb = getSB();
+        const history = messages.value.slice(-10).map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text }));
+        const { data, error } = await sb.functions.invoke('chat', {
+          body: { message: t, personality: personality.value, context: buildContext(), history }
+        });
+        if (error) throw error;
+        if (data?.limitReached) {
+          messages.value.push({ id: Date.now()+1, role: 'ai', text: "You've hit today's message limit. Upgrade to Pro for unlimited coaching." });
+        } else {
+          messages.value.push({ id: Date.now()+1, role: 'ai', text: data.text || "..." });
+        }
+      } catch (e) {
+        messages.value.push({ id: Date.now()+1, role: 'ai', text: "Connection error. Check your Supabase Edge Functions are deployed." });
+      } finally {
+        sending.value = false;
+        scrollToBottom();
+      }
+    }
+
+    async function sendPepTalk() {
+      sending.value = true;
+      try {
+        const sb = getSB();
+        const { data } = await sb.functions.invoke('pep-talk', { body: { personality: personality.value, context: buildContext() } });
+        messages.value.push({ id: Date.now(), role: 'ai', text: data?.text || '...' });
+      } finally {
+        sending.value = false;
+        scrollToBottom();
+      }
+    }
+
+    async function changeCoach(id) {
+      showCoachSelect.value = false;
+      personality.value = id;
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (sb && uid) await sb.from('users').update({ personality: id }).eq('id', uid);
+    }
+
+    function scrollToBottom() {
+      nextTick(() => { if (chatEl.value) chatEl.value.scrollTop = chatEl.value.scrollHeight; });
+    }
+
+    function formatMsg(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+
+    onMounted(() => {
+      if (messages.value.length === 0) {
+        const c = COACHES[personality.value];
+        messages.value.push({ id: 0, role: 'ai', text: `${userName.value}. I'm ${c?.name || 'your coach'}. I'm tracking everything — habits, goals, check-ins. I don't forget. **What are we working on today?**` });
+      }
+    });
+
+    return { messages, inputText, sending, chatEl, coach, coaches, personality, quickChips, send, sendPepTalk, changeCoach, formatMsg, showCoachSelect, monkMode, streak, dopamineScore, coachMemory, habits };
+  },
+  template: `
+  <div class="flex h-full overflow-hidden">
+
+    <!-- Chat area -->
+    <div class="flex flex-col flex-1 min-w-0">
+
+      <!-- Chat header -->
+      <div class="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <button @click="showCoachSelect=!showCoachSelect"
+            class="flex items-center gap-2 bg-bg2 border border-border rounded-full px-3 py-1.5 hover:border-white/10 transition-colors">
+            <span class="text-base">{{ coach.emoji }}</span>
+            <span class="text-xs font-bold text-white/70">{{ coach.name }}</span>
+            <span class="text-xs text-muted">▾</span>
+          </button>
+          <div v-if="monkMode" class="flex items-center gap-1.5 bg-purple/10 border border-purple/20 rounded-full px-2.5 py-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-purple animate-pulse"></span>
+            <span class="text-[10px] font-bold text-purple uppercase tracking-wider">Monk Mode</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 desktop-only">
+          <span class="font-mono text-xs text-gold font-bold">🔥 {{ streak }}</span>
+          <div class="w-px h-4 bg-border"></div>
+          <button @click="sendPepTalk" :disabled="sending" class="text-xs font-bold text-muted hover:text-white transition-colors disabled:opacity-40">
+            ⚡ Pep talk
+          </button>
+        </div>
+      </div>
+
+      <!-- Coach selector dropdown -->
+      <div v-if="showCoachSelect" class="absolute top-[114px] left-[80px] z-30 bg-bg2 border border-border rounded-2xl p-3 shadow-2xl w-72 fade-in desktop-only">
+        <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-2 px-1">Select Coach</div>
+        <div class="space-y-1">
+          <button v-for="(c, id) in coaches" :key="id" @click="changeCoach(id)"
+            :class="['w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors', personality===id ? 'bg-bg3' : 'hover:bg-bg3']">
+            <span class="text-base">{{ c.emoji }}</span>
+            <div class="flex-1">
+              <div class="text-xs font-bold text-white">{{ c.name }}</div>
+              <div class="text-[10px] text-muted">{{ c.tagline }}</div>
+            </div>
+            <div v-if="personality===id" class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="\`background: \${c.color}\`"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div ref="chatEl" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        <div v-for="msg in messages" :key="msg.id" :class="['msg-enter flex', msg.role==='user' ? 'justify-end' : 'justify-start']">
+          <div v-if="msg.role==='ai'" class="flex gap-2.5 max-w-[85%] md:max-w-[70%]">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">
+              {{ coach.emoji }}
+            </div>
+            <div class="bg-bg2 border border-border rounded-2xl rounded-tl-sm px-4 py-3">
+              <p class="text-[13px] text-white/80 leading-relaxed" v-html="formatMsg(msg.text)"></p>
+            </div>
+          </div>
+          <div v-else class="max-w-[80%] rounded-2xl rounded-tr-sm px-4 py-3" :style="\`background: \${coach.color}12; border: 1px solid \${coach.color}20\`">
+            <p class="text-[13px] leading-relaxed font-medium" :style="\`color: \${coach.color}\`">{{ msg.text }}</p>
+          </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div v-if="sending" class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">{{ coach.emoji }}</div>
+          <div class="bg-bg2 border border-border rounded-2xl rounded-tl-sm px-4 py-3">
+            <div class="typing flex gap-1 items-center h-4">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick chips -->
+      <div class="px-4 pb-2 flex gap-2 overflow-x-auto flex-shrink-0">
+        <button v-for="chip in quickChips" :key="chip.label" @click="send(chip.msg)"
+          class="flex-shrink-0 text-[11px] font-bold text-white/50 bg-bg2 border border-border rounded-full px-3 py-1.5 hover:text-white hover:border-white/15 transition-all">
+          {{ chip.label }}
+        </button>
+      </div>
+
+      <!-- Input -->
+      <div class="px-4 pb-4 flex-shrink-0">
+        <div class="flex gap-2 items-end bg-bg2 border border-border chat-input rounded-2xl px-4 py-3 transition-colors">
+          <textarea v-model="inputText" @keydown.enter.exact.prevent="send()" placeholder="Talk to your coach..."
+            class="flex-1 bg-transparent text-sm text-white placeholder-muted leading-relaxed max-h-32 min-h-[20px]"
+            rows="1" @input="$event.target.style.height='auto'; $event.target.style.height=$event.target.scrollHeight+'px'"></textarea>
+          <button @click="send()" :disabled="!inputText.trim() || sending"
+            class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-30"
+            :style="inputText.trim() ? \`background: \${coach.color}; color: #0a0a0a\` : 'background: #1a1a1a; color: #555'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context panel (desktop) -->
+    <aside class="desktop-only w-72 border-l border-border flex flex-col overflow-y-auto flex-shrink-0">
+      <div class="p-4 space-y-4">
+
+        <!-- Stats -->
+        <div class="bg-bg2 border border-border rounded-2xl p-4">
+          <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">Today's Stats</div>
+          <div class="flex gap-4">
+            <div class="text-center flex-1">
+              <div class="font-mono font-bold text-white text-xl">🔥 {{ streak }}</div>
+              <div class="text-[9px] text-muted uppercase tracking-widest mt-0.5">Streak</div>
+            </div>
+            <div class="w-px bg-border"></div>
+            <div class="text-center flex-1">
+              <div class="font-mono font-bold text-xl" :style="\`color: \${streak > 7 ? '#b8f058' : '#f5c840'}\`">{{ habits.filter(h=>h.completedToday).length }}/{{ habits.length }}</div>
+              <div class="text-[9px] text-muted uppercase tracking-widest mt-0.5">Habits</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Habit quick view -->
+        <div v-if="habits.length" class="bg-bg2 border border-border rounded-2xl p-4">
+          <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">Today's Habits</div>
+          <div class="space-y-2">
+            <div v-for="h in habits.slice(0,5)" :key="h.id" class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-md flex items-center justify-center flex-shrink-0" :style="h.completedToday ? \`background: \${coach.color}20; border: 1px solid \${coach.color}40\` : 'border: 1px solid #2a2a2a'">
+                <svg v-if="h.completedToday" width="8" height="8" viewBox="0 0 12 12" fill="none" :stroke="coach.color" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+              </div>
+              <span class="text-xs" :class="h.completedToday ? 'text-white/60' : 'text-muted'">{{ h.emoji }} {{ h.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coach memory -->
+        <div v-if="coachMemory" class="bg-bg2 border border-border rounded-2xl p-4">
+          <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-2">Coach Remembers</div>
+          <p class="text-xs text-white/40 leading-relaxed italic">"{{ coachMemory.slice(0, 140) }}{{ coachMemory.length > 140 ? '…' : '' }}"</p>
+        </div>
+
+      </div>
+    </aside>
+  </div>
+  `
+});
+
+// ─── Habits Screen ──────────────────────────────────────────────────────────
+app.component('habits-screen', {
+  setup() {
+    const habits = state.habits;
+    const personality = state.personality;
+    const coach = computed(() => COACHES[personality.value] || COACHES.stoic_mentor);
+    const adding = ref(false);
+    const newName = ref('');
+    const newEmoji = ref('✅');
+    const loading = ref(false);
+    const today = new Date().toISOString().split('T')[0];
+
+    async function toggle(habit) {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid) return;
+      if (habit.completedToday) {
+        await sb.from('habit_completions').delete().eq('habit_id', habit.id).eq('date', today);
+        habit.completedToday = false;
+      } else {
+        await sb.from('habit_completions').upsert({ habit_id: habit.id, date: today, user_id: uid });
+        habit.completedToday = true;
+      }
+    }
+
+    async function addHabit() {
+      const name = newName.value.trim();
+      if (!name) return;
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid) return;
+      const { data } = await sb.from('habits').insert({ user_id: uid, name, emoji: newEmoji.value, streak_days: 0 }).select().single();
+      if (data) habits.value.push({ ...data, completedToday: false });
+      newName.value = '';
+      adding.value = false;
+    }
+
+    async function deleteHabit(id) {
+      const sb = getSB();
+      if (!sb) return;
+      await sb.from('habits').delete().eq('id', id);
+      habits.value = habits.value.filter(h => h.id !== id);
+    }
+
+    const completedCount = computed(() => habits.value.filter(h => h.completedToday).length);
+    const pct = computed(() => habits.value.length ? Math.round(completedCount.value / habits.value.length * 100) : 0);
+
+    return { habits, coach, adding, newName, newEmoji, loading, toggle, addHabit, deleteHabit, completedCount, pct };
+  },
+  template: `
+  <div class="h-full overflow-y-auto px-4 py-6 max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="font-syne font-black text-2xl text-white tracking-tight">Habits</h1>
+        <p class="text-muted text-sm mt-0.5">{{ completedCount }} / {{ habits.length }} done today</p>
+      </div>
+      <button @click="adding=!adding" class="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+        :style="adding ? \`border-color: \${coach.color}40; color: \${coach.color}\` : 'border-color: #252525; color: #555; hover:color: white'">
+        {{ adding ? '✕ Cancel' : '+ Add' }}
+      </button>
+    </div>
+
+    <!-- Progress bar -->
+    <div v-if="habits.length" class="mb-6">
+      <div class="flex justify-between text-[10px] text-muted font-mono mb-1.5">
+        <span>Progress</span><span>{{ pct }}%</span>
+      </div>
+      <div class="h-1.5 bg-bg3 rounded-full overflow-hidden">
+        <div class="h-full rounded-full progress-bar" :style="\`width: \${pct}%; background: \${coach.color}\`"></div>
+      </div>
+    </div>
+
+    <!-- Add form -->
+    <div v-if="adding" class="bg-bg2 border border-border rounded-2xl p-4 mb-4 fade-in">
+      <div class="flex gap-2 mb-3">
+        <input v-model="newEmoji" class="w-14 bg-bg3 border border-border rounded-xl text-center text-xl py-2" maxlength="2" />
+        <input v-model="newName" @keyup.enter="addHabit" placeholder="Habit name..." class="flex-1 bg-bg3 border border-border rounded-xl px-3 py-2 text-sm text-white focus:border-lime/30 transition-colors" />
+      </div>
+      <button @click="addHabit" class="w-full py-2.5 rounded-xl text-sm font-bold transition-colors" :style="\`background: \${coach.color}; color: #0a0a0a\`">Add Habit</button>
+    </div>
+
+    <!-- Habit list -->
+    <div class="space-y-2">
+      <div v-if="!habits.length" class="text-center py-16 text-muted text-sm">
+        No habits yet. Add your first one above.
+      </div>
+      <div v-for="habit in habits" :key="habit.id" class="habit-row flex items-center gap-3 bg-bg2 border border-border rounded-2xl px-4 py-4 group transition-all">
+        <button @click="toggle(habit)" class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+          :style="habit.completedToday ? \`background: \${coach.color}20; border: 1.5px solid \${coach.color}60\` : 'background: transparent; border: 1.5px solid #2a2a2a; hover:border-color: #444'">
+          <svg v-if="habit.completedToday" width="12" height="12" viewBox="0 0 12 12" fill="none" :stroke="coach.color" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+        </button>
+        <span class="text-xl flex-shrink-0">{{ habit.emoji }}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold" :class="habit.completedToday ? 'text-white/50 line-through' : 'text-white'">{{ habit.name }}</div>
+          <div v-if="habit.streak_days > 0" class="text-[10px] text-muted font-mono">🔥 {{ habit.streak_days }} day streak</div>
+        </div>
+        <button @click="deleteHabit(habit.id)" class="opacity-0 group-hover:opacity-100 text-muted hover:text-crimson transition-all text-lg leading-none px-1">×</button>
+      </div>
+    </div>
+  </div>
+  `
+});
+
+// ─── Goals Screen ───────────────────────────────────────────────────────────
+app.component('goals-screen', {
+  setup() {
+    const goals = state.goals;
+    const personality = state.personality;
+    const coach = computed(() => COACHES[personality.value] || COACHES.stoic_mentor);
+    const adding = ref(false);
+    const newGoal = ref({ name: '', category: 'health', target: '', deadline: '', progress: 0 });
+    const categories = ['health', 'business', 'mindset', 'finance', 'relationships'];
+    const catColors = { health: '#b8f058', business: '#40f5c8', mindset: '#7b6af0', finance: '#f5c840', relationships: '#f0a060' };
+
+    async function addGoal() {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid || !newGoal.value.name.trim()) return;
+      const { data } = await sb.from('goals').insert({ user_id: uid, ...newGoal.value }).select().single();
+      if (data) goals.value.push(data);
+      newGoal.value = { name: '', category: 'health', target: '', deadline: '', progress: 0 };
+      adding.value = false;
+    }
+
+    async function updateProgress(goal, delta) {
+      const next = Math.max(0, Math.min(100, goal.progress + delta));
+      const sb = getSB();
+      if (!sb) return;
+      goal.progress = next;
+      await sb.from('goals').update({ progress: next }).eq('id', goal.id);
+    }
+
+    async function deleteGoal(id) {
+      const sb = getSB();
+      if (!sb) return;
+      await sb.from('goals').delete().eq('id', id);
+      goals.value = goals.value.filter(g => g.id !== id);
+    }
+
+    return { goals, coach, adding, newGoal, addGoal, updateProgress, deleteGoal, categories, catColors };
+  },
+  template: `
+  <div class="h-full overflow-y-auto px-4 py-6 max-w-2xl mx-auto">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="font-syne font-black text-2xl text-white tracking-tight">Goals</h1>
+        <p class="text-muted text-sm mt-0.5">{{ goals.length }} active goals</p>
+      </div>
+      <button @click="adding=!adding" class="text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+        :style="adding ? \`border-color: \${coach.color}40; color: \${coach.color}\` : 'border-color: #252525; color: #555'">
+        {{ adding ? '✕ Cancel' : '+ Add' }}
+      </button>
+    </div>
+
+    <!-- Add form -->
+    <div v-if="adding" class="bg-bg2 border border-border rounded-2xl p-5 mb-4 fade-in space-y-3">
+      <input v-model="newGoal.name" placeholder="Goal name" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" />
+      <div class="flex gap-2">
+        <select v-model="newGoal.category" class="flex-1 bg-bg3 border border-border rounded-xl px-3 py-2.5 text-sm text-white appearance-none">
+          <option v-for="c in categories" :key="c" :value="c">{{ c.charAt(0).toUpperCase() + c.slice(1) }}</option>
+        </select>
+        <input v-model="newGoal.deadline" type="date" class="flex-1 bg-bg3 border border-border rounded-xl px-3 py-2.5 text-sm text-white" />
+      </div>
+      <input v-model="newGoal.target" placeholder="Target (e.g. Run 5km in under 25min)" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" />
+      <button @click="addGoal" class="w-full py-2.5 rounded-xl text-sm font-bold" :style="\`background: \${coach.color}; color: #0a0a0a\`">Add Goal</button>
+    </div>
+
+    <!-- Goals -->
+    <div class="space-y-3">
+      <div v-if="!goals.length" class="text-center py-16 text-muted text-sm">No goals yet. Set one above.</div>
+      <div v-for="goal in goals" :key="goal.id" class="bg-bg2 border border-border rounded-2xl p-5 group transition-all hover:border-white/5">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full font-mono" :style="\`background: \${catColors[goal.category] || '#b8f058'}15; color: \${catColors[goal.category] || '#b8f058'}\`">{{ goal.category }}</span>
+              <span v-if="goal.deadline" class="text-[10px] text-muted font-mono">⏳ {{ goal.deadline }}</span>
+            </div>
+            <div class="text-sm font-bold text-white">{{ goal.name }}</div>
+            <div v-if="goal.target" class="text-xs text-muted mt-0.5">{{ goal.target }}</div>
+          </div>
+          <button @click="deleteGoal(goal.id)" class="opacity-0 group-hover:opacity-100 text-muted hover:text-crimson transition-all ml-2 text-lg leading-none">×</button>
+        </div>
+        <!-- Progress -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 h-2 bg-bg3 rounded-full overflow-hidden">
+            <div class="h-full rounded-full progress-bar" :style="\`width: \${goal.progress}%; background: \${catColors[goal.category] || '#b8f058'}\`"></div>
+          </div>
+          <span class="font-mono text-xs font-bold text-white/50 w-8 text-right">{{ goal.progress }}%</span>
+          <div class="flex gap-1">
+            <button @click="updateProgress(goal, -10)" class="w-6 h-6 rounded-lg bg-bg3 border border-border text-muted text-xs hover:text-white transition-colors flex items-center justify-center">−</button>
+            <button @click="updateProgress(goal, 10)" class="w-6 h-6 rounded-lg bg-bg3 border border-border text-muted text-xs hover:text-white transition-colors flex items-center justify-center" :style="goal.progress > 0 ? \`border-color: \${catColors[goal.category]}40; color: \${catColors[goal.category]}\` : ''">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `
+});
+
+// ─── Check-in Screen ────────────────────────────────────────────────────────
+app.component('checkin-screen', {
+  setup() {
+    const personality = state.personality;
+    const coach = computed(() => COACHES[personality.value] || COACHES.stoic_mentor);
+    const tab = ref('morning');
+    const morning = ref({ mission: '', energy: 3, distraction: '' });
+    const evening = ref({ completed: null, reason: '' });
+    const submitting = ref(false);
+    const submitted = ref({ morning: state.morningDone.value, evening: state.eveningDone.value });
+    const aiResponse = ref('');
+
+    async function submitMorning() {
+      if (!morning.value.mission.trim()) return;
+      submitting.value = true;
+      aiResponse.value = '';
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        await sb.from('check_ins').upsert({ user_id: uid, date: today, type: 'morning', mission: morning.value.mission, energy: morning.value.energy, distraction: morning.value.distraction });
+        state.morningDone.value = true;
+        state.morningMission.value = morning.value.mission;
+        submitted.value.morning = true;
+        const { data } = await sb.functions.invoke('morning-brief', {
+          body: { personality: personality.value, context: { userName: state.userName.value, streak: state.streak.value, dopamineScore: state.dopamineScore.value, doneHabits: [], missedHabits: state.habits.value.map(h=>h.name), identityStatement: state.identityStatement.value, goals: state.goals.value.map(g=>({name:g.name,progress:g.progress,daysSince:0})) }, mission: morning.value.mission, energy: morning.value.energy, distraction: morning.value.distraction }
+        });
+        aiResponse.value = data?.text || '';
+      } finally { submitting.value = false; }
+    }
+
+    async function submitEvening() {
+      if (evening.value.completed === null) return;
+      submitting.value = true;
+      aiResponse.value = '';
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        const done = state.habits.value.filter(h=>h.completedToday).length;
+        const total = state.habits.value.length;
+        await sb.from('check_ins').upsert({ user_id: uid, date: today, type: 'evening', completed: evening.value.completed, reason: evening.value.reason });
+        state.eveningDone.value = true;
+        submitted.value.evening = true;
+        const { data } = await sb.functions.invoke('evening-feedback', {
+          body: { personality: personality.value, context: { userName: state.userName.value, streak: state.streak.value, dopamineScore: state.dopamineScore.value, doneHabits: state.habits.value.filter(h=>h.completedToday).map(h=>h.name), missedHabits: state.habits.value.filter(h=>!h.completedToday).map(h=>h.name), morningMission: state.morningMission.value, identityStatement: state.identityStatement.value, goals: state.goals.value.map(g=>({name:g.name,progress:g.progress,daysSince:0})) }, mission: state.morningMission.value, completed: evening.value.completed, reason: evening.value.reason, completedHabits: done, totalHabits: total }
+        });
+        aiResponse.value = data?.text || '';
+      } finally { submitting.value = false; }
+    }
+
+    return { tab, morning, evening, submitting, submitted, aiResponse, coach, submitMorning, submitEvening };
+  },
+  template: `
+  <div class="h-full overflow-y-auto px-4 py-6 max-w-xl mx-auto">
+    <h1 class="font-syne font-black text-2xl text-white tracking-tight mb-2">Check-in</h1>
+    <p class="text-muted text-sm mb-6">Two moments. Two truths. No hiding.</p>
+
+    <!-- Tabs -->
+    <div class="flex bg-bg2 border border-border rounded-xl p-1 mb-6">
+      <button @click="tab='morning'" :class="['flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all', tab==='morning' ? 'bg-bg3 text-white' : 'text-muted']">
+        ☀️ Morning
+        <span v-if="submitted.morning" class="ml-1.5 text-lime">✓</span>
+      </button>
+      <button @click="tab='evening'" :class="['flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all', tab==='evening' ? 'bg-bg3 text-white' : 'text-muted']">
+        🌙 Evening
+        <span v-if="submitted.evening" class="ml-1.5 text-lime">✓</span>
+      </button>
+    </div>
+
+    <!-- Morning -->
+    <div v-if="tab==='morning'">
+      <div v-if="submitted.morning" class="bg-bg2 border border-lime/20 rounded-2xl p-6 text-center fade-in">
+        <div class="text-3xl mb-3">☀️</div>
+        <div class="text-white font-bold mb-1">Morning check-in done.</div>
+        <div class="text-muted text-sm">Mission: "{{ morning.mission || 'locked in' }}"</div>
+      </div>
+      <div v-else class="space-y-4">
+        <div class="bg-bg2 border border-border rounded-2xl p-5">
+          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Today's Mission</label>
+          <textarea v-model="morning.mission" placeholder="I will accomplish..." rows="3" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors leading-relaxed"></textarea>
+        </div>
+        <div class="bg-bg2 border border-border rounded-2xl p-5">
+          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-3">Energy Level</label>
+          <div class="flex gap-2">
+            <button v-for="n in [1,2,3,4,5]" :key="n" @click="morning.energy=n" class="flex-1 py-2 rounded-lg text-sm transition-all"
+              :style="morning.energy>=n ? \`background: \${coach.color}20; color: \${coach.color}; border: 1px solid \${coach.color}40\` : 'background: #1a1a1a; color: #555; border: 1px solid transparent'">
+              {{ n }}
+            </button>
+          </div>
+        </div>
+        <div class="bg-bg2 border border-border rounded-2xl p-5">
+          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Biggest Distraction to Avoid</label>
+          <input v-model="morning.distraction" placeholder="What will try to derail you?" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors" />
+        </div>
+        <button @click="submitMorning" :disabled="!morning.mission.trim() || submitting" class="w-full py-4 rounded-2xl text-sm font-syne font-black transition-all disabled:opacity-40" :style="\`background: \${coach.color}; color: #0a0a0a\`">
+          {{ submitting ? 'Getting response...' : 'Lock In Morning Mission' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Evening -->
+    <div v-if="tab==='evening'">
+      <div v-if="submitted.evening" class="bg-bg2 border border-border rounded-2xl p-6 text-center fade-in">
+        <div class="text-3xl mb-3">🌙</div>
+        <div class="text-white font-bold mb-1">Evening debrief done.</div>
+        <div class="text-muted text-sm">See you tomorrow.</div>
+      </div>
+      <div v-else class="space-y-4">
+        <div class="bg-bg2 border border-border rounded-2xl p-5">
+          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-3">Did you complete your mission?</label>
+          <div class="flex gap-3">
+            <button @click="evening.completed=true" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all border"
+              :style="evening.completed===true ? 'background: rgba(184,240,88,0.1); border-color: rgba(184,240,88,0.4); color: #b8f058' : 'border-color: #252525; color: #555'">
+              ✓ Yes
+            </button>
+            <button @click="evening.completed=false" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all border"
+              :style="evening.completed===false ? 'background: rgba(240,96,96,0.1); border-color: rgba(240,96,96,0.4); color: #f06060' : 'border-color: #252525; color: #555'">
+              ✗ No
+            </button>
+          </div>
+        </div>
+        <div v-if="evening.completed===false" class="bg-bg2 border border-border rounded-2xl p-5 fade-in">
+          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">What happened?</label>
+          <textarea v-model="evening.reason" placeholder="Be honest. Your coach will remember this." rows="3" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors leading-relaxed"></textarea>
+        </div>
+        <button @click="submitEvening" :disabled="evening.completed===null || submitting" class="w-full py-4 rounded-2xl text-sm font-syne font-black transition-all disabled:opacity-40" :style="\`background: \${coach.color}; color: #0a0a0a\`">
+          {{ submitting ? 'Getting feedback...' : 'Submit Evening Debrief' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- AI response -->
+    <div v-if="aiResponse" class="mt-4 bg-bg2 border border-border rounded-2xl p-5 fade-in">
+      <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">{{ coach.emoji }} {{ coach.name }}</div>
+      <p class="text-sm text-white/70 leading-relaxed" v-html="aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')"></p>
+    </div>
+  </div>
+  `
+});
+
+// ─── Stats Screen ───────────────────────────────────────────────────────────
+app.component('stats-screen', {
+  setup() {
+    const personality = state.personality;
+    const coach = computed(() => COACHES[personality.value] || COACHES.stoic_mentor);
+    const streak = state.streak;
+    const dopamineScore = state.dopamineScore;
+    const habits = state.habits;
+    const scoreColor = computed(() => { const s = dopamineScore.value; return s >= 80 ? '#b8f058' : s >= 50 ? '#f5c840' : '#f06060'; });
+    const completedToday = computed(() => habits.value.filter(h => h.completedToday).length);
+
+    // Week data
+    const weekDays = ref([]);
+    const loading = ref(true);
+
+    onMounted(async () => {
+      const sb = getSB();
+      const uid = state.user.value?.id;
+      if (!sb || !uid) { loading.value = false; return; }
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(d.toISOString().split('T')[0]);
+      }
+      const habitIds = habits.value.map(h => h.id);
+      if (habitIds.length === 0) { weekDays.value = days.map(d => ({ date: d, count: 0 })); loading.value = false; return; }
+      const { data: comps } = await sb.from('habit_completions').select('date, habit_id').gte('date', days[0]).lte('date', days[6]).in('habit_id', habitIds);
+      const byDay = {};
+      (comps || []).forEach(c => { byDay[c.date] = (byDay[c.date] || 0) + 1; });
+      weekDays.value = days.map(d => ({ date: d, count: byDay[d] || 0, label: ['S','M','T','W','T','F','S'][new Date(d+'T12:00:00').getDay()] }));
+      loading.value = false;
+    });
+
+    const maxCount = computed(() => Math.max(1, ...weekDays.value.map(d => d.count)));
+
+    return { streak, dopamineScore, scoreColor, coach, habits, completedToday, weekDays, maxCount, loading };
+  },
+  template: `
+  <div class="h-full overflow-y-auto px-4 py-6 max-w-2xl mx-auto">
+    <h1 class="font-syne font-black text-2xl text-white tracking-tight mb-6">Stats</h1>
+
+    <!-- Score cards -->
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      <div class="bg-bg2 border border-border rounded-2xl p-4 text-center">
+        <div class="font-mono font-black text-2xl text-gold">🔥 {{ streak }}</div>
+        <div class="text-[9px] text-muted uppercase tracking-widest mt-1">Day Streak</div>
+      </div>
+      <div class="bg-bg2 border border-border rounded-2xl p-4 text-center">
+        <div class="font-mono font-black text-2xl" :style="\`color: \${scoreColor}\`">{{ dopamineScore }}</div>
+        <div class="text-[9px] text-muted uppercase tracking-widest mt-1">Score</div>
+      </div>
+      <div class="bg-bg2 border border-border rounded-2xl p-4 text-center">
+        <div class="font-mono font-black text-2xl text-white">{{ completedToday }}/{{ habits.length }}</div>
+        <div class="text-[9px] text-muted uppercase tracking-widest mt-1">Today</div>
+      </div>
+    </div>
+
+    <!-- Week chart -->
+    <div class="bg-bg2 border border-border rounded-2xl p-5 mb-6">
+      <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-4">This Week</div>
+      <div v-if="loading" class="h-24 flex items-center justify-center text-muted text-sm">Loading...</div>
+      <div v-else class="flex items-end gap-2 h-24">
+        <div v-for="day in weekDays" :key="day.date" class="flex-1 flex flex-col items-center gap-1.5">
+          <div class="flex-1 w-full flex items-end">
+            <div class="w-full rounded-t-lg transition-all duration-500" :style="\`height: \${day.count > 0 ? Math.max(12, (day.count/maxCount)*100) : 4}%; background: \${day.date === new Date().toISOString().split('T')[0] ? coach.color : '#252525'}\`"></div>
+          </div>
+          <span class="text-[9px] text-muted font-mono">{{ day.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score explanation -->
+    <div class="bg-bg2 border border-border rounded-2xl p-5">
+      <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">Score Breakdown</div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-white/60">Habit completion rate</span>
+          <span class="font-mono text-xs text-white/60">{{ habits.length ? Math.round(completedToday/habits.length*100) : 0 }}%</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-white/60">Active streak</span>
+          <span class="font-mono text-xs text-gold">{{ streak }} days</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-white/60">Dopamine score</span>
+          <span class="font-mono text-xs font-bold" :style="\`color: \${scoreColor}\`">{{ dopamineScore }}/100</span>
+        </div>
+      </div>
+      <div class="mt-4 h-1.5 bg-bg3 rounded-full overflow-hidden">
+        <div class="h-full rounded-full progress-bar" :style="\`width: \${dopamineScore}%; background: \${scoreColor}\`"></div>
+      </div>
+    </div>
+  </div>
+  `
+});
+
+// ─── Review Screen ──────────────────────────────────────────────────────────
+app.component('review-screen', {
+  setup() {
+    const personality = state.personality;
+    const coach = computed(() => COACHES[personality.value] || COACHES.stoic_mentor);
+    const review = ref('');
+    const loading = ref(false);
+
+    async function generateReview() {
+      loading.value = true;
+      review.value = '';
+      const sb = getSB();
+      const habits = state.habits.value;
+      const done = habits.filter(h => h.completedToday).length;
+      try {
+        const { data } = await sb.functions.invoke('review', {
+          body: {
+            personality: personality.value,
+            context: { userName: state.userName.value, streak: state.streak.value, dopamineScore: state.dopamineScore.value, doneHabits: habits.filter(h=>h.completedToday).map(h=>h.name), missedHabits: habits.filter(h=>!h.completedToday).map(h=>h.name), morningMission: state.morningMission.value, identityStatement: state.identityStatement.value, goals: state.goals.value.map(g=>({name:g.name,progress:g.progress,daysSince:0})), coachMemory: state.coachMemory.value },
+            weekTotal: done, weekMax: habits.length * 7, failedMissions: 0, failureReasons: [],
+          }
+        });
+        review.value = data?.text || 'No review generated.';
+      } catch(e) {
+        review.value = 'Error generating review. Make sure your Edge Functions are deployed.';
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    return { review, loading, generateReview, coach };
+  },
+  template: `
+  <div class="h-full overflow-y-auto px-4 py-6 max-w-xl mx-auto">
+    <h1 class="font-syne font-black text-2xl text-white tracking-tight mb-2">Weekly Review</h1>
+    <p class="text-muted text-sm mb-6">Your coach's honest assessment. No sugar-coating.</p>
+
+    <div v-if="!review && !loading" class="bg-bg2 border border-dashed border-border rounded-2xl p-10 text-center">
+      <div class="text-4xl mb-4">📋</div>
+      <div class="text-white font-bold mb-2">Ready for your review?</div>
+      <div class="text-muted text-sm mb-6">Your coach will analyze your week — habits, goals, check-ins, and patterns.</div>
+      <button @click="generateReview" class="px-8 py-3 rounded-xl text-sm font-syne font-black transition-all" :style="\`background: \${coach.color}; color: #0a0a0a\`">
+        Generate Review
+      </button>
+    </div>
+
+    <div v-if="loading" class="bg-bg2 border border-border rounded-2xl p-8 text-center fade-in">
+      <div class="typing flex gap-1.5 items-center justify-center h-8 mb-3">
+        <span style="width:7px;height:7px"></span><span style="width:7px;height:7px"></span><span style="width:7px;height:7px"></span>
+      </div>
+      <div class="text-muted text-sm">{{ coach.emoji }} Analyzing your week...</div>
+    </div>
+
+    <div v-if="review" class="fade-in">
+      <div class="bg-bg2 border border-border rounded-2xl p-6 mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xl">{{ coach.emoji }}</span>
+          <div>
+            <div class="text-xs font-bold text-white">{{ coach.name }}</div>
+            <div class="text-[10px] text-muted">Weekly Review</div>
+          </div>
+        </div>
+        <p class="text-sm text-white/75 leading-relaxed whitespace-pre-wrap" v-html="review.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')"></p>
+      </div>
+      <button @click="generateReview" class="w-full border border-border text-muted py-3 rounded-xl text-sm font-bold hover:text-white hover:border-white/15 transition-all">
+        Regenerate
+      </button>
+    </div>
+  </div>
+  `
+});
+
+// ─── Mount ─────────────────────────────────────────────────────────────────
+app.mount('#app');
+</script>
+
+</body>
+</html>

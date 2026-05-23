@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monk.ai — The AI Coach That Doesn't Let You Off the Hook</title>
+
+  <link href="https://fonts.cdnfonts.com/css/cabinet-grotesk" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lime:   '#b8f058',
+            purple: '#7b6af0',
+            crimson:'#f06060',
+            gold:   '#f5c840',
+            teal:   '#40f5c8',
+            amber:  '#f0a060',
+          },
+          fontFamily: {
+            cabinet: ['"Cabinet Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/SplitText.min.js"></script>
+
+  <style>
+    *, *::before, *::after {
+      font-family: "Cabinet Grotesk", ui-sans-serif, system-ui, sans-serif;
+      box-sizing: border-box;
+    }
+    html { background: #070707; color: #f0f0f0; }
+
+    /* Noise overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-track { background: #070707; }
+    ::-webkit-scrollbar-thumb { background: #b8f058; }
+
+    /* Glass nav */
+    .glass-pill {
+      background: rgba(10, 10, 10, 0.72);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+    }
+
+    /* Hero phone mockup */
+    .phone-card {
+      background: #0e0e0e;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 28px;
+    }
+    .phone-card-glow {
+      box-shadow: 0 40px 120px rgba(184,240,88,0.12), 0 0 0 1px rgba(184,240,88,0.04);
+    }
+
+    /* Horizontal personality accordion */
+    .p-slice {
+      flex: 1;
+      min-width: 56px;
+      cursor: pointer;
+      border-radius: 18px;
+      transition: flex 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+      border: 1px solid #181818;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-slice:hover { flex: 5.5; }
+    .slice-label {
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      transition: opacity 0.28s ease;
+    }
+    .p-slice:hover .slice-label { opacity: 0; }
+    .slice-body {
+      opacity: 0;
+      transition: opacity 0.38s ease 0.22s;
+    }
+    .p-slice:hover .slice-body { opacity: 1; }
+    .p-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    .p-slice:hover .p-bg { opacity: 0.2; }
+
+    /* Bento cards */
+    .b-card {
+      background: #0c0c0c;
+      border: 1px solid #181818;
+      border-radius: 22px;
+      overflow: hidden;
+      transition: border-color 0.4s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .b-card:hover {
+      border-color: rgba(184,240,88,0.2);
+      transform: translateY(-4px);
+    }
+
+    /* Scrub words */
+    .scrub-w { opacity: 0.08; display: inline; }
+
+    /* Pinned scroll section */
+    .pin-wrapper { position: relative; }
+    .pin-left { position: sticky; top: 25vh; }
+
+    /* Marquee */
+    @keyframes marquee-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      display: flex;
+      gap: 3.5rem;
+      align-items: center;
+      width: max-content;
+      animation: marquee-left 28s linear infinite;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+
+    /* Lime glow CTA */
+    .lime-cta {
+      box-shadow: 0 0 44px rgba(184,240,88,0.28), 0 0 100px rgba(184,240,88,0.08);
+    }
+
+    /* Pricing pro card */
+    .pro-card {
+      background: linear-gradient(155deg, #0b1108 0%, #080f06 100%);
+      border: 1px solid rgba(184,240,88,0.22);
+      border-radius: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Inline image in heading */
+    .inline-img {
+      display: inline-block;
+      border-radius: 100px;
+      overflow: hidden;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+    }
+  </style>
+</head>
+
+<body class="overflow-x-hidden w-full max-w-full bg-[#070707]">
+
+  <!-- NAV: Floating glass pill -->
+  <nav id="nav" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 glass-pill rounded-full px-5 py-2.5 flex items-center justify-between gap-6 w-[92%] max-w-2xl">
+    <a href="#" class="font-black text-base tracking-[-0.05em] text-[#b8f058] flex items-center gap-1.5">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.4">
+        <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+      </svg>
+      MONK
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-[13px] font-bold text-white/40">
+      <a href="#coaches" class="hover:text-white transition-colors duration-200">Coaches</a>
+      <a href="#features" class="hover:text-white transition-colors duration-200">Features</a>
+      <a href="#pricing" class="hover:text-white transition-colors duration-200">Pricing</a>
+    </div>
+    <a href="#pricing" class="bg-[#b8f058] text-[#080808] text-[12px] font-black px-4 py-2 rounded-full hover:bg-white transition-colors duration-200">
+      Start Free
+    </a>
+  </nav>
+
+  <!-- HERO: Artistic Asymmetry -->
+  <section class="relative min-h-[100dvh] flex items-center px-6 pt-28 pb-20 overflow-hidden">
+
+    <!-- Deep radial glow -->
+    <div class="absolute pointer-events-none" style="inset:0; background: radial-gradient(ellipse 55% 70% at 70% 55%, rgba(184,240,88,0.07) 0%, transparent 65%), radial-gradient(ellipse 40% 50% at 20% 40%, rgba(123,106,240,0.05) 0%, transparent 60%);"></div>
+
+    <!-- Dot matrix -->
+    <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle, rgba(255,255,255,0.065) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.6;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: text -->
+      <div id="hero-text">
+        <div id="hero-tag" class="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-full px-3.5 py-1.5 text-[11px] font-bold text-white/40 mb-10 uppercase tracking-[0.12em]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#b8f058] animate-pulse flex-shrink-0"></span>
+          Memory · Accountability · Real Stakes
+        </div>
+
+        <h1 class="font-black text-white leading-[0.87] tracking-[-0.045em] max-w-3xl mb-8" style="font-size: clamp(3.8rem, 6.5vw, 7.5rem);">
+          Your AI Coach<br>
+          <span style="color:#b8f058;">Has No Mercy.</span>
+        </h1>
+
+        <p class="text-white/40 text-[17px] max-w-md mb-12 font-medium leading-relaxed">
+          Six distinct personalities. Persistent memory. Built for people who are done lying to themselves.
+        </p>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <a href="#pricing" class="bg-[#b8f058] text-[#080808] font-black text-[14px] px-8 py-4 rounded-full lime-cta hover:bg-white hover:scale-105 transition-all duration-300">
+            Get Started Free
+          </a>
+          <a href="#coaches" class="border border-white/15 text-white/70 font-bold text-[14px] px-8 py-4 rounded-full hover:border-white/40 hover:text-white transition-all duration-200">
+            Meet the Coaches
+          </a>
+        </div>
+
+        <!-- Inline stat strip -->
+        <div class="flex items-center gap-8 mt-14 pt-10 border-t border-white/[0.06]">
+          <div>
+            <div class="font-black text-white text-2xl tracking-tight">14d</div>
+            <div class="text-white/30 text-[11px] font-semibold uppercase tracking-widest">Avg streak</div>
+          </div>
+          <div class="w-px h-8 bg-white/10"></div>
+          <div>
+            <div class="font-black text-white text-2xl tracking-tight">6</div>
+            <div class="text-white/30 text-[11px] font-semibold uppercase tracking-widest">Coach types</div>
+          </div>
+          <div class="w-px h-8 bg-white/10"></div>
+          <div>
+            <div class="font-black text-[#b8f058] text-2xl tracking-tight">$0</div>
+            <div class="text-white/30 text-[11px] font-semibold uppercase tracking-widest">To start</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: floating phone card -->
+      <div id="hero-card" class="relative hidden md:flex justify-end">
+        <!-- Outer glow -->
+        <div class="absolute -inset-12 pointer-events-none" style="background: radial-gradient(ellipse 80% 80% at 60% 50%, rgba(184,240,88,0.09) 0%, transparent 70%);"></div>
+
+        <!-- Chat mockup -->
+        <div class="phone-card phone-card-glow w-full max-w-[380px] p-6 relative">
+          <!-- Coach header -->
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-white/[0.05]">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #0f1a06, #1a2e0a); border: 1px solid rgba(184,240,88,0.2);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.4">
+                <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <div class="font-black text-white text-[13px]">Monk · Stoic Mentor</div>
+              <div class="text-white/25 text-[10px]">Updated 2m ago</div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#b8f058]"></span>
+              <span class="text-[10px] text-white/25">online</span>
+            </div>
+          </div>
+
+          <!-- AI message -->
+          <div class="mb-4">
+            <div class="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-sm p-4">
+              <p class="text-white/70 text-[13px] leading-relaxed font-medium">
+                "You committed to training at 06:00. It's 08:52. I tracked the same pattern last Monday and Tuesday. What changed — and don't give me a feeling, give me a reason."
+              </p>
+            </div>
+          </div>
+
+          <!-- User message -->
+          <div class="flex justify-end mb-4">
+            <div class="bg-[#b8f058]/10 border border-[#b8f058]/15 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[75%]">
+              <p class="text-[#b8f058] text-[12px] leading-relaxed font-semibold">I overslept again. I know.</p>
+            </div>
+          </div>
+
+          <!-- Coach response 2 -->
+          <div class="mb-5">
+            <div class="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-sm p-4">
+              <p class="text-white/70 text-[13px] leading-relaxed font-medium">
+                "Knowing is not enough. When does this pattern end? Set your alarm now. I'll check tomorrow."
+              </p>
+            </div>
+          </div>
+
+          <!-- Bottom stats bar -->
+          <div class="flex items-center justify-between pt-4 border-t border-white/[0.05]">
+            <div class="flex items-center gap-3">
+              <div class="text-center">
+                <div class="font-black text-white text-sm">14</div>
+                <div class="text-white/25 text-[9px] uppercase tracking-widest">streak</div>
+              </div>
+              <div class="w-px h-6 bg-white/10"></div>
+              <div class="text-center">
+                <div class="font-black text-[#b8f058] text-sm">78</div>
+                <div class="text-white/25 text-[9px] uppercase tracking-widest">score</div>
+              </div>
+            </div>
+            <div class="flex gap-1.5">
+              <div class="w-5 h-5 rounded-full bg-white/[0.06] border border-white/10"></div>
+              <div class="w-5 h-5 rounded-full bg-white/[0.06] border border-white/10"></div>
+              <div class="w-5 h-5 rounded-full bg-[#b8f058]"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating badge — offset from card -->
+        <div class="absolute -bottom-6 -left-8 bg-[#0c0c0c] border border-white/[0.07] rounded-2xl px-4 py-3 hidden lg:block" style="backdrop-filter: blur(16px);">
+          <div class="text-[10px] text-white/30 uppercase tracking-[0.12em] font-bold mb-1">Monk Mode</div>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-[#7b6af0] animate-pulse"></div>
+            <span class="font-black text-white text-sm">Active — Day 3</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <section class="py-10 border-y border-[#131313] overflow-hidden">
+    <div class="overflow-hidden">
+      <div class="marquee-track">
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#b8f058]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f5c840]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7b6af0]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#40f5c8]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f0a060]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
+        <!-- duplicate for seamless loop -->
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#b8f058]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f5c840]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7b6af0]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#40f5c8]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f0a060]"></span>
+        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
+        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COACHES: Horizontal Accordion -->
+  <section id="coaches" class="py-36 md:py-52 px-6">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="font-black leading-[0.88] tracking-[-0.045em] text-white mb-16" style="font-size: clamp(2.8rem, 5.5vw, 5.5rem);">
+        Six coaches.<br><span style="color:rgba(255,255,255,0.3);">Zero tolerance.</span>
+      </h2>
+
+      <div class="flex gap-3 h-[480px]">
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #100808, #1c0a0a);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/military-harsh/600/800'); filter: grayscale(1) contrast(1.6);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#f06060;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">Drill Sergeant</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">Military. No excuses, no sympathy. You perform or you explain.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">DRILL</span>
+          </div>
+        </div>
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #0a0f07, #0c1a09);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/roman-stoic/600/800'); filter: grayscale(1) sepia(0.2) contrast(1.3);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#b8f058;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">Stoic Mentor</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">Marcus Aurelius energy. Wisdom earned through consistent action.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">STOIC</span>
+          </div>
+        </div>
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #09080f, #0d0b1e);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/dojo-night/600/800'); filter: grayscale(1) hue-rotate(260deg) contrast(1.4);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#7b6af0;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">Anime Sensei</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">Dramatic, high-stakes intensity. Every arc ends in a power-up or breakdown.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">SENSEI</span>
+          </div>
+        </div>
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #0f0c07, #1c1308);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/endurance-dark/600/800'); filter: grayscale(1) contrast(1.7);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#f5c840;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">Stay Hard</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">Raw Goggins methodology. Callus the mind. Suffering is the only metric.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">HARD</span>
+          </div>
+        </div>
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #080f0d, #0a1c18);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/boardroom-dim/600/800'); filter: grayscale(1) contrast(1.3);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#40f5c8;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">CEO Coach</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">ROI-focused. Your morning routine is a P&amp;L statement.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">CEO</span>
+          </div>
+        </div>
+
+        <div class="p-slice" style="background: linear-gradient(155deg, #0f0c09, #1a1410);">
+          <div class="p-bg" style="background-image: url('https://picsum.photos/seed/forest-calm/600/800'); filter: grayscale(1) sepia(0.35) contrast(1.25);"></div>
+          <div class="relative z-10 h-full flex flex-col justify-between p-5">
+            <div class="w-1.5 h-14 rounded-full" style="background:#f0a060;"></div>
+            <div class="slice-body">
+              <h3 class="font-black text-xl text-white mb-2 whitespace-nowrap">Calm Therapist</h3>
+              <p class="text-white/45 text-xs leading-relaxed max-w-[200px]">Compassionate but firm. Self-awareness as the foundation of real growth.</p>
+            </div>
+            <span class="slice-label font-black text-[10px] text-white/25 uppercase tracking-[0.2em]">CALM</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES: Bento Grid — 3 cols × 2 rows = 6 cells, zero gaps, grid-flow-dense -->
+  <section id="features" class="py-36 md:py-52 px-6" style="background: linear-gradient(180deg, #070707 0%, #060606 100%);">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Heading with inline image -->
+      <h2 class="font-black leading-[0.88] tracking-[-0.045em] text-white mb-16" style="font-size: clamp(2.8rem, 5.5vw, 5.5rem);">
+        Not another
+        <span class="inline-img mx-3" style="width: 3.2em; height: 1.1em; background-image: url('https://picsum.photos/seed/habit-track/400/200'); background-size: cover; background-position: center; filter: contrast(1.2) grayscale(0.3); border: 1px solid rgba(255,255,255,0.08);"></span>
+        habit tracker.
+      </h2>
+
+      <!--
+        Grid math:
+        3 cols × 2 rows = 6 cells.
+        Card A: col-span-2, row-span-1 = 2 cells (row1 col1-2)
+        Card B: col-span-1, row-span-2 = 2 cells (rows1-2, col3)
+        Card C: col-span-1, row-span-1 = 1 cell  (row2, col1)
+        Card D: col-span-1, row-span-1 = 1 cell  (row2, col2)
+        Total: 2 + 2 + 1 + 1 = 6. No gaps.
+      -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" style="grid-auto-flow: dense; min-height: 560px;">
+
+        <!-- A: AI Memory — wide top -->
+        <div class="b-card md:col-span-2 p-8 flex flex-col justify-between group relative min-h-[260px]">
+          <div class="absolute inset-0 overflow-hidden rounded-[22px]">
+            <img src="https://picsum.photos/seed/neural-ai/900/400" alt="" class="w-full h-full object-cover opacity-0 group-hover:opacity-[0.07] transition-opacity duration-700" style="filter: grayscale(1) contrast(1.5);" />
+          </div>
+          <div class="relative z-10">
+            <div class="w-10 h-10 rounded-xl mb-6 flex items-center justify-center flex-shrink-0" style="background: rgba(184,240,88,0.07); border: 1px solid rgba(184,240,88,0.15);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="1.8">
+                <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+              </svg>
+            </div>
+            <h3 class="font-black text-[1.4rem] text-white mb-3 tracking-tight">Persistent AI Memory</h3>
+            <p class="text-white/40 text-[14px] leading-relaxed max-w-md">Conversations build context over time. Your coach remembers every goal, every missed session, every excuse. No starting over.</p>
+          </div>
+          <div class="relative z-10 mt-6 bg-black/50 border border-white/[0.05] rounded-2xl p-4 max-w-sm">
+            <p class="text-[#b8f058] text-[10px] font-black uppercase tracking-[0.14em] mb-2">Recalled from 3 days ago</p>
+            <p class="text-white/50 text-[12px] leading-relaxed italic">"You skipped cardio Tuesday and Thursday. That's a pattern. What changed since last week?"</p>
+          </div>
+        </div>
+
+        <!-- B: Monk Mode — tall right -->
+        <div class="b-card md:row-span-2 p-8 flex flex-col justify-between group relative min-h-[280px]">
+          <div class="absolute inset-0 overflow-hidden rounded-[22px]">
+            <img src="https://picsum.photos/seed/meditation-monk/500/900" alt="" class="w-full h-full object-cover opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700" style="filter: grayscale(1) contrast(1.4);" />
+          </div>
+          <div class="absolute -top-8 -right-8 w-48 h-48 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(123,106,240,0.12) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-10 h-10 rounded-xl mb-6 flex items-center justify-center flex-shrink-0" style="background: rgba(123,106,240,0.07); border: 1px solid rgba(123,106,240,0.18);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7b6af0" stroke-width="1.8">
+                <circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+              </svg>
+            </div>
+            <h3 class="font-black text-[1.35rem] text-white mb-3 tracking-tight">Monk Mode</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Dopamine detox. Strict daily goals. Distraction lock. When you enter, your coach holds you to an entirely different standard.</p>
+          </div>
+
+          <!-- Monk mode UI element -->
+          <div class="relative z-10 mt-auto">
+            <div class="bg-[#7b6af0]/10 border border-[#7b6af0]/20 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-black text-[#7b6af0] text-[11px] uppercase tracking-[0.14em]">Mode Active</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#7b6af0] animate-pulse"></span>
+                  <span class="text-[10px] text-[#7b6af0]/60">Day 3</span>
+                </div>
+              </div>
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-white/40">5am wake</span>
+                  <span class="text-[#b8f058] font-bold">Done</span>
+                </div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-white/40">Cold shower</span>
+                  <span class="text-[#b8f058] font-bold">Done</span>
+                </div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-white/40">No social media</span>
+                  <span class="text-white/25">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- C: Accountability -->
+        <div class="b-card p-7 flex flex-col justify-between group relative min-h-[240px]">
+          <div class="absolute right-5 bottom-3 font-black text-white/[0.025] pointer-events-none leading-none select-none" style="font-size: 8rem; line-height: 1;">78</div>
+          <div class="relative z-10">
+            <div class="w-10 h-10 rounded-xl mb-5 flex items-center justify-center flex-shrink-0" style="background: rgba(245,200,64,0.07); border: 1px solid rgba(245,200,64,0.18);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="1.8">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <h3 class="font-black text-[1.2rem] text-white mb-2 tracking-tight">Real Accountability</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Streak tracking, dopamine score, leaderboard. Your coach calls you out the moment your numbers slip.</p>
+          </div>
+        </div>
+
+        <!-- D: Check-ins -->
+        <div class="b-card p-7 flex flex-col justify-between group relative min-h-[240px]">
+          <div class="relative z-10">
+            <div class="w-10 h-10 rounded-xl mb-5 flex items-center justify-center flex-shrink-0" style="background: rgba(240,160,96,0.07); border: 1px solid rgba(240,160,96,0.18);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f0a060" stroke-width="1.8">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <h3 class="font-black text-[1.2rem] text-white mb-2 tracking-tight">Morning + Evening Check-ins</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Set your mission at dawn. Debrief at dusk. Your coach reviews both and remembers patterns.</p>
+          </div>
+          <!-- Mini check-in widget -->
+          <div class="relative z-10 mt-4 space-y-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full border border-[#f0a060]/30 flex items-center justify-center flex-shrink-0">
+                <svg width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="#b8f058" stroke-width="2.2"><path d="M2 6l3 3 5-5"/></svg>
+              </div>
+              <span class="text-white/40 text-[11px]">Morning — Mission set</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full border border-white/15 flex-shrink-0"></div>
+              <span class="text-white/25 text-[11px]">Evening — 21:00 debrief</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GSAP PINNED SCROLL: "Why it hits different" -->
+  <section id="why" class="py-36 md:py-52 px-6">
+    <div class="max-w-7xl mx-auto pin-wrapper">
+      <div class="md:grid md:grid-cols-[1fr_1fr] md:gap-24 items-start">
+
+        <!-- Left: pinned -->
+        <div class="pin-left pb-24">
+          <h2 id="pin-heading" class="font-black leading-[0.9] tracking-[-0.045em] text-white mb-6" style="font-size: clamp(2.6rem, 5vw, 5rem);">
+            Why it hits<br><span style="color:#b8f058;">different.</span>
+          </h2>
+          <p class="text-white/35 text-base font-medium leading-relaxed max-w-xs">
+            Every other app motivates you. This one holds you accountable.
+          </p>
+        </div>
+
+        <!-- Right: scrolling cards -->
+        <div id="reason-cards" class="space-y-5 pt-4">
+
+          <div class="reason-card b-card p-8">
+            <div class="font-black text-[#b8f058] text-[10px] uppercase tracking-[0.18em] mb-4">Memory</div>
+            <h3 class="font-black text-[1.25rem] text-white mb-3 tracking-tight">It remembers what you said yesterday</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Most AI forgets after every session. Monk builds a longitudinal model of your behavior — excuses, patterns, breakthroughs. It uses all of it.</p>
+          </div>
+
+          <div class="reason-card b-card p-8">
+            <div class="font-black text-[#7b6af0] text-[10px] uppercase tracking-[0.18em] mb-4">Personality</div>
+            <h3 class="font-black text-[1.25rem] text-white mb-3 tracking-tight">Six distinct coaching philosophies</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Not one-size-fits-all. Switch between a military drill sergeant, a Stoic philosopher, a Goggins-style voice, or a compassionate therapist. Different days need different energies.</p>
+          </div>
+
+          <div class="reason-card b-card p-8">
+            <div class="font-black text-[#f5c840] text-[10px] uppercase tracking-[0.18em] mb-4">Stakes</div>
+            <h3 class="font-black text-[1.25rem] text-white mb-3 tracking-tight">Real metrics, not fake motivation</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Dopamine score, streak system, a live leaderboard. You can see exactly where you stand and your coach uses those numbers against you when you slip.</p>
+          </div>
+
+          <div class="reason-card b-card p-8">
+            <div class="font-black text-[#40f5c8] text-[10px] uppercase tracking-[0.18em] mb-4">Ritual</div>
+            <h3 class="font-black text-[1.25rem] text-white mb-3 tracking-tight">Morning mission, evening debrief</h3>
+            <p class="text-white/40 text-[13px] leading-relaxed">Two check-ins structure every day. Set your mission at 7am. Your coach reviews execution at 9pm. No hiding from the gap between who you said you'd be and who you were.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCRUBBING TEXT REVEAL -->
+  <section class="py-36 md:py-52 px-6" style="background: #060606;">
+    <div class="max-w-5xl mx-auto">
+      <div id="scrub-text" class="font-black leading-[1.05] tracking-[-0.045em] text-center" style="font-size: clamp(2.4rem, 4.8vw, 5rem);">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="py-36 md:py-52 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <h2 class="font-black leading-[0.88] tracking-[-0.045em] text-white mb-5" style="font-size: clamp(3.2rem, 7vw, 7.5rem);">
+        No excuses<br><span style="color:#b8f058;">on price.</span>
+      </h2>
+      <p class="text-white/35 text-lg mb-20 max-w-xs mx-auto font-medium">
+        Start today. Upgrade when you're serious.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto text-left">
+
+        <!-- Free -->
+        <div class="b-card p-9">
+          <h3 class="font-black text-lg text-white mb-1">Free</h3>
+          <div class="flex items-baseline gap-1.5 mb-8">
+            <span class="font-black text-white" style="font-size: 4rem; line-height: 1; letter-spacing: -0.04em;">$0</span>
+            <span class="text-white/25 text-sm">/ forever</span>
+          </div>
+          <ul class="space-y-3.5 mb-10">
+            <li class="flex items-center gap-3 text-sm text-white/55">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+              1 coach personality
+            </li>
+            <li class="flex items-center gap-3 text-sm text-white/55">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+              10 AI messages per day
+            </li>
+            <li class="flex items-center gap-3 text-sm text-white/55">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+              3 habits, 2 goals
+            </li>
+            <li class="flex items-center gap-3 text-sm text-white/20">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2a2a2a" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              Weekly AI review
+            </li>
+            <li class="flex items-center gap-3 text-sm text-white/20">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2a2a2a" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              Monk Mode
+            </li>
+          </ul>
+          <a href="#" class="block w-full text-center border border-white/12 text-white/50 font-bold py-4 rounded-xl text-[13px] hover:border-white/35 hover:text-white transition-all duration-200">
+            Start Free
+          </a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pro-card p-9">
+          <div class="absolute inset-0 rounded-[22px] pointer-events-none" style="background: radial-gradient(ellipse 100% 55% at 50% -5%, rgba(184,240,88,0.09) 0%, transparent 65%);"></div>
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-black text-lg text-white">Pro</h3>
+              <span class="bg-[#b8f058] text-[#080808] text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-[0.08em]">Most Popular</span>
+            </div>
+            <div class="flex items-baseline gap-1.5 mb-8">
+              <span class="font-black text-white" style="font-size: 4rem; line-height: 1; letter-spacing: -0.04em;">$9</span>
+              <span class="text-white/25 text-sm">/ month</span>
+            </div>
+            <ul class="space-y-3.5 mb-10">
+              <li class="flex items-center gap-3 text-sm text-white/70">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+                All 6 coach personalities
+              </li>
+              <li class="flex items-center gap-3 text-sm text-white/70">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+                Unlimited AI messages
+              </li>
+              <li class="flex items-center gap-3 text-sm text-white/70">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+                Unlimited habits + goals
+              </li>
+              <li class="flex items-center gap-3 text-sm text-white/70">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+                Weekly AI review
+              </li>
+              <li class="flex items-center gap-3 text-sm text-white/70">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+                Full Monk Mode access
+              </li>
+            </ul>
+            <a href="#" class="block w-full text-center bg-[#b8f058] text-[#080808] font-black py-4 rounded-xl text-[13px] hover:bg-white transition-colors duration-200 lime-cta">
+              Get Pro — $9 / month
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-[#111111] px-6 py-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.4">
+            <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+          </svg>
+          <span class="font-black text-base tracking-[-0.04em] text-[#b8f058]">MONK</span>
+        </div>
+        <p class="text-white/20 text-xs">AI accountability that actually works.</p>
+      </div>
+      <div class="flex gap-8 text-[13px] text-white/25 font-semibold">
+        <a href="#" class="hover:text-white/60 transition-colors">Privacy</a>
+        <a href="#" class="hover:text-white/60 transition-colors">Terms</a>
+        <a href="#" class="hover:text-white/60 transition-colors">Contact</a>
+      </div>
+      <p class="text-white/12 text-xs">2026 Monk.ai</p>
+    </div>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // === Hero entrance ===
+    const heroTl = gsap.timeline({ delay: 0.12 });
+    heroTl
+      .fromTo('#hero-tag',  { opacity:0, y:10 }, { opacity:1, y:0, duration:0.55, ease:'power2.out' })
+      .fromTo('#hero-text h1', { opacity:0, y:28 }, { opacity:1, y:0, duration:0.75, ease:'power3.out' }, '-=0.28')
+      .fromTo('#hero-text p',  { opacity:0, y:16 }, { opacity:1, y:0, duration:0.55, ease:'power2.out' }, '-=0.45')
+      .fromTo('#hero-text .flex.items-center.gap-3', { opacity:0, y:14 }, { opacity:1, y:0, duration:0.5, ease:'power2.out' }, '-=0.35')
+      .fromTo('#hero-text .flex.items-center.gap-8', { opacity:0, y:10 }, { opacity:1, y:0, duration:0.5, ease:'power2.out' }, '-=0.3')
+      .fromTo('#hero-card', { opacity:0, y:36, scale:0.96 }, { opacity:1, y:0, scale:1, duration:0.9, ease:'power3.out' }, '-=0.65');
+
+    // === Hero card: image scale on scroll in ===
+    gsap.to('#hero-card', {
+      scale: 1.035,
+      y: -18,
+      scrollTrigger: {
+        trigger: 'body',
+        start: 'top top',
+        end: '28% top',
+        scrub: 1.8,
+      }
+    });
+
+    // === Coaches entrance ===
+    gsap.fromTo('.p-slice',
+      { opacity:0, scaleY:0.88 },
+      {
+        opacity:1, scaleY:1,
+        duration:0.65, stagger:0.07, ease:'power2.out',
+        transformOrigin:'bottom center',
+        scrollTrigger: { trigger:'#coaches', start:'top 72%' }
+      }
+    );
+
+    // === Bento cards entrance ===
+    gsap.fromTo('.b-card',
+      { opacity:0, y:28 },
+      {
+        opacity:1, y:0,
+        duration:0.7, stagger:0.12, ease:'power2.out',
+        scrollTrigger: { trigger:'#features', start:'top 70%' }
+      }
+    );
+
+    // === Reason cards: staggered upward on scroll ===
+    gsap.fromTo('.reason-card',
+      { opacity:0, y:40 },
+      {
+        opacity:1, y:0,
+        duration:0.7, stagger:0.16, ease:'power2.out',
+        scrollTrigger: { trigger:'#reason-cards', start:'top 75%' }
+      }
+    );
+
+    // === Scrubbing text reveal ===
+    const scrubWords = [
+      "Accountability", "without", "excuses.", " ",
+      "Memory", "without", "mercy.", " ",
+      "Growth", "without", "comfort."
+    ];
+    const scrubEl = document.getElementById('scrub-text');
+    scrubWords.forEach(w => {
+      if (w === ' ') { scrubEl.appendChild(document.createTextNode(' ')); return; }
+      const s = document.createElement('span');
+      s.className = 'scrub-w';
+      s.textContent = w + ' ';
+      scrubEl.appendChild(s);
+    });
+    const wordSpans = scrubEl.querySelectorAll('.scrub-w');
+    ScrollTrigger.create({
+      trigger: scrubEl,
+      start: 'top 75%',
+      end: 'bottom 30%',
+      scrub: 1,
+      onUpdate(self) {
+        const n = wordSpans.length;
+        wordSpans.forEach((s, i) => {
+          const p = Math.max(0, Math.min(1, (self.progress * (n + 2)) - i));
+          s.style.opacity = 0.08 + p * 0.92;
+        });
+      }
+    });
+
+    // === Pricing entrance ===
+    gsap.fromTo('#pricing .grid > *',
+      { opacity:0, y:24, scale:0.978 },
+      {
+        opacity:1, y:0, scale:1,
+        duration:0.68, stagger:0.18, ease:'power2.out',
+        scrollTrigger: { trigger:'#pricing', start:'top 70%' }
+      }
+    );
+
+    // === Nav hide/show on scroll ===
+    let lastScroll = 0;
+    ScrollTrigger.create({
+      trigger: 'body',
+      start: 'top top',
+      end: '99999px top',
+      onUpdate(self) {
+        const y = window.scrollY;
+        if (y > 90 && y > lastScroll) {
+          gsap.to('#nav', { y:-84, duration:0.38, ease:'power2.in' });
+        } else {
+          gsap.to('#nav', { y:0, duration:0.32, ease:'power2.out' });
+        }
+        lastScroll = y;
+      }
+    });
+  </script>
+
+</body>
+</html>
