@@ -215,30 +215,6 @@
         </button>
       </div>
 
-      <!-- Differentiators (competitor contrast) -->
-      <div class="mt-8 space-y-2">
-        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
-          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
-          <div>
-            <div class="text-xs font-bold text-white/70">Not a game. Not a gentle nudge.</div>
-            <div class="text-[11px] text-muted leading-relaxed">Habitica gamifies. Fabulous whispers. Monk holds you accountable.</div>
-          </div>
-        </div>
-        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
-          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
-          <div>
-            <div class="text-xs font-bold text-white/70">AI that remembers everything.</div>
-            <div class="text-[11px] text-muted leading-relaxed">Your excuses, patterns, missed sessions — your coach builds a model of you.</div>
-          </div>
-        </div>
-        <div class="flex items-start gap-3 bg-bg2/50 border border-border rounded-xl px-4 py-3">
-          <span class="text-lime mt-0.5 flex-shrink-0 font-mono font-bold text-xs">✓</span>
-          <div>
-            <div class="text-xs font-bold text-white/70">6 coaching philosophies. Zero tolerance.</div>
-            <div class="text-[11px] text-muted leading-relaxed">Drill Sergeant to Stoic Mentor — pick the voice that breaks your patterns.</div>
-          </div>
-        </div>
-      </div>
 
       <p class="text-center text-muted text-xs mt-6">Free forever to start. No excuses on price.</p>
     </div>
@@ -262,7 +238,7 @@
           <button v-for="(c, id) in coaches" :key="id" @click="onboardCoach=id"
             :class="['flex items-start gap-3 p-4 rounded-2xl border text-left transition-all', onboardCoach===id ? 'border-current' : 'border-border bg-bg2 hover:border-white/10']"
             :style="onboardCoach===id ? `background: ${c.color}12; border-color: ${c.color}40; color: ${c.color}` : ''">
-            <span class="text-2xl flex-shrink-0">{{ c.emoji }}</span>
+            <div class="w-1.5 h-7 rounded-full flex-shrink-0 mt-0.5" :style="`background: ${c.color}`"></div>
             <div>
               <div class="text-xs font-black text-white">{{ c.name }}</div>
               <div class="text-[10px] text-muted leading-relaxed mt-0.5">{{ c.tagline }}</div>
@@ -301,7 +277,7 @@
         <p class="text-muted text-sm text-center mb-8">Your coach is watching. This is where it starts.</p>
         <div class="bg-bg2 border border-border rounded-2xl p-6 space-y-4 mb-6">
           <div class="flex items-center gap-4">
-            <span class="text-3xl">{{ coaches[onboardCoach]?.emoji }}</span>
+            <div class="w-10 h-10 rounded-xl flex-shrink-0" :style="`background: ${coaches[onboardCoach]?.color || '#b8f058'}18; border: 1px solid ${coaches[onboardCoach]?.color || '#b8f058'}35`"></div>
             <div>
               <div class="text-xs font-mono text-muted uppercase tracking-widest">Your coach</div>
               <div class="font-bold text-white">{{ coaches[onboardCoach]?.name }}</div>
@@ -345,7 +321,7 @@
           :class="['sidebar-btn flex items-center justify-center h-10 rounded-xl', view===nav.id ? 'active' : '']"
           style="width: 48px;"
           :style="view===nav.id ? `--coach-color: ${coaches[personality]?.color || '#b8f058'}` : ''">
-          <span class="text-lg" :style="view===nav.id ? `filter: drop-shadow(0 0 8px ${coaches[personality]?.color || '#b8f058'}50)` : 'opacity: 0.45'">{{ nav.icon }}</span>
+          <span :style="view===nav.id ? `color: ${coaches[personality]?.color || '#b8f058'}` : 'color: rgba(255,255,255,0.38)'" v-html="nav.icon"></span>
           <span class="tooltip">{{ nav.label }}</span>
         </button>
       </template>
@@ -357,7 +333,9 @@
       <button @click="toggleMonkMode" :class="['sidebar-btn w-12 h-12 rounded-xl flex items-center justify-center mb-1 transition-all', monkMode ? 'bg-purple/15' : '']"
         :style="monkMode ? 'border: 1px solid rgba(123,106,240,0.3)' : ''"
         title="Monk Mode">
-        <span class="text-lg" :style="monkMode ? 'filter: drop-shadow(0 0 6px #7b6af0)' : ''">🧘</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" :stroke="monkMode ? '#7b6af0' : 'rgba(255,255,255,0.38)'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 12l10 10 10-10L12 2z"/>
+        </svg>
         <span class="tooltip">{{ monkMode ? 'Monk Mode ON' : 'Monk Mode' }}</span>
       </button>
 
@@ -385,7 +363,10 @@
           <span class="font-syne font-black text-base tracking-tight" :style="`color: ${coaches[personality]?.color || '#b8f058'}`">MONK</span>
         </div>
         <div class="flex items-center gap-3">
-          <span class="font-mono text-xs font-bold text-gold">🔥 {{ streak }}</span>
+          <span class="font-mono text-xs font-bold text-gold flex items-center gap-1">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            {{ streak }}
+          </span>
           <span class="font-mono text-xs font-bold" :style="`color: ${scoreColor}`">{{ dopamineScore }}</span>
           <button @click="showProfile=true" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black" :style="`background: ${coaches[personality]?.color || '#b8f058'}20; color: ${coaches[personality]?.color || '#b8f058'}`">
             {{ userName.slice(0,1).toUpperCase() }}
@@ -406,9 +387,9 @@
       <!-- Mobile bottom nav -->
       <nav class="mobile-only flex border-t border-border flex-shrink-0" style="padding-bottom: env(safe-area-inset-bottom, 0);">
         <button v-for="nav in navItems" :key="nav.id" @click="setView(nav.id)"
-          :class="['flex-1 flex flex-col items-center py-2.5 gap-0.5', view===nav.id ? 'text-white' : 'text-muted']">
-          <span class="text-base">{{ nav.icon }}</span>
-          <span class="text-[9px] font-bold uppercase tracking-widest">{{ nav.label.slice(0,4) }}</span>
+          class="flex-1 flex flex-col items-center py-2.5 gap-0.5">
+          <span :style="view===nav.id ? `color: ${coaches[personality]?.color || '#b8f058'}` : 'color: #555'" v-html="nav.icon"></span>
+          <span class="text-[9px] font-bold uppercase tracking-widest" :style="view===nav.id ? `color: ${coaches[personality]?.color || '#b8f058'}` : 'color: #555'">{{ nav.shortLabel }}</span>
         </button>
       </nav>
     </main>
@@ -438,7 +419,10 @@
           <div class="font-syne font-black text-white text-base">{{ userName }}</div>
           <div class="text-muted text-xs mb-1">{{ userEmail }}</div>
           <div class="flex items-center gap-2">
-            <span class="text-gold text-xs font-mono font-bold">🔥 {{ streak }} day</span>
+            <span class="text-gold text-xs font-mono font-bold flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              {{ streak }} day
+            </span>
             <span class="text-border">·</span>
             <span class="text-xs font-mono" :style="`color: ${coaches[personality]?.color || '#b8f058'}`">{{ coaches[personality]?.name }}</span>
           </div>
@@ -479,12 +463,12 @@ const COACHES = {
 };
 
 const NAV_ITEMS = [
-  { id: 'coach',   icon: '🤖', label: 'Coach'   },
-  { id: 'checkin', icon: '☀️', label: 'Check-in' },
-  { id: 'habits',  icon: '✓',  label: 'Habits'  },
-  { id: 'goals',   icon: '🎯', label: 'Goals'   },
-  { id: 'stats',   icon: '📊', label: 'Stats'   },
-  { id: 'review',  icon: '⭐', label: 'Review'  },
+  { id: 'coach',   label: 'Coach',    shortLabel: 'Coach',  icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' },
+  { id: 'checkin', label: 'Check-in', shortLabel: 'Check',  icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>' },
+  { id: 'habits',  label: 'Habits',   shortLabel: 'Habits', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' },
+  { id: 'goals',   label: 'Goals',    shortLabel: 'Goals',  icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>' },
+  { id: 'stats',   label: 'Stats',    shortLabel: 'Stats',  icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' },
+  { id: 'review',  label: 'Review',   shortLabel: 'Review', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
 ];
 
 // ─── Supabase singleton ─────────────────────────────────────────────────────
@@ -704,10 +688,10 @@ app.component('coach-screen', {
     const quickChips = computed(() => {
       const missed = habits.value.filter(h => !h.completedToday).map(h => h.name);
       const chips = [];
-      if (missed.length > 0) chips.push({ label: `❌ ${missed[0]}`, msg: `I haven't done ${missed[0]}. I keep putting it off.` });
-      if (state.morningMission.value) chips.push({ label: '🎯 Mission check', msg: `How am I doing on my mission: "${state.morningMission.value}"?` });
-      chips.push({ label: '💪 Push me', msg: "I need a push right now. Don't be gentle." });
-      chips.push({ label: '🌙 End of day', msg: 'Help me close today properly and set up tomorrow.' });
+      if (missed.length > 0) chips.push({ label: missed[0], msg: `I haven't done ${missed[0]}. I keep putting it off.` });
+      if (state.morningMission.value) chips.push({ label: 'Mission check', msg: `How am I doing on my mission: "${state.morningMission.value}"?` });
+      chips.push({ label: 'Push me', msg: "I need a push right now. Don't be gentle." });
+      chips.push({ label: 'End of day', msg: 'Help me close today properly and set up tomorrow.' });
       return chips.slice(0, 4);
     });
 
@@ -810,7 +794,7 @@ app.component('coach-screen', {
         <div class="flex items-center gap-3">
           <button @click="showCoachSelect=!showCoachSelect"
             class="flex items-center gap-2 bg-bg2 border border-border rounded-full px-3 py-1.5 hover:border-white/10 transition-colors">
-            <span class="text-base">{{ coach.emoji }}</span>
+            <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="\`background: \${coach.color}\`"></div>
             <span class="text-xs font-bold text-white/70">{{ coach.name }}</span>
             <span class="text-xs text-muted">▾</span>
           </button>
@@ -820,10 +804,13 @@ app.component('coach-screen', {
           </div>
         </div>
         <div class="flex items-center gap-3 desktop-only">
-          <span class="font-mono text-xs text-gold font-bold">🔥 {{ streak }}</span>
+          <span class="font-mono text-xs text-gold font-bold flex items-center gap-1">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            {{ streak }}
+          </span>
           <div class="w-px h-4 bg-border"></div>
           <button @click="sendPepTalk" :disabled="sending" class="text-xs font-bold text-muted hover:text-white transition-colors disabled:opacity-40">
-            ⚡ Pep talk
+            Pep talk
           </button>
         </div>
       </div>
@@ -834,7 +821,7 @@ app.component('coach-screen', {
         <div class="space-y-1">
           <button v-for="(c, id) in coaches" :key="id" @click="changeCoach(id)"
             :class="['w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors', personality===id ? 'bg-bg3' : 'hover:bg-bg3']">
-            <span class="text-base">{{ c.emoji }}</span>
+            <div class="w-1.5 h-6 rounded-full flex-shrink-0" :style="\`background: \${c.color}\`"></div>
             <div class="flex-1">
               <div class="text-xs font-bold text-white">{{ c.name }}</div>
               <div class="text-[10px] text-muted">{{ c.tagline }}</div>
@@ -848,8 +835,8 @@ app.component('coach-screen', {
       <div ref="chatEl" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div v-for="msg in messages" :key="msg.id" :class="['msg-enter flex', msg.role==='user' ? 'justify-end' : 'justify-start']">
           <div v-if="msg.role==='ai'" class="flex gap-2.5 max-w-[85%] md:max-w-[70%]">
-            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">
-              {{ coach.emoji }}
+            <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/></svg>
             </div>
             <div class="bg-bg2 border border-border rounded-2xl rounded-tl-sm px-4 py-3">
               <p class="text-[13px] text-white/80 leading-relaxed" v-html="formatMsg(msg.text)"></p>
@@ -862,7 +849,9 @@ app.component('coach-screen', {
 
         <!-- Typing indicator -->
         <div v-if="sending" class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">{{ coach.emoji }}</div>
+          <div class="w-7 h-7 rounded-full flex items-center justify-center" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/></svg>
+          </div>
           <div class="bg-bg2 border border-border rounded-2xl rounded-tl-sm px-4 py-3">
             <div class="typing flex gap-1 items-center h-4">
               <span></span><span></span><span></span>
@@ -903,7 +892,10 @@ app.component('coach-screen', {
           <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">Today's Stats</div>
           <div class="flex gap-4">
             <div class="text-center flex-1">
-              <div class="font-mono font-bold text-white text-xl">🔥 {{ streak }}</div>
+              <div class="font-mono font-bold text-white text-xl flex items-center justify-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                {{ streak }}
+              </div>
               <div class="text-[9px] text-muted uppercase tracking-widest mt-0.5">Streak</div>
             </div>
             <div class="w-px bg-border"></div>
@@ -1040,7 +1032,10 @@ app.component('habits-screen', {
         <span class="text-xl flex-shrink-0">{{ habit.emoji }}</span>
         <div class="flex-1 min-w-0">
           <div class="text-sm font-bold" :class="habit.completedToday ? 'text-white/50 line-through' : 'text-white'">{{ habit.name }}</div>
-          <div v-if="habit.streak_days > 0" class="text-[10px] text-muted font-mono">🔥 {{ habit.streak_days }} day streak</div>
+          <div v-if="habit.streak_days > 0" class="text-[10px] text-muted font-mono flex items-center gap-0.5">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#f5c840" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            {{ habit.streak_days }} day streak
+          </div>
         </div>
         <button @click="deleteHabit(habit.id)" class="opacity-0 group-hover:opacity-100 text-muted hover:text-crimson transition-all text-lg leading-none px-1">×</button>
       </div>

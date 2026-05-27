@@ -1,74 +1,64 @@
 {
-  "timestamp": "2026-05-23T17:54:42.150Z",
+  "timestamp": "2026-05-25T13:02:19.725Z",
   "mode": "headless",
   "workerType": "audit",
   "model": "haiku",
-  "durationMs": 93386,
-  "executionId": "audit_1779558788764_7nv2uw",
+  "durationMs": 36439,
+  "executionId": "audit_1779714103286_e266es",
   "success": true,
   "findings": {
     "vulnerabilities": [
       {
         "severity": "high",
-        "file": "mobile/src/services/ai.ts",
-        "line": 8,
-        "description": "Audio transcription accepts user-provided URI without file size validation or MIME type validation. Allows large file uploads causing potential DoS or arbitrary file type uploads."
+        "file": "backend-mobile/src/index.ts",
+        "line": 100,
+        "description": "Hardcoded test credentials seeded into production database. Test user with plaintext password ('password') and hardcoded token ('test_token') can be used to gain unauthorized access. This should never be in committed code."
       },
       {
         "severity": "high",
-        "file": "mobile/src/services/offline.ts",
-        "line": 5,
-        "description": "Offline action queue stored in AsyncStorage without encryption. AsyncStorage is world-readable on both iOS and Android. Sensitive user data (habit toggles, missions) exposed if device is compromised."
+        "file": ".claude/helpers/github-safe.js",
+        "line": 55,
+        "description": "Command injection vulnerability in execSync call. Arguments are joined directly into shell command string: `execSync(\\`gh ${args.join(' ')}\\`)`. Malicious arguments can execute arbitrary shell commands. Even with temp file mitigation for body content, other flags/parameters are exposed."
       },
       {
         "severity": "medium",
-        "file": "mobile/src/services/notifications.ts",
-        "line": 47,
-        "description": "scheduleDailyReminders() accepts hour/minute parameters without validation. Invalid values (e.g., hour=25) could cause runtime errors or unexpected behavior."
+        "file": "backend-mobile/src/index.ts",
+        "line": 85,
+        "description": "Weak token validation in getUser(). Function accepts any string found in database as valid token without format/length validation. No token expiration or rotation. Any leaked token grants permanent access."
       },
       {
         "severity": "medium",
-        "file": "mobile/src/services/context.ts",
-        "line": 39,
-        "description": "Goal created_at field used without null check. If database returns null for created_at, new Date(null) = 1970-01-01, causing daysSince calculation to return incorrect (very large) values."
-      },
-      {
-        "severity": "medium",
-        "file": "mobile/src/services/purchases.ts",
-        "line": 23,
-        "description": "Mock purchase mode active if __DEV__ is true and RC keys missing. Misconfigured builds could allow purchasing bypass in production if __DEV__ flag isn't properly stripped."
-      },
-      {
-        "severity": "medium",
-        "file": "mobile/src/services/syncQueue.ts",
-        "line": 18,
-        "description": "Offline queue actions processed without payload validation. Malformed action.payload.date (not YYYY-MM-DD format) could cause database errors or unexpected behavior."
-      },
-      {
-        "severity": "low",
-        "file": "mobile/src/services/offline.ts",
+        "file": "backend-mobile/src/index.ts",
         "line": 22,
-        "description": "Type string in OfflineAction is hardcoded to 'habit_toggle' but not validated. Future action types added without validation could bypass intent checks."
+        "description": "CORS enabled without origin restriction: `app.use(cors())`. Allows requests from any origin. Should specify allowed origins: `cors({ origin: ['https://yourdomain.com'] })`"
+      },
+      {
+        "severity": "medium",
+        "file": "mobile/src/services/offline.ts",
+        "line": 28,
+        "description": "No input validation for offline queue payload. Arbitrary JSON objects can be stored in AsyncStorage without schema validation. If synced to backend without validation, could introduce data integrity issues or injection attacks."
       },
       {
         "severity": "low",
-        "file": "mobile/src/services/ai.ts",
-        "line": 23,
-        "description": "The invoke() function silently catches all errors in RateLimitError check. A function returning {limitReached: true} but also other errors could mask real failures."
+        "file": "mobile/src/lib/supabase.ts",
+        "line": 3,
+        "description": "Missing URL format validation for Supabase endpoint. Environment check only verifies non-empty string, not valid URL format. Malformed URLs could cause unexpected behavior."
       }
     ],
-    "riskScore": 42,
+    "riskScore": 72,
     "recommendations": [
-      "Add file size limits and MIME type validation in transcribeAudio() before upload — check file size < 10MB and type === 'audio/*'",
-      "Encrypt offline queue in AsyncStorage using react-native-encrypted-storage instead — sensitive user actions should never be stored in plaintext",
-      "Validate notification times: add guards like `if (morningH < 0 || morningH > 23) throw Error('Invalid hour')`",
-      "Add null coalescing for created_at: `const daysSince = g.created_at ? Math.floor((Date.now() - new Date(g.created_at).getTime()) / 86400000) : 0`",
-      "Strip __DEV__ flag completely from production builds — verify bundler config (Expo) removes __DEV__ in production",
-      "Validate date format in syncQueue — add `if (!action.payload.date.match(/\\d{4}-\\d{2}-\\d{2}/)) throw Error()`",
-      "Enable Supabase Row Level Security (RLS) on all tables to prevent unauthorized cross-user access — not visible in provided code",
-      "Add explicit authorization checks in backend functions, not just implicit user ID checks"
+      "Remove hardcoded test credentials immediately. Use environment-based test accounts or skip seeding in production builds.",
+      "Replace execSync command building with proper argument passing or use safer alternatives like child_process.execFileSync with argument array.",
+      "Implement token expiration (JWT with short TTL), validation (format checking), and rotation mechanisms.",
+      "Restrict CORS to specific allowed origins instead of '*'. Use: `cors({ origin: process.env.ALLOWED_ORIGINS?.split(',') })`",
+      "Add runtime schema validation for offline queue using zod/joi before storing. Validate structure matches expected action types.",
+      "Add URL format validation for Supabase endpoint: `new URL(supabaseUrl)` to throw on invalid format.",
+      "Hash passwords in database. Current schema stores plaintext. Use bcrypt with salt.",
+      "Add rate limiting to auth endpoints to prevent brute force attacks on token/password.",
+      "Remove environment variables from client-side code where possible. Supabase anon key is OK (public), but reconsider architecture if sensitive data depends on it.",
+      "Add input validation middleware for all POST/PUT routes before database operations."
     ]
   },
-  "rawOutputPreview": "Looking at this codebase, I found several security issues across authentication, data validation, and client-side storage. Here's my analysis:\n\n```json\n{\n  \"vulnerabilities\": [\n    {\n      \"severity\": \"high\",\n      \"file\": \"mobile/src/services/ai.ts\",\n      \"line\": 8,\n      \"description\": \"Audio transcription accepts user-provided URI without file size validation or MIME type validation. Allows large file uploads causing potential DoS or arbitrary file type uploads.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"mobile/src/services/offline.ts\",\n      \"line\": 5,\n      \"description\": \"Offline action queue stored in AsyncStorage without encryption. AsyncStorage is world-readable on both iOS and Android. Sensitive user data (habit toggles, missions) exposed if device is compromised.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/notifications.ts\",\n      \"line\": 47,\n      \"description\": \"scheduleDailyReminders() accepts hour/minute parameters without validation. Invalid values (e.g., hour=25) could cause runtime errors or unexpected behavior.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/context.ts\",\n      \"line\": 39,\n      \"description\": \"Goal created_at field used without null check. If database returns null for created_at, new Date(null) = 1970-01-01, causing daysSince calculation to return incorrect (very large) values.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/purchases.ts\",\n      \"line\": 23,\n      \"description\": \"Mock purchase mode active if __DEV__ is true and RC keys missing. Misconfigured builds could allow purchasing bypass in production if __DEV__ flag isn't properly stripped.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/syncQueue.ts\",\n      \"line\": 18,\n      \"description\": \"Offline queue actions processed without payload validation. Malformed action.payload.date (not YYYY-MM-DD format) could cause database errors or unexpecte",
-  "rawOutputLength": 3906
+  "rawOutputPreview": "```json\n{\n  \"vulnerabilities\": [\n    {\n      \"severity\": \"high\",\n      \"file\": \"backend-mobile/src/index.ts\",\n      \"line\": 100,\n      \"description\": \"Hardcoded test credentials seeded into production database. Test user with plaintext password ('password') and hardcoded token ('test_token') can be used to gain unauthorized access. This should never be in committed code.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \".claude/helpers/github-safe.js\",\n      \"line\": 55,\n      \"description\": \"Command injection vulnerability in execSync call. Arguments are joined directly into shell command string: `execSync(\\\\`gh ${args.join(' ')}\\\\`)`. Malicious arguments can execute arbitrary shell commands. Even with temp file mitigation for body content, other flags/parameters are exposed.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"backend-mobile/src/index.ts\",\n      \"line\": 85,\n      \"description\": \"Weak token validation in getUser(). Function accepts any string found in database as valid token without format/length validation. No token expiration or rotation. Any leaked token grants permanent access.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"backend-mobile/src/index.ts\",\n      \"line\": 22,\n      \"description\": \"CORS enabled without origin restriction: `app.use(cors())`. Allows requests from any origin. Should specify allowed origins: `cors({ origin: ['https://yourdomain.com'] })`\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/offline.ts\",\n      \"line\": 28,\n      \"description\": \"No input validation for offline queue payload. Arbitrary JSON objects can be stored in AsyncStorage without schema validation. If synced to backend without validation, could introduce data integrity issues or injection attacks.\"\n    },\n    {\n      \"severity\": \"low\",\n      \"file\": \"mobile/src/lib/supabase.ts\",\n      \"line\": 3,\n      \"description\": \"Missing URL format validation for Supabase endpoint. Environment check only verifies non-empty s",
+  "rawOutputLength": 3777
 }

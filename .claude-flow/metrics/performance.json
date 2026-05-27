@@ -1,15 +1,127 @@
 {
-  "timestamp": "2026-05-23T17:53:20.700Z",
+  "timestamp": "2026-05-25T13:03:34.247Z",
   "mode": "headless",
   "workerType": "optimize",
   "model": "sonnet",
-  "durationMs": 11944,
-  "executionId": "optimize_1779558788756_euwwfp",
-  "success": false,
+  "durationMs": 110982,
+  "executionId": "optimize_1779714103265_9ie8e5",
+  "success": true,
   "findings": {
-    "sections": [],
-    "codeBlocks": []
+    "sections": [
+      {
+        "title": "Performance Analysis — Monk.ai Mobile",
+        "content": "\n",
+        "level": 2
+      },
+      {
+        "title": "1. N+1 Query Patterns",
+        "content": "\n**`CoachScreen.loadProfile()` — sequential waterfall** (`mobile/src/screens/CoachScreen.tsx:276`)\n\nThree parallel queries run first, then two *sequential* queries fire after — one for free users' message count, one for habit completions. That's 5 round trips where 3 is the minimum:\n\n```ts\n// Current: 3 parallel → then 2 sequential (worst case 3 round trips)\nconst [userData, habitsData, checkinRows] = await Promise.all([...]);\n\n// Sequential #1 — only for free users\nconst { count } = await supabase.from('chat_messages')...\n// Sequential #2 — needs habit IDs from habitsData\nconst { data: completions } = await supabase.from('habit_completions')...\n```\n\nFix: include `chat_messages` count in the initial `Promise.all` and keep the completions query parallel too — habit IDs are available before the await resolves:\n\n```ts\nconst today = new Date().toISOString().split('T')[0];\nconst { data: { user } } = await supabase.auth.getUser();\n\n// Kick off ALL queries at once\nconst completionsPromise = supabase.from('habit_completions').select('habit_id')\n  .eq('date', today); // we'll filter by user_id via RLS, or join\n\nconst [userData, habitsData, checkinRows, msgCount] = await Promise.all([\n  supabase.from('users').select('...').eq('id', user.id).single(),\n  supabase.from('habits').select('id').eq('user_id', user.id),\n  supabase.from('check_ins').select('type, mission').eq('user_id', user.id).eq('date', today),\n  supabase.from('chat_messages')\n    .select('*', { count: 'exact', head: true })\n    .eq('user_id', user.id).eq('role', 'user').gte('created_at', today),\n]);\n// then filter completions client-side using habitsData\n```\n\n---\n\n**`buildCoachContext()` — habits → completions waterfall** (`mobile/src/services/context.ts:46`)\n\n```ts\n// Current: 4 parallel, then sequential completions fetch\nconst [userResult, habitsResult, goalsResult, checkinResult] = await Promise.all([...]);\n// ...\nif (habitIds.length > 0) {\n  const { data: completions } = await supabase  // ← extra round trip\n    .from('habit_completions').select('habit_id').eq('date', today).in('habit_id', habitIds);\n}\n```\n\nThis function is called on **every message send** and **every pep talk** — meaning users pay this round-trip cost 5+ times per session. Fix with a DB view or RPC that joins habits + completions in one query, or cache the result for ~60s:\n\n```ts\n// Option A: single RPC\nconst { data } = await supabase.rpc('get_coach_context', { p_user_id: userId });\n\n// Option B: module-level cache (simple, good enough)\nconst contextCache = new Map<string, { data: CoachContext; ts: number }>();\n\nexport async function buildCoachContext(userId: string): Promise<CoachContext> {\n  const cached = contextCache.get(userId);\n  if (cached && Date.now() - cached.ts < 60_000) return cached.data;\n  // ... fetch ...\n  contextCache.set(userId, { data: ctx, ts: Date.now() });\n  return ctx;\n}\n```\n\n---\n\n**`StatsScreen.loadStats()` — two sequential queries at the end** (`mobile/src/screens/StatsScreen.tsx:184`)\n\nMonthly completions and focus sessions are fetched *after* the main 6-query batch, serially:\n\n```ts\n// After the Promise.all resolves:\nconst { data: monthCompletions } = await supabase.from('habit_completions')...  // sequential\nconst { data: focusData } = await supabase.from('monk_sessions')...              // sequential\n```\n\nFix — include them in the initial batch:\n\n```ts\nconst [userData, habitsData, completionsData, checkInsData, totalHabits, totalMissions,\n       monthCompletions, focusData] = await Promise.all([\n  // existing 6 queries...\n  supabase.from('habit_completions').select('date, habit_id').eq('user_id', user.id).gte('date', monthStart),\n  supabase.from('monk_sessions').select('duration_minutes').eq('user_id', user.id).gte('completed_at', weekAgoISO),\n]);\n```\n\n---\n\n",
+        "level": 3
+      },
+      {
+        "title": "2. Unnecessary Re-renders",
+        "content": "\n**`QuoteCard` and `TodayCard` defined as inner functions** (`CoachScreen.tsx:566, 579`)\n\nBoth are defined *inside* `CoachScreen`, so they're recreated as new function references on every render. Since `messages` state changes on every chat message, these components re-render even when their data (streak, habits, quote) hasn't changed:\n\n```ts\n// Current — recreated every CoachScreen render\nconst QuoteCard = () => { ... };\nconst TodayCard = () => { ... };\n```\n\nFix: extract to `React.memo` components outside CoachScreen:\n\n```ts\nconst QuoteCard = React.memo(({ personality, color, dismissed, onDismiss }) => {\n  if (dismissed) return null;\n  const quote = getDailyQuote(personality);\n  return (...);\n});\n\nconst TodayCard = React.memo(({ streak, habitsToday, dopamineScore, morningDone, eveningDone }) => {\n  ...\n});\n```\n\n---\n\n**`renderMessage` not memoized in FlatList** (`CoachScreen.tsx:618`)\n\n```ts\n// Recreated every render → FlatList sees new prop → re-renders all visible cells\nconst renderMessage = ({ item }: { item: Message }) => (...)\n```\n\nFix:\n```ts\nconst renderMessage = useCallback(({ item }: { item: Message }) => (\n  <AnimatedMessageWrapper>\n    ...\n  </AnimatedMessageWrapper>\n), [personality, color, starredIds, handleStarMessage]); // only update when these change\n```\n\n---\n\n**Inline array allocation in JSX** (`CoachScreen.tsx:775`)\n\n```ts\n// New array created every render inside JSX — disrupts FlatList memoization\n{([[ dot1, dotY1 ], [dot2, dotY2], [dot3, dotY3]] as [Animated.Value, Animated.Value][]).map(...)}\n```\n\nFix — move to a `useRef` or constant outside render:\n\n```ts\nconst dotPairs = useRef<[Animated.Value, Animated.Value][]>([]);\n// populate in component body once:\nif (!dotPairs.current.length) {\n  dotPairs.current = [[dot1, dotY1], [dot2, dotY2], [dot3, dotY3]];\n}\n```\n\n---\n\n**Streak calendar IIFE inside render** (`StatsScreen.tsx:404`)\n\nThe entire calendar is built via an IIFE (`(() => { ... })()`) directly in JSX, running on every render. Extract to `React.memo`:\n\n```ts\nconst StreakCalendar = React.memo(({ monthData, rankColor }: { monthData: ..., rankColor: string }) => {\n  const now = new Date();\n  // ... calendar logic ...\n  return <View>...</View>;\n});\n```\n\n---\n\n",
+        "level": 3
+      },
+      {
+        "title": "3. Caching Opportunities",
+        "content": "\n**`buildCoachContext` called on every message** — see fix above. 60-second TTL is enough since the data (habits, goals, check-ins) is written by the same user moments apart.\n\n**`getQuickActions()` recalculated every render** (`CoachScreen.tsx:539`)\n\nTime-of-day changes only every 6 hours at most. Memoize:\n\n```ts\nconst quickActions = useMemo(() => getQuickActions(), []);\n// No deps needed — re-mount or focus event is the right refresh boundary\n```\n\n**Rate limit query duplicated client + server** (`CoachScreen.tsx:300`, `limits.ts:24`)\n\nThe client queries `chat_messages` count to show `messagesLeft`, and the server *also* queries `users.daily_messages` on every message. The server already tracks `daily_messages` atomically — use that as source of truth and return it in the response to skip the client-side query:\n\n```ts\n// In limits.ts, return remaining count in the response\nreturn new Response(JSON.stringify({ remaining: FREE_DAILY_LIMIT - user.daily_messages }), ...);\n\n// In invoke(), surface it\nif ((data as any)?.remaining !== undefined) {\n  // update messagesLeft state from server response, no client-side DB query needed\n}\n```\n\n---\n\n",
+        "level": 3
+      },
+      {
+        "title": "4. Memory Leaks",
+        "content": "\n**`searchDebounce` not cleared on unmount** (`CoachScreen.tsx:213`)\n\n```ts\nconst searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);\n\n// Current: only cleared in exitSearch(), not on unmount\n```\n\nFix — add cleanup:\n\n```ts\nuseEffect(() => {\n  return () => {\n    if (searchDebounce.current) clearTimeout(searchDebounce.current);\n  };\n}, []);\n```\n\n---\n\n**Recording animation loop not stopped on unmount** (`CoachScreen.tsx:490`)\n\n`Animated.loop(...).start()` in `startRecording` creates a persistent animation. If the component unmounts while recording (e.g., navigation), the loop continues running referencing stale state:\n\n```ts\nconst recordingAnimRef = useRef<Animated.CompositeAnimation | null>(null);\n\nconst startRecording = async () => {\n  // ...\n  recordingAnimRef.current = Animated.loop(...);\n  recordingAnimRef.current.start();\n};\n\n// Cleanup\nuseEffect(() => {\n  return () => {\n    recordingAnimRef.current?.stop();\n  };\n}, []);\n```\n\n---\n\n**`pulseAnim` loop runs forever** (`CoachScreen.tsx:226`)\n\nThe opacity pulse on the empty state icon loops continuously from mount, even when messages exist and the empty state isn't visible. Since `useNativeDriver: true`, it's cheap but wasteful:\n\n```ts\nuseEffect(() => {\n  if (messages.length > 0) return; // skip if not showing empty state\n  const anim = Animated.loop(...);\n  anim.start();\n  return () => anim.stop();\n}, [messages.length]); // stop when messages arrive\n```\n\n---\n\n",
+        "level": 3
+      },
+      {
+        "title": "5. Redundant Computations",
+        "content": "**`buildCoachContext` called independently per action** — `sendMessage`, `handlePepTalk`, and `generateOpeningMessage` each call `buildCoachContext(userId)` independently with no sharing. Three tab navigations away and back will trigger three independent multi-query fetches. The cache fix above solves this.\n\n**`supabase.auth.getUser()` called in every async function**\n\n`loadProfile`, `loadChatHistory`, `sendMessage`, `handlePepTalk`, `switchCoach`, `runSearch` — all call `supabase.auth.getUser()` independently. Cache it at component level:\n\n```ts\nconst userRef = useRef<string | null>(null);\n\nuseEffect(() => {\n  supabase.auth.getUser().then(({ data: { user } }) => {\n    userRef.current = user?.id ?? null;\n  });\n}, []);\n```\n\nThen replace `await supabase.auth.getUser()` with `userRef.current` in all handlers. On a cold start this saves ~5 redundant auth reads.\n\n---\n\n**Summary table:**\n\n| Issue | File | Impact | Fix effort |\n|---|---|---|---|\n| N+1: habits→completions in context | `context.ts:46` | High — every message | DB view / 60s cache |\n| N+1: stats sequential queries | `StatsScreen:184` | Medium | Add to Promise.all |\n| N+1: profile waterfall | `CoachScreen:300` | Medium | Merge into Promise.all |\n| Re-render: inner component functions | `CoachScreen:566` | High — on every message | React.memo extraction |\n| Re-render: renderMessage inline | `CoachScreen:618` | High | useCallback |\n| Re-render: calendar IIFE | `StatsScreen:404` | Medium | React.memo extraction |\n| Memory leak: searchDebounce | `CoachScreen:213` | Low | useEffect cleanup |\n| Memory leak: recording animation | `CoachScreen:490` | Low | ref + cleanup |\n| Redundant: getUser() per handler | `CoachScreen` | Medium | userRef cache |\n| Redundant: context rebuild per message | `context.ts` | High | 60s TTL cache |\n\nThe highest ROI fixes are: **cache `buildCoachContext`** (eliminates 2+ DB round trips per message) and **extract `QuoteCard`/`TodayCard` to `React.memo`** (stops re-rendering header on every keystroke and message).",
+        "level": 3
+      }
+    ],
+    "codeBlocks": [
+      {
+        "language": "ts",
+        "code": "// Current: 3 parallel → then 2 sequential (worst case 3 round trips)\nconst [userData, habitsData, checkinRows] = await Promise.all([...]);\n\n// Sequential #1 — only for free users\nconst { count } = await supabase.from('chat_messages')...\n// Sequential #2 — needs habit IDs from habitsData\nconst { data: completions } = await supabase.from('habit_completions')..."
+      },
+      {
+        "language": "ts",
+        "code": "const today = new Date().toISOString().split('T')[0];\nconst { data: { user } } = await supabase.auth.getUser();\n\n// Kick off ALL queries at once\nconst completionsPromise = supabase.from('habit_completions').select('habit_id')\n  .eq('date', today); // we'll filter by user_id via RLS, or join\n\nconst [userData, habitsData, checkinRows, msgCount] = await Promise.all([\n  supabase.from('users').select('...').eq('id', user.id).single(),\n  supabase.from('habits').select('id').eq('user_id', user.id),\n  supabase.from('check_ins').select('type, mission').eq('user_id', user.id).eq('date', today),\n  supabase.from('chat_messages')\n    .select('*', { count: 'exact', head: true })\n    .eq('user_id', user.id).eq('role', 'user').gte('created_at', today),\n]);\n// then filter completions client-side using habitsData"
+      },
+      {
+        "language": "ts",
+        "code": "// Current: 4 parallel, then sequential completions fetch\nconst [userResult, habitsResult, goalsResult, checkinResult] = await Promise.all([...]);\n// ...\nif (habitIds.length > 0) {\n  const { data: completions } = await supabase  // ← extra round trip\n    .from('habit_completions').select('habit_id').eq('date', today).in('habit_id', habitIds);\n}"
+      },
+      {
+        "language": "ts",
+        "code": "// Option A: single RPC\nconst { data } = await supabase.rpc('get_coach_context', { p_user_id: userId });\n\n// Option B: module-level cache (simple, good enough)\nconst contextCache = new Map<string, { data: CoachContext; ts: number }>();\n\nexport async function buildCoachContext(userId: string): Promise<CoachContext> {\n  const cached = contextCache.get(userId);\n  if (cached && Date.now() - cached.ts < 60_000) return cached.data;\n  // ... fetch ...\n  contextCache.set(userId, { data: ctx, ts: Date.now() });\n  return ctx;\n}"
+      },
+      {
+        "language": "ts",
+        "code": "// After the Promise.all resolves:\nconst { data: monthCompletions } = await supabase.from('habit_completions')...  // sequential\nconst { data: focusData } = await supabase.from('monk_sessions')...              // sequential"
+      },
+      {
+        "language": "ts",
+        "code": "const [userData, habitsData, completionsData, checkInsData, totalHabits, totalMissions,\n       monthCompletions, focusData] = await Promise.all([\n  // existing 6 queries...\n  supabase.from('habit_completions').select('date, habit_id').eq('user_id', user.id).gte('date', monthStart),\n  supabase.from('monk_sessions').select('duration_minutes').eq('user_id', user.id).gte('completed_at', weekAgoISO),\n]);"
+      },
+      {
+        "language": "ts",
+        "code": "// Current — recreated every CoachScreen render\nconst QuoteCard = () => { ... };\nconst TodayCard = () => { ... };"
+      },
+      {
+        "language": "ts",
+        "code": "const QuoteCard = React.memo(({ personality, color, dismissed, onDismiss }) => {\n  if (dismissed) return null;\n  const quote = getDailyQuote(personality);\n  return (...);\n});\n\nconst TodayCard = React.memo(({ streak, habitsToday, dopamineScore, morningDone, eveningDone }) => {\n  ...\n});"
+      },
+      {
+        "language": "ts",
+        "code": "// Recreated every render → FlatList sees new prop → re-renders all visible cells\nconst renderMessage = ({ item }: { item: Message }) => (...)"
+      },
+      {
+        "language": "ts",
+        "code": "const renderMessage = useCallback(({ item }: { item: Message }) => (\n  <AnimatedMessageWrapper>\n    ...\n  </AnimatedMessageWrapper>\n), [personality, color, starredIds, handleStarMessage]); // only update when these change"
+      },
+      {
+        "language": "ts",
+        "code": "// New array created every render inside JSX — disrupts FlatList memoization\n{([[ dot1, dotY1 ], [dot2, dotY2], [dot3, dotY3]] as [Animated.Value, Animated.Value][]).map(...)}"
+      },
+      {
+        "language": "ts",
+        "code": "const dotPairs = useRef<[Animated.Value, Animated.Value][]>([]);\n// populate in component body once:\nif (!dotPairs.current.length) {\n  dotPairs.current = [[dot1, dotY1], [dot2, dotY2], [dot3, dotY3]];\n}"
+      },
+      {
+        "language": "ts",
+        "code": "const StreakCalendar = React.memo(({ monthData, rankColor }: { monthData: ..., rankColor: string }) => {\n  const now = new Date();\n  // ... calendar logic ...\n  return <View>...</View>;\n});"
+      },
+      {
+        "language": "ts",
+        "code": "const quickActions = useMemo(() => getQuickActions(), []);\n// No deps needed — re-mount or focus event is the right refresh boundary"
+      },
+      {
+        "language": "ts",
+        "code": "// In limits.ts, return remaining count in the response\nreturn new Response(JSON.stringify({ remaining: FREE_DAILY_LIMIT - user.daily_messages }), ...);\n\n// In invoke(), surface it\nif ((data as any)?.remaining !== undefined) {\n  // update messagesLeft state from server response, no client-side DB query needed\n}"
+      },
+      {
+        "language": "ts",
+        "code": "const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);\n\n// Current: only cleared in exitSearch(), not on unmount"
+      },
+      {
+        "language": "ts",
+        "code": "useEffect(() => {\n  return () => {\n    if (searchDebounce.current) clearTimeout(searchDebounce.current);\n  };\n}, []);"
+      },
+      {
+        "language": "ts",
+        "code": "const recordingAnimRef = useRef<Animated.CompositeAnimation | null>(null);\n\nconst startRecording = async () => {\n  // ...\n  recordingAnimRef.current = Animated.loop(...);\n  recordingAnimRef.current.start();\n};\n\n// Cleanup\nuseEffect(() => {\n  return () => {\n    recordingAnimRef.current?.stop();\n  };\n}, []);"
+      },
+      {
+        "language": "ts",
+        "code": "useEffect(() => {\n  if (messages.length > 0) return; // skip if not showing empty state\n  const anim = Animated.loop(...);\n  anim.start();\n  return () => anim.stop();\n}, [messages.length]); // stop when messages arrive"
+      },
+      {
+        "language": "ts",
+        "code": "const userRef = useRef<string | null>(null);\n\nuseEffect(() => {\n  supabase.auth.getUser().then(({ data: { user } }) => {\n    userRef.current = user?.id ?? null;\n  });\n}, []);"
+      }
+    ]
   },
-  "rawOutputPreview": "You've hit your session limit · resets 9:20pm (Europe/London)\n",
-  "rawOutputLength": 62
+  "rawOutputPreview": "Now I have enough to do a thorough analysis. Here's the full performance report:\n\n---\n\n## Performance Analysis — Monk.ai Mobile\n\n### 1. N+1 Query Patterns\n\n**`CoachScreen.loadProfile()` — sequential waterfall** (`mobile/src/screens/CoachScreen.tsx:276`)\n\nThree parallel queries run first, then two *sequential* queries fire after — one for free users' message count, one for habit completions. That's 5 round trips where 3 is the minimum:\n\n```ts\n// Current: 3 parallel → then 2 sequential (worst case 3 round trips)\nconst [userData, habitsData, checkinRows] = await Promise.all([...]);\n\n// Sequential #1 — only for free users\nconst { count } = await supabase.from('chat_messages')...\n// Sequential #2 — needs habit IDs from habitsData\nconst { data: completions } = await supabase.from('habit_completions')...\n```\n\nFix: include `chat_messages` count in the initial `Promise.all` and keep the completions query parallel too — habit IDs are available before the await resolves:\n\n```ts\nconst today = new Date().toISOString().split('T')[0];\nconst { data: { user } } = await supabase.auth.getUser();\n\n// Kick off ALL queries at once\nconst completionsPromise = supabase.from('habit_completions').select('habit_id')\n  .eq('date', today); // we'll filter by user_id via RLS, or join\n\nconst [userData, habitsData, checkinRows, msgCount] = await Promise.all([\n  supabase.from('users').select('...').eq('id', user.id).single(),\n  supabase.from('habits').select('id').eq('user_id', user.id),\n  supabase.from('check_ins').select('type, mission').eq('user_id', user.id).eq('date', today),\n  supabase.from('chat_messages')\n    .select('*', { count: 'exact', head: true })\n    .eq('user_id', user.id).eq('role', 'user').gte('created_at', today),\n]);\n// then filter completions client-side using habitsData\n```\n\n---\n\n**`buildCoachContext()` — habits → completions waterfall** (`mobile/src/services/context.ts:46`)\n\n```ts\n// Current: 4 parallel, then sequential completions fetch\nconst [userResult, habitsResult, goalsR",
+  "rawOutputLength": 10886
 }
