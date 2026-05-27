@@ -1,0 +1,111 @@
+<h2>Monk.ai mobile app — full design</h2>
+<p class="subtitle">Iterating on /mobile to match monk-ai_4.html. Confirm each section.</p>
+
+<div class="section">
+  <h3>1 — Backend AI proxy (same as before)</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;line-height:2;color:#aaa;">
+    backend/src/index.ts &nbsp;&nbsp;&nbsp;← Express + 5 routes<br>
+    backend/src/prompts.ts &nbsp;← rich personality prompts from monk-ai-handoff/src/ai.ts<br>
+    backend/.env &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← ANTHROPIC_API_KEY, PORT=3001<br><br>
+    <span style="color:#f06060;">DELETE</span> mobile/src/services/openai.ts<br>
+    <span style="color:#b8f058;">NEW &nbsp;&nbsp;</span> mobile/src/services/ai.ts &nbsp;&nbsp;← calls localhost:3001
+  </div>
+</div>
+
+<div class="section">
+  <h3>2 — Onboarding flow (new)</h3>
+  <div style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#b8f058;">Login/Register</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#b8f058;">What do I call you?</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#b8f058;">Pick your coach</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#b8f058;">Who are you becoming?</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#fff;">Main app</div>
+    </div>
+    <div style="color:#555;font-size:11px;margin-top:10px;">Triggered once after first login. Saved to Supabase users table (name, personality, identity_statement).</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3 — CoachScreen additions</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+      <div style="color:#b8f058;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">MONK MODE PANEL</div>
+      <div style="color:#aaa;font-size:11px;line-height:1.8;">
+        Toggle button in header<br>
+        When active, panel slides up with:<br>
+        • Block Distractions<br>
+        • Dopamine Detox Timer<br>
+        • No Excuses Mode<br>
+        • Strict Daily Goals<br>
+        Saved to users.monk_mode in Supabase
+      </div>
+    </div>
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+      <div style="color:#b8f058;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">VOICE INPUT</div>
+      <div style="color:#aaa;font-size:11px;line-height:1.8;">
+        Mic button in chat input bar<br>
+        Uses expo-av / expo-speech<br>
+        "Listening…" state indicator<br>
+        Transcribed text fills input<br>
+        Only on physical device<br>(not simulator)
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>4 — Screen restyling</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:14px;">
+    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid #222;">
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">CoachScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Header with streak + Monk Mode toggle. Chat bubbles styled per prototype. "Pep talk" quick action button.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #222;">
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">CheckInScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Morning / Evening tabs. Mission input with "Lock it in" CTA. Energy slider (1–5). "Did you follow through?" evening prompt.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #222;">
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">HabitsScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Habit cards with colored category badges. Streak counter. One-tap complete. Add habit form.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #222;">
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">GoalsScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Goal cards with progress bar, deadline, stall detection ("This goal is STALLED").</td>
+      </tr>
+      <tr style="border-bottom:1px solid #222;">
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">StatsScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Dopamine Score ring. Rank system (Starting Out → Rising Force → Monk Elite). Leaderboard. This Week summary.</td>
+      </tr>
+      <tr>
+        <td style="color:#b8f058;padding:6px 8px;font-family:monospace;">ReviewScreen</td>
+        <td style="color:#aaa;padding:6px 8px;">Weekly date header. AI-generated 3-paragraph forensic analysis. Triggered manually.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>5 — Font setup</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#aaa;">
+    Install expo-font + @expo-google-fonts/syne + @expo-google-fonts/dm-mono<br>
+    Load in App.tsx with useFonts hook<br>
+    Apply: Syne_700Bold for headings, DMmono_400Regular for labels
+  </div>
+</div>
+
+<div class="section">
+  <h3>6 — Supabase additions needed</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#aaa;line-height:1.8;">
+    users table already has: personality, identity_statement, monk_mode, streak, dopamine_score<br>
+    <span style="color:#b8f058;">ADD:</span> onboarding_done boolean default false &nbsp;&nbsp;← gate the onboarding flow<br>
+    All other tables (habits, goals, check_ins, chat_messages) already in supabase.sql ✓
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px;">Does this cover everything? Reply in terminal.</p>

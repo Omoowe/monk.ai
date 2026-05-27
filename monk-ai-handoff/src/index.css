@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #080810;
+  --bg2: #10101c;
+  --bg3: #18182a;
+  --bg4: #1f1f32;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #eeecf0;
+  --muted: #7a7888;
+  --accent: #b8f058;
+  --accent2: #7b6af0;
+  --accent3: #f06060;
+  --gold: #f5c840;
+  --teal: #40f5c8;
+  --font: 'Syne', sans-serif;
+  --mono: 'DM Mono', monospace;
+
+  /* Safe area insets for iPhone notch / Dynamic Island / home indicator */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+html {
+  /* Prevent font size inflation on iOS */
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body, #root {
+  height: 100%;
+  /* Use dvh (dynamic viewport height) to handle iOS browser chrome */
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  /* Prevent iOS rubber-band scrolling on the body */
+  overscroll-behavior: none;
+}
+
+/* Scrollable containers use momentum scrolling on iOS */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+::-webkit-scrollbar { width: 0px; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse-dot {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.animate-fade-up { animation: fadeUp 0.4s ease both; }
+.animate-fade-in { animation: fadeIn 0.3s ease both; }
+.delay-100 { animation-delay: 0.08s; }
+.delay-200 { animation-delay: 0.16s; }
+.delay-300 { animation-delay: 0.24s; }
+.delay-400 { animation-delay: 0.32s; }
+.delay-500 { animation-delay: 0.4s; }
+
+.typing-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: pulse-dot 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.bar-animate {
+  transform-origin: bottom;
+  animation: bar-grow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+input, textarea, select {
+  font-family: var(--font);
+  /* Prevent iOS zoom on focus (requires font-size >= 16px) */
+  font-size: 16px;
+}
+
+/* Larger touch targets for mobile — min 44x44px (Apple HIG) */
+button {
+  min-height: 36px;
+  cursor: pointer;
+}
+
+/* Prevent selection on UI elements */
+nav, header, button {
+  user-select: none;
+  -webkit-user-select: none;
+}

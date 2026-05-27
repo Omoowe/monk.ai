@@ -1,0 +1,115 @@
+<h2>Monk.ai mobile — updated design</h2>
+<p class="subtitle">Backend = Supabase Edge Functions. No separate server.</p>
+
+<div class="section">
+  <h3>1 — AI backend: Supabase Edge Functions</h3>
+  <div style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#b8f058;">Mobile (Expo)</div>
+      <div style="color:#555;">──▶</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#40f5c8;">Supabase Edge Function</div>
+      <div style="color:#555;">──▶</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 12px;font-size:11px;font-family:monospace;color:#7b6af0;">Anthropic API</div>
+    </div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:6px;padding:12px;font-family:monospace;font-size:11px;line-height:2;color:#aaa;">
+      supabase/functions/chat/index.ts<br>
+      supabase/functions/pep-talk/index.ts<br>
+      supabase/functions/morning-brief/index.ts<br>
+      supabase/functions/evening-feedback/index.ts<br>
+      supabase/functions/review/index.ts
+    </div>
+    <div style="color:#555;font-size:11px;margin-top:10px;">
+      ANTHROPIC_API_KEY stored as Supabase secret (never in mobile bundle).<br>
+      Local dev: <span style="font-family:monospace;color:#b8f058;">supabase functions serve</span> runs them locally.<br>
+      Deploy: <span style="font-family:monospace;color:#b8f058;">supabase functions deploy</span> — no separate server to manage.
+    </div>
+  </div>
+  <div style="margin-top:8px;">
+    <span style="color:#f06060;font-size:11px;">DELETE</span><span style="color:#aaa;font-size:11px;font-family:monospace;"> mobile/src/services/openai.ts</span><br>
+    <span style="color:#b8f058;font-size:11px;">NEW &nbsp;&nbsp;</span><span style="color:#aaa;font-size:11px;font-family:monospace;"> mobile/src/services/ai.ts</span><span style="color:#555;font-size:11px;"> — calls Supabase function URLs</span>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2 — Onboarding flow (new)</h3>
+  <div style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:14px;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 11px;font-size:11px;font-family:monospace;color:#b8f058;">Login/Register</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 11px;font-size:11px;font-family:monospace;color:#b8f058;">Name</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 11px;font-size:11px;font-family:monospace;color:#b8f058;">Pick coach</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 11px;font-size:11px;font-family:monospace;color:#b8f058;">Identity</div>
+      <div style="color:#555;">→</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 11px;font-size:11px;font-family:monospace;color:#fff;">Main app</div>
+    </div>
+    <div style="color:#555;font-size:11px;margin-top:10px;">Gated by users.onboarding_done. Shown once after first login.</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3 — CoachScreen additions</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+      <div style="color:#b8f058;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">MONK MODE PANEL</div>
+      <div style="color:#aaa;font-size:11px;line-height:1.8;">Toggle in header<br>Panel slides up:<br>• Block Distractions<br>• Dopamine Detox Timer<br>• No Excuses Mode<br>• Strict Daily Goals<br>Saved to users.monk_mode</div>
+    </div>
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+      <div style="color:#b8f058;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">VOICE INPUT</div>
+      <div style="color:#aaa;font-size:11px;line-height:1.8;">Mic button in input bar<br>expo-speech or<br>@react-native-voice/voice<br>"Listening…" indicator<br>Fills text input<br>Device only (not sim)</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>4 — Screen restyling (all 6)</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:14px;">
+    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid #1a1a1a;">
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Coach</td>
+        <td style="color:#aaa;padding:5px 8px;">Header: streak + Monk Mode toggle. Chat bubbles. Pep talk button.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1a1a1a;">
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Check-In</td>
+        <td style="color:#aaa;padding:5px 8px;">Morning/Evening tabs. Mission lock-in. Energy 1–5. "Did you follow through?"</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1a1a1a;">
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Habits</td>
+        <td style="color:#aaa;padding:5px 8px;">Category badges. Streak counter. One-tap complete.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1a1a1a;">
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Goals</td>
+        <td style="color:#aaa;padding:5px 8px;">Progress bar. Deadline. Stall detection ("This goal is STALLED").</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1a1a1a;">
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Stats</td>
+        <td style="color:#aaa;padding:5px 8px;">Dopamine Score ring. Rank system. Leaderboard. This Week view.</td>
+      </tr>
+      <tr>
+        <td style="color:#b8f058;padding:5px 8px;font-family:monospace;white-space:nowrap;">Review</td>
+        <td style="color:#aaa;padding:5px 8px;">Weekly header. 3-paragraph AI forensic analysis.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>5 — Fonts + Supabase migration</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;font-size:11px;color:#aaa;font-family:monospace;line-height:1.8;">
+      expo-font<br>
+      @expo-google-fonts/syne<br>
+      @expo-google-fonts/dm-mono<br>
+      <span style="color:#b8f058;">@react-native-voice/voice</span>
+    </div>
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;font-size:11px;color:#aaa;font-family:monospace;line-height:1.8;">
+      ALTER TABLE users<br>
+      ADD COLUMN onboarding_done<br>
+      BOOLEAN DEFAULT false;<br>
+      <span style="color:#555;">(all other tables exist ✓)</span>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px;">Does this look right? Reply in terminal.</p>

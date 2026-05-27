@@ -1,0 +1,98 @@
+<h2>Landing page design</h2>
+<p class="subtitle">Architecture + page structure — confirm before writing the spec</p>
+
+<div class="section">
+  <h3>What gets added / changed</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+    <div style="background:#0f1a0a;border:1px solid #2a4a1a;border-radius:8px;padding:14px;">
+      <div style="color:#b8f058;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">NEW FILES</div>
+      <div style="color:#ccc;font-size:12px;line-height:2;font-family:monospace;">
+        src/pages/LandingPage.tsx<br>
+        src/lib/supabase.ts<br>
+        .env.example
+      </div>
+    </div>
+    <div style="background:#1a0f0a;border:1px solid #4a2a1a;border-radius:8px;padding:14px;">
+      <div style="color:#f0a060;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">MODIFIED</div>
+      <div style="color:#ccc;font-size:12px;line-height:2;font-family:monospace;">
+        src/main.tsx — add BrowserRouter<br>
+        src/App.tsx — add Routes<br>
+        package.json — 2 new deps
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Routing</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;color:#aaa;line-height:1.8;">
+    <span style="color:#b8f058;">/</span> → LandingPage.tsx &nbsp;&nbsp;<span style="color:#444;">(new — email waitlist)</span><br>
+    <span style="color:#b8f058;">/app</span> → existing App logic &nbsp;<span style="color:#444;">(unchanged)</span>
+  </div>
+</div>
+
+<div class="section">
+  <h3>5 page sections</h3>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="color:#b8f058;font-size:10px;font-family:monospace;min-width:20px;">01</div>
+      <div>
+        <div style="color:#fff;font-size:13px;font-weight:700;">Hero</div>
+        <div style="color:#666;font-size:11px;">Full viewport · "Stop organizing. Start becoming." · inline email form</div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="color:#b8f058;font-size:10px;font-family:monospace;min-width:20px;">02</div>
+      <div>
+        <div style="color:#fff;font-size:13px;font-weight:700;">Problem</div>
+        <div style="color:#666;font-size:11px;">"Most apps help you organize. None hold you accountable." · 3 pain points</div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="color:#b8f058;font-size:10px;font-family:monospace;min-width:20px;">03</div>
+      <div>
+        <div style="color:#fff;font-size:13px;font-weight:700;">Features</div>
+        <div style="color:#666;font-size:11px;">3 cards: Memory · Monk Mode · Streak system</div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="color:#b8f058;font-size:10px;font-family:monospace;min-width:20px;">04</div>
+      <div>
+        <div style="color:#fff;font-size:13px;font-weight:700;">Personalities</div>
+        <div style="color:#666;font-size:11px;">6 coach cards — the viral hook · pulls from existing store.ts data</div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="color:#b8f058;font-size:10px;font-family:monospace;min-width:20px;">05</div>
+      <div>
+        <div style="color:#fff;font-size:13px;font-weight:700;">Waitlist CTA</div>
+        <div style="color:#666;font-size:11px;">Repeat email form · "First 500 get 3 months Pro free"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Supabase</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:14px;font-family:monospace;font-size:12px;color:#aaa;">
+    <div style="color:#b8f058;margin-bottom:6px;">-- run in Supabase SQL editor</div>
+    create table waitlist (<br>
+    &nbsp;&nbsp;id uuid default gen_random_uuid() primary key,<br>
+    &nbsp;&nbsp;email text unique not null,<br>
+    &nbsp;&nbsp;created_at timestamptz default now()<br>
+    );<br><br>
+    <div style="color:#b8f058;margin-bottom:6px;">-- RLS: allow anonymous inserts only</div>
+    alter table waitlist enable row level security;<br>
+    create policy "anon insert" on waitlist for insert to anon with check (true);
+  </div>
+  <div style="color:#555;font-size:11px;margin-top:8px;">VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY in .env — safe to expose (insert-only + RLS)</div>
+</div>
+
+<div class="section">
+  <h3>New deps to install</h3>
+  <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#b8f058;">
+    npm install react-router-dom @supabase/supabase-js
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px;">Does this architecture look right? Reply in terminal to confirm or flag changes.</p>

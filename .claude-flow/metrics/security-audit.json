@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-05-23T17:54:42.150Z",
+  "mode": "headless",
+  "workerType": "audit",
+  "model": "haiku",
+  "durationMs": 93386,
+  "executionId": "audit_1779558788764_7nv2uw",
+  "success": true,
+  "findings": {
+    "vulnerabilities": [
+      {
+        "severity": "high",
+        "file": "mobile/src/services/ai.ts",
+        "line": 8,
+        "description": "Audio transcription accepts user-provided URI without file size validation or MIME type validation. Allows large file uploads causing potential DoS or arbitrary file type uploads."
+      },
+      {
+        "severity": "high",
+        "file": "mobile/src/services/offline.ts",
+        "line": 5,
+        "description": "Offline action queue stored in AsyncStorage without encryption. AsyncStorage is world-readable on both iOS and Android. Sensitive user data (habit toggles, missions) exposed if device is compromised."
+      },
+      {
+        "severity": "medium",
+        "file": "mobile/src/services/notifications.ts",
+        "line": 47,
+        "description": "scheduleDailyReminders() accepts hour/minute parameters without validation. Invalid values (e.g., hour=25) could cause runtime errors or unexpected behavior."
+      },
+      {
+        "severity": "medium",
+        "file": "mobile/src/services/context.ts",
+        "line": 39,
+        "description": "Goal created_at field used without null check. If database returns null for created_at, new Date(null) = 1970-01-01, causing daysSince calculation to return incorrect (very large) values."
+      },
+      {
+        "severity": "medium",
+        "file": "mobile/src/services/purchases.ts",
+        "line": 23,
+        "description": "Mock purchase mode active if __DEV__ is true and RC keys missing. Misconfigured builds could allow purchasing bypass in production if __DEV__ flag isn't properly stripped."
+      },
+      {
+        "severity": "medium",
+        "file": "mobile/src/services/syncQueue.ts",
+        "line": 18,
+        "description": "Offline queue actions processed without payload validation. Malformed action.payload.date (not YYYY-MM-DD format) could cause database errors or unexpected behavior."
+      },
+      {
+        "severity": "low",
+        "file": "mobile/src/services/offline.ts",
+        "line": 22,
+        "description": "Type string in OfflineAction is hardcoded to 'habit_toggle' but not validated. Future action types added without validation could bypass intent checks."
+      },
+      {
+        "severity": "low",
+        "file": "mobile/src/services/ai.ts",
+        "line": 23,
+        "description": "The invoke() function silently catches all errors in RateLimitError check. A function returning {limitReached: true} but also other errors could mask real failures."
+      }
+    ],
+    "riskScore": 42,
+    "recommendations": [
+      "Add file size limits and MIME type validation in transcribeAudio() before upload — check file size < 10MB and type === 'audio/*'",
+      "Encrypt offline queue in AsyncStorage using react-native-encrypted-storage instead — sensitive user actions should never be stored in plaintext",
+      "Validate notification times: add guards like `if (morningH < 0 || morningH > 23) throw Error('Invalid hour')`",
+      "Add null coalescing for created_at: `const daysSince = g.created_at ? Math.floor((Date.now() - new Date(g.created_at).getTime()) / 86400000) : 0`",
+      "Strip __DEV__ flag completely from production builds — verify bundler config (Expo) removes __DEV__ in production",
+      "Validate date format in syncQueue — add `if (!action.payload.date.match(/\\d{4}-\\d{2}-\\d{2}/)) throw Error()`",
+      "Enable Supabase Row Level Security (RLS) on all tables to prevent unauthorized cross-user access — not visible in provided code",
+      "Add explicit authorization checks in backend functions, not just implicit user ID checks"
+    ]
+  },
+  "rawOutputPreview": "Looking at this codebase, I found several security issues across authentication, data validation, and client-side storage. Here's my analysis:\n\n```json\n{\n  \"vulnerabilities\": [\n    {\n      \"severity\": \"high\",\n      \"file\": \"mobile/src/services/ai.ts\",\n      \"line\": 8,\n      \"description\": \"Audio transcription accepts user-provided URI without file size validation or MIME type validation. Allows large file uploads causing potential DoS or arbitrary file type uploads.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"mobile/src/services/offline.ts\",\n      \"line\": 5,\n      \"description\": \"Offline action queue stored in AsyncStorage without encryption. AsyncStorage is world-readable on both iOS and Android. Sensitive user data (habit toggles, missions) exposed if device is compromised.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/notifications.ts\",\n      \"line\": 47,\n      \"description\": \"scheduleDailyReminders() accepts hour/minute parameters without validation. Invalid values (e.g., hour=25) could cause runtime errors or unexpected behavior.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/context.ts\",\n      \"line\": 39,\n      \"description\": \"Goal created_at field used without null check. If database returns null for created_at, new Date(null) = 1970-01-01, causing daysSince calculation to return incorrect (very large) values.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/purchases.ts\",\n      \"line\": 23,\n      \"description\": \"Mock purchase mode active if __DEV__ is true and RC keys missing. Misconfigured builds could allow purchasing bypass in production if __DEV__ flag isn't properly stripped.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \"mobile/src/services/syncQueue.ts\",\n      \"line\": 18,\n      \"description\": \"Offline queue actions processed without payload validation. Malformed action.payload.date (not YYYY-MM-DD format) could cause database errors or unexpecte",
+  "rawOutputLength": 3906
+}

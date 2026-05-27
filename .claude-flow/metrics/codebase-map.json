@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-05-23T17:37:23.297Z",
+  "projectRoot": "/Users/hafee/Documents/Claude/Monk",
+  "structure": {
+    "hasPackageJson": false,
+    "hasTsConfig": false,
+    "hasClaudeConfig": true,
+    "hasClaudeFlow": true
+  },
+  "scannedAt": 1779557843297
+}

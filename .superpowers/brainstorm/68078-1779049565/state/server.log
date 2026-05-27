@@ -1,0 +1,14 @@
+{"type":"server-started","port":57679,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57679","screen_dir":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content","state_dir":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/state"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/landing-direction.html"}
+{"source":"user-event","type":"click","text":"MONK.AI\n      Stop organizing.Start becoming.\n      The AI that holds you accountable when you want to quit.\n      JOIN WAITLIST\n    \n    \n      A — Dark & Intense\n      Black background, acid green accents, militaristic typography. Matches the drill sergeant / Goggins energy. Targets discipline-obsessed Gen Z.","choice":"a","id":null,"timestamp":1779049636231}
+{"source":"user-event","type":"click","text":"MONK.AI\n      Stop organizing.Start becoming.\n      The AI that holds you accountable when you want to quit.\n      JOIN WAITLIST\n    \n    \n      A — Dark & Intense\n      Black background, acid green accents, militaristic typography. Matches the drill sergeant / Goggins energy. Targets discipline-obsessed Gen Z.","choice":"a","id":null,"timestamp":1779049638519}
+{"source":"user-event","type":"click","text":"MONK.AI\n      Stop organizing.Start becoming.\n      The AI that holds you accountable when you want to quit.\n      JOIN WAITLIST\n    \n    \n      A — Dark & Intense\n      Black background, acid green accents, militaristic typography. Matches the drill sergeant / Goggins energy. Targets discipline-obsessed Gen Z.","choice":"a","id":null,"timestamp":1779049638785}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/hero-layout.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/page-sections.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/waiting-1.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/design-architecture.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/waiting-2.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/design-mobile-backend.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/design-full-mobile.html"}
+{"type":"screen-added","file":"/Users/hafee/Documents/Claude/Monk/.superpowers/brainstorm/68078-1779049565/content/design-full-mobile-v2.html"}
+{"type":"server-stopped","reason":"idle timeout"}

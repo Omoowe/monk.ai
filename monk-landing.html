@@ -110,12 +110,23 @@
       border: 1px solid #181818;
       border-radius: 22px;
       overflow: hidden;
+      position: relative;
       transition: border-color 0.4s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .b-card:hover {
       border-color: rgba(184,240,88,0.2);
       transform: translateY(-4px);
     }
+    .b-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(184,240,88,0.065) 0%, transparent 65%);
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .b-card:hover::after { opacity: 1; }
 
     /* Scrub words */
     .scrub-w { opacity: 0.08; display: inline; }
@@ -275,7 +286,7 @@
           <!-- AI message -->
           <div class="mb-4">
             <div class="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-sm p-4">
-              <p class="text-white/70 text-[13px] leading-relaxed font-medium">
+              <p id="hero-msg-1" class="text-white/70 text-[13px] leading-relaxed font-medium">
                 "You committed to training at 06:00. It's 08:52. I tracked the same pattern last Monday and Tuesday. What changed — and don't give me a feeling, give me a reason."
               </p>
             </div>
@@ -284,14 +295,14 @@
           <!-- User message -->
           <div class="flex justify-end mb-4">
             <div class="bg-[#b8f058]/10 border border-[#b8f058]/15 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[75%]">
-              <p class="text-[#b8f058] text-[12px] leading-relaxed font-semibold">I overslept again. I know.</p>
+              <p id="hero-msg-user" class="text-[#b8f058] text-[12px] leading-relaxed font-semibold">I overslept again. I know.</p>
             </div>
           </div>
 
           <!-- Coach response 2 -->
           <div class="mb-5">
             <div class="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-sm p-4">
-              <p class="text-white/70 text-[13px] leading-relaxed font-medium">
+              <p id="hero-msg-2" class="text-white/70 text-[13px] leading-relaxed font-medium">
                 "Knowing is not enough. When does this pattern end? Set your alarm now. I'll check tomorrow."
               </p>
             </div>
@@ -335,41 +346,41 @@
   <section class="py-10 border-y border-[#131313] overflow-hidden">
     <div class="overflow-hidden">
       <div class="marquee-track">
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#b8f058]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f5c840]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7b6af0]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#40f5c8]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f0a060]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
         <!-- duplicate for seamless loop -->
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">No Excuses</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Discipline Is Freedom</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#b8f058]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Stay Hard</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f5c840]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Unlock Your Final Form</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7b6af0]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">ROI On Every Habit</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#40f5c8]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Pattern Recognized</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f0a060]"></span>
-        <span class="font-black text-[1.35rem] text-white/12 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
+        <span class="font-black text-[1.35rem] text-white/20 uppercase tracking-[-0.02em] whitespace-nowrap">Growth Through Friction</span>
         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#f06060]"></span>
       </div>
     </div>
   </section>
 
   <!-- COACHES: Horizontal Accordion -->
-  <section id="coaches" class="py-36 md:py-52 px-6">
+  <section id="coaches" class="py-36 md:py-52 px-6" style="background:#060606;">
     <div class="max-w-7xl mx-auto">
       <h2 class="font-black leading-[0.88] tracking-[-0.045em] text-white mb-16" style="font-size: clamp(2.8rem, 5.5vw, 5.5rem);">
         Six coaches.<br><span style="color:rgba(255,255,255,0.3);">Zero tolerance.</span>
@@ -731,22 +742,22 @@
 
         <!-- Free -->
         <div class="b-card p-9">
-          <h3 class="font-black text-lg text-white mb-1">Free</h3>
+          <h3 class="font-black text-lg text-white/40 mb-1">Free</h3>
           <div class="flex items-baseline gap-1.5 mb-8">
-            <span class="font-black text-white" style="font-size: 4rem; line-height: 1; letter-spacing: -0.04em;">$0</span>
-            <span class="text-white/25 text-sm">/ forever</span>
+            <span class="font-black text-white/25" style="font-size: 4rem; line-height: 1; letter-spacing: -0.04em;">$0</span>
+            <span class="text-white/15 text-sm">/ forever</span>
           </div>
           <ul class="space-y-3.5 mb-10">
-            <li class="flex items-center gap-3 text-sm text-white/55">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+            <li class="flex items-center gap-3 text-sm text-white/30">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
               1 coach personality
             </li>
-            <li class="flex items-center gap-3 text-sm text-white/55">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+            <li class="flex items-center gap-3 text-sm text-white/30">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
               10 AI messages per day
             </li>
-            <li class="flex items-center gap-3 text-sm text-white/55">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
+            <li class="flex items-center gap-3 text-sm text-white/30">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.6"><path d="M5 13l4 4L19 7"/></svg>
               3 habits, 2 goals
             </li>
             <li class="flex items-center gap-3 text-sm text-white/20">
@@ -922,6 +933,59 @@
         scrollTrigger: { trigger:'#pricing', start:'top 70%' }
       }
     );
+
+    // === Bento cursor spotlight ===
+    document.querySelectorAll('.b-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+
+    // === Hero chat typewriter loop ===
+    (function() {
+      const msg1El = document.getElementById('hero-msg-1');
+      const msgUserEl = document.getElementById('hero-msg-user');
+      const msg2El = document.getElementById('hero-msg-2');
+      if (!msg1El || !msgUserEl || !msg2El) return;
+
+      const M1 = `”You committed to training at 06:00. It’s 08:52. I tracked the same pattern last Monday and Tuesday. What changed — and don’t give me a feeling, give me a reason.”`;
+      const MU = `I overslept again. I know.`;
+      const M2 = `”Knowing is not enough. When does this pattern end? Set your alarm now. I’ll check tomorrow.”`;
+      const CUR = '▌';
+
+      function typeInto(el, text, msPerChar, cb) {
+        let i = 0;
+        el.textContent = '';
+        const id = setInterval(() => {
+          i++;
+          el.textContent = text.slice(0, i) + (i < text.length ? CUR : '');
+          if (i >= text.length) { clearInterval(id); if (cb) setTimeout(cb, 420); }
+        }, msPerChar);
+      }
+
+      function runLoop() {
+        msg1El.textContent = '';
+        msgUserEl.textContent = '';
+        msg2El.textContent = '';
+        setTimeout(() => {
+          typeInto(msg1El, M1, 22, () => {
+            setTimeout(() => {
+              typeInto(msgUserEl, MU, 38, () => {
+                setTimeout(() => {
+                  typeInto(msg2El, M2, 26, () => {
+                    setTimeout(runLoop, 2800);
+                  });
+                }, 320);
+              });
+            }, 480);
+          });
+        }, 700);
+      }
+
+      setTimeout(runLoop, 1700);
+    })();
 
     // === Nav hide/show on scroll ===
     let lastScroll = 0;
