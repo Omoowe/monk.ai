@@ -16,11 +16,14 @@ const SOUNDS = [
   { id: 'lofi',  label: 'Lo-fi' },
 ];
 
-// Replace values with your own loopable audio URLs (MP3 or AAC)
+// Files live in Supabase Storage bucket "ambient-sounds" (public).
+// Upload rain.mp3, brown-noise.mp3, lofi.mp3 to that bucket.
+// Bucket URL: Supabase dashboard → Storage → ambient-sounds → make public
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const SOUND_URLS: Record<string, string> = {
-  rain:  '',
-  brown: '',
-  lofi:  '',
+  rain:  `${SUPABASE_URL}/storage/v1/object/public/ambient-sounds/rain.mp3`,
+  brown: `${SUPABASE_URL}/storage/v1/object/public/ambient-sounds/brown-noise.mp3`,
+  lofi:  `${SUPABASE_URL}/storage/v1/object/public/ambient-sounds/lofi.mp3`,
 };
 
 type Props = { navigation: NativeStackNavigationProp<any> };
@@ -136,10 +139,6 @@ export default function MonkModeScreen({ navigation }: Props) {
   };
 
   const selectSound = (id: string | null) => {
-    if (id && !SOUND_URLS[id]) {
-      Alert.alert('Sound unavailable', 'Configure audio URLs in SOUND_URLS to enable ambient sounds.');
-      return;
-    }
     setSelectedSound(id === selectedSound ? null : id);
   };
 
