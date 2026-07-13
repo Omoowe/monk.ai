@@ -1,0 +1,22 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+- tapOn:
+    id: "tab-goals"
+- waitForAnimationToEnd
+- takeScreenshot: "04_goals_initial"
+
+- runFlow:
+    when:
+      visible: "No targets yet."
+    commands:
+      - assertVisible: "What are you chasing?"
+      - takeScreenshot: "04_goals_empty_state"
+
+- runFlow:
+    when:
+      visible: "+ Goal"
+    commands:
+      - scroll
+      - waitForAnimationToEnd
+      - takeScreenshot: "04_goals_scrolled"

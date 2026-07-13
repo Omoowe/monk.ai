@@ -1,0 +1,61 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-coach"
+    timeout: 30000
+- waitForAnimationToEnd
+- back
+- waitForAnimationToEnd
+- waitForAnimationToEnd
+
+# ── CHECKIN BACK ─────────────────────────────────
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "tab-checkin"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+- tapOn:
+    id: "checkin-morning-card"
+- waitForAnimationToEnd
+- tapOn:
+    id: "checkin-back-btn"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+- takeScreenshot: "07_back_from_morning"
+
+# ── GOALS CANCEL ─────────────────────────────────
+- tapOn:
+    id: "tab-goals"
+- waitForAnimationToEnd
+- tapOn:
+    id: "goals-add-btn"
+- waitForAnimationToEnd
+- tapOn:
+    id: "goals-cancel-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "07_back_from_goals"
+
+# ── PROFILE MODAL BACK ───────────────────────────
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "header-profile-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "07_profile_modal"
+- back
+- waitForAnimationToEnd
+- takeScreenshot: "07_back_from_profile"
+
+# ── MONKMODE BACK ────────────────────────────────
+- tapOn:
+    id: "monkmode-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "07_monkmode_opened"
+- back
+- waitForAnimationToEnd
+- takeScreenshot: "07_back_from_monkmode"

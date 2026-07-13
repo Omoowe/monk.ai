@@ -1,0 +1,2 @@
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS monk_mode BOOLEAN NOT NULL DEFAULT false;

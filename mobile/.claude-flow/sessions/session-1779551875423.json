@@ -1,0 +1,15 @@
+{
+  "id": "session-1779551875423",
+  "startedAt": "2026-05-23T15:57:55.423Z",
+  "platform": "darwin",
+  "cwd": "/Users/hafee/Documents/Claude/Monk/mobile",
+  "context": {},
+  "metrics": {
+    "edits": 14,
+    "commands": 0,
+    "tasks": 0,
+    "errors": 0
+  },
+  "endedAt": "2026-05-23T16:24:08.056Z",
+  "duration": 1572637
+}

@@ -1,0 +1,46 @@
+appId: com.monk.ai
+---
+# Helper: handles welcome → auth → sign in
+# Env vars: MONK_TEST_EMAIL, MONK_TEST_PASSWORD
+
+- launchApp:
+    appId: com.monk.ai
+    clearState: false
+
+# Wait for auth check to resolve
+- extendedWaitUntil:
+    visible: "MONK.AI"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Dismiss RevenueCat or any LogBox error overlay if present
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+      - waitForAnimationToEnd
+
+# If on welcome screen, tap sign-in link
+- runFlow:
+    when:
+      visible: "MONKS"
+    commands:
+      - tapOn:
+          id: "login-sign-in-link"
+      - waitForAnimationToEnd
+
+# Dismiss any error that appeared after navigation
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+      - waitForAnimationToEnd
+
+# Fill login form if on auth screen (detected by email input being present)
+- runFlow:
+    when:
+      visible:
+        id: "login-email-input"
+    file: _do_login.yaml

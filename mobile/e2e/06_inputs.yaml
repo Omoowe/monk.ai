@@ -1,0 +1,72 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-coach"
+    timeout: 30000
+- waitForAnimationToEnd
+- back
+- waitForAnimationToEnd
+- waitForAnimationToEnd
+
+# ── COACH INPUT ──────────────────────────────────
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "coach-input"
+- inputText: "automation test message"
+- assertVisible: "automation test message"
+- takeScreenshot: "06_coach_input_filled"
+- waitForAnimationToEnd
+
+# ── CHECKIN MORNING FORM INPUTS ──────────────────
+- tapOn:
+    id: "tab-checkin"
+- waitForAnimationToEnd
+- tapOn:
+    id: "checkin-morning-card"
+- waitForAnimationToEnd
+- takeScreenshot: "06_morning_form"
+
+- tapOn:
+    id: "checkin-mission-input"
+- inputText: "Ship the feature today"
+- takeScreenshot: "06_mission_typed"
+
+- tapOn:
+    id: "checkin-energy-4"
+- takeScreenshot: "06_energy_4_selected"
+
+- tapOn:
+    id: "checkin-distraction-input"
+- inputText: "Slack notifications"
+- takeScreenshot: "06_distraction_typed"
+
+- tapOn:
+    id: "checkin-back-btn"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+
+# ── GOALS ADD FORM INPUTS ────────────────────────
+- tapOn:
+    id: "tab-goals"
+- waitForAnimationToEnd
+- tapOn:
+    id: "goals-add-btn"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "goals-name-input"
+- inputText: "Learn Spanish"
+- takeScreenshot: "06_goal_name_typed"
+
+- tapOn:
+    id: "goals-target-input"
+- inputText: "A1 level"
+- takeScreenshot: "06_goal_target_typed"
+
+- tapOn:
+    id: "goals-cancel-btn"
+- waitForAnimationToEnd

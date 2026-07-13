@@ -1,0 +1,3 @@
+ALTER TABLE public.reviews
+  ADD COLUMN IF NOT EXISTS week_of    DATE,
+  ADD COLUMN IF NOT EXISTS week_stats JSONB;

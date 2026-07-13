@@ -1,0 +1,39 @@
+appId: com.monk.ai
+---
+# Requires: a test account with onboarding_done=false in the Supabase users table.
+# The test account must already be signed in on the simulator (session in AsyncStorage).
+# To reset: run `UPDATE users SET onboarding_done=false WHERE email='<test@...>'` in Supabase.
+
+- launchApp:
+    appId: com.monk.ai
+    clearState: false
+- extendedWaitUntil:
+    visible: "STEP 1 OF 3"
+    timeout: 15000
+
+# Step 0: Coach picker
+- assertVisible: "STEP 1 OF 3"
+- assertVisible: "Pick your"
+- takeScreenshot: "01_coach_picker"
+- tapOn: "Stoic Mentor"
+- takeScreenshot: "01_coach_selected"
+- tapOn: "Continue →"
+- waitForAnimationToEnd
+
+# Step 1: Identity
+- assertVisible: "STEP 2 OF 3"
+- assertVisible: "Who are you"
+- takeScreenshot: "01_identity_step"
+- tapOn: "I am a calm, focused builder"
+- inputText: "I am disciplined and consistent."
+- takeScreenshot: "01_identity_typed"
+- tapOn: "Continue →"
+- waitForAnimationToEnd
+
+# Step 2: Commit
+- assertVisible: "STEP 3 OF 3"
+- assertVisible: "I commit to"
+- takeScreenshot: "01_commit_step"
+- tapOn: "✦  Begin"
+- waitForAnimationToEnd
+- takeScreenshot: "01_onboarding_done"

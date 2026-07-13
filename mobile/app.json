@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "newArchEnabled": false,
+    "name": "Monk.ai",
+    "slug": "monk-ai",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "scheme": "monkai",
+    "ios": {
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.monk.ai",
+      "buildNumber": "1",
+      "privacyPolicyUrl": "https://monkai.app/privacy",
+      "entitlements": {
+        "aps-environment": "production"
+      },
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Used for voice input during coaching sessions. Your audio is transcribed via OpenAI Whisper and is not stored.",
+        "NSUserNotificationUsageDescription": "Daily reminders to check in with your coach."
+      }
+    },
+    "android": {
+      "package": "com.monk.ai",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a0a0a"
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "monkai" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#b8f058",
+          "sounds": []
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-coach"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# ── CHECKIN BUTTONS ──────────────────────────────
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "tab-checkin"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+- tapOn:
+    id: "checkin-morning-card"
+- waitForAnimationToEnd
+- takeScreenshot: "05_morning_form_opened"
+- tapOn:
+    id: "checkin-back-btn"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+- takeScreenshot: "05_back_to_pick"
+
+# ── GOALS BUTTONS ────────────────────────────────
+- tapOn:
+    id: "tab-goals"
+- waitForAnimationToEnd
+- tapOn:
+    id: "goals-add-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "05_add_goal_form"
+- tapOn:
+    id: "goals-cancel-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "05_goal_cancelled"
+
+# ── PROFILE VIA HEADER ───────────────────────────
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "header-profile-btn"
+- waitForAnimationToEnd
+- takeScreenshot: "05_profile_opened"
+- back
+- waitForAnimationToEnd
+- takeScreenshot: "05_back_from_profile"

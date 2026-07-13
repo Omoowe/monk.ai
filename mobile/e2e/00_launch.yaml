@@ -1,0 +1,9 @@
+appId: com.monk.ai
+---
+- launchApp:
+    appId: com.monk.ai
+    clearState: false
+- waitForAnimationToEnd
+- takeScreenshot: "00_launch"
+# Should land on welcome screen or main tabs (if already signed in)
+- takeScreenshot: "00_initial_screen"

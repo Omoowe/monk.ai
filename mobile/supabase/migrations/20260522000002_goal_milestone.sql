@@ -1,0 +1,2 @@
+ALTER TABLE public.goals
+  ADD COLUMN IF NOT EXISTS last_milestone INTEGER DEFAULT 0;

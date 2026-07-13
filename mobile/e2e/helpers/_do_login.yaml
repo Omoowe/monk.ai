@@ -1,0 +1,15 @@
+appId: com.monk.ai
+---
+# Fills login form and submits. Called only when login screen is visible.
+- tapOn:
+    id: "login-email-input"
+- inputText: "${MONK_TEST_EMAIL}"
+- tapOn:
+    id: "login-password-input"
+- inputText: "${MONK_TEST_PASSWORD}"
+- tapOn: "Sign In →"
+- extendedWaitUntil:
+    visible:
+      id: "tab-coach"
+    timeout: 20000
+- waitForAnimationToEnd

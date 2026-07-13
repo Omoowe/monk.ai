@@ -1,0 +1,2 @@
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS coach_memory TEXT NOT NULL DEFAULT '';

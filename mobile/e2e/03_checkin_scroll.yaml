@@ -1,0 +1,29 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+# Navigate away then back — focus listener resets phase to 'pick'
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- tapOn:
+    id: "tab-checkin"
+- waitForAnimationToEnd
+- assertVisible: "Check In"
+- takeScreenshot: "03_checkin_top"
+
+# Scroll down — verify content below fold is reachable
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: "03_checkin_mid"
+
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: "03_checkin_bottom"
+
+# Scroll back to top
+- scrollUntilVisible:
+    element:
+      text: "Check In"
+    direction: UP
+- assertVisible: "Check In"
+- takeScreenshot: "03_checkin_back_top"

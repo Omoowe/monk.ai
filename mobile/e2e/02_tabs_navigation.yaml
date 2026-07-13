@@ -1,0 +1,34 @@
+appId: com.monk.ai
+---
+- runFlow: _login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-coach"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: "02_initial_state"
+
+- tapOn:
+    id: "tab-coach"
+- waitForAnimationToEnd
+- takeScreenshot: "02_coach_tab"
+
+- tapOn:
+    id: "tab-checkin"
+- waitForAnimationToEnd
+- takeScreenshot: "02_checkin_tab"
+
+- tapOn:
+    id: "tab-goals"
+- waitForAnimationToEnd
+- takeScreenshot: "02_goals_tab"
+
+- tapOn:
+    id: "tab-stats"
+- waitForAnimationToEnd
+- takeScreenshot: "02_stats_tab"
+
+- tapOn:
+    id: "tab-social"
+- waitForAnimationToEnd
+- takeScreenshot: "02_social_tab"
