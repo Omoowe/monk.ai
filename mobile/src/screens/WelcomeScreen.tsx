@@ -83,7 +83,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         opacity: ctaAnim,
         transform: [{ translateY: ctaAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
       }]}>
-        <TouchableOpacity style={styles.cta} onPress={() => navigation.navigate('Onboarding')} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.cta} onPress={() => navigation.navigate('Login')} activeOpacity={0.85}>
           <Text style={styles.ctaText}>I'm ready to be held accountable →</Text>
         </TouchableOpacity>
         <Text style={styles.footnote}>No fluff. No hand-holding. Just results.</Text>
