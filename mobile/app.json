@@ -55,7 +55,8 @@
           "color": "#b8f058",
           "sounds": []
         }
-      ]
+      ],
+      "./plugins/withMonkWidget"
     ]
   }
 }

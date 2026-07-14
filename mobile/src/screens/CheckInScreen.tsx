@@ -34,6 +34,7 @@ import HabitHistoryModal from '../components/HabitHistoryModal';
 import PaywallModal from '../components/PaywallModal';
 import { useUser } from '../context/UserContext';
 import { getCoachColor, getContrastText } from '../utils/coachColors';
+import { updateWidgetData } from '../services/widget';
 
 const HABIT_EMOJIS = [
   '✅','💪','🏃','🧘','📚','💧','🥗','😴',
@@ -305,6 +306,19 @@ export default function CheckInScreen() {
       }
       updateHabitStreak(habitId).catch(() => {});
       recalculateStats(user.id).catch(() => {});
+      // Push latest state to home screen widget
+      setHabits((prev) => {
+        const updated = prev.map(h => h.id === habitId ? { ...h, completedToday: !current } : h);
+        const done = updated.filter(h => h.completedToday).length;
+        updateWidgetData({
+          streak:      profile?.streak ?? 0,
+          doneCount:   done,
+          totalCount:  updated.length,
+          personality: profile?.personality ?? 'stoic_mentor',
+          name:        profile?.name ?? '',
+        });
+        return updated;
+      });
     } catch {
       // Network failure — keep optimistic state, queue for sync when back online
       const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
