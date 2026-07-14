@@ -91,10 +91,9 @@ export default function StatsScreen() {
   const catBarAnims = useRef<Animated.Value[]>(Array.from({ length: 10 }, () => new Animated.Value(0)));
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const countAnim = useRef(new Animated.Value(0)).current;
-  const sectionAnim = useRef(new Animated.Value(0)).current;
+  const cardAnims = useRef<Animated.Value[]>(Array.from({ length: 8 }, () => new Animated.Value(0)));
 
   useEffect(() => {
-    Animated.spring(scaleAnim, { toValue: 1, tension: 80, friction: 10, useNativeDriver: true }).start();
     loadStats();
   }, []);
 
@@ -104,6 +103,8 @@ export default function StatsScreen() {
   }, [navigation]);
 
   const loadStats = async () => {
+    cardAnims.current.forEach(a => a.setValue(0));
+    scaleAnim.setValue(0);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -240,13 +241,20 @@ export default function StatsScreen() {
       console.error('Failed to load stats:', err instanceof Error ? err.message : String(err));
     } finally {
       setDataLoading(false);
-      Animated.timing(sectionAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+      Animated.spring(scaleAnim, { toValue: 1, tension: 80, friction: 10, useNativeDriver: true }).start();
+      Animated.stagger(70, cardAnims.current.map(anim =>
+        Animated.spring(anim, { toValue: 1, tension: 65, friction: 14, useNativeDriver: true })
+      )).start();
     }
   };
 
   const rank = getRank(dopamineScore);
   const completionPct = weekStats.total > 0 ? Math.round((weekStats.completed / weekStats.total) * 100) : 0;
   const barMaxHeight = 80;
+  const cardSlide = (i: number) => ({
+    opacity: cardAnims.current[i],
+    transform: [{ translateY: cardAnims.current[i].interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) }],
+  });
 
   const shareStats = async () => {
     const rankInfo = getRank(dopamineScore);
@@ -321,7 +329,7 @@ export default function StatsScreen() {
         )}
         {/* Score card — only when there's data */}
         {weekStats.total > 0 && (
-          <Animated.View style={[styles.scoreCard, { overflow: 'hidden', opacity: sectionAnim, transform: [{ scale: scaleAnim }] }]}>
+          <Animated.View style={[styles.scoreCard, { overflow: 'hidden', opacity: cardAnims.current[0], transform: [{ scale: scaleAnim }, { translateY: cardAnims.current[0].interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) }] }]}>
             <View style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: rank.color + '09' }} />
             <View style={styles.scoreMeta}>
               <Text style={styles.scoreLabel}>DOPAMINE SCORE</Text>
@@ -344,7 +352,7 @@ export default function StatsScreen() {
         )}
 
         {/* Hero row — 2 dominant stats */}
-        <Animated.View style={{ flexDirection: 'row', gap: 10, opacity: sectionAnim }}>
+        <Animated.View style={[{ flexDirection: 'row', gap: 10 }, cardSlide(1)]}>
           <View style={[styles.gridCellHero, { borderTopColor: rank.color, borderTopWidth: 2 }]}>
             <Text style={[styles.gridNumberHero, { color: rank.color }]}>{weekStats.completed}</Text>
             <Text style={styles.gridLabel}>HABITS THIS WEEK</Text>
@@ -355,7 +363,7 @@ export default function StatsScreen() {
           </View>
         </Animated.View>
         {/* Secondary grid */}
-        <Animated.View style={[styles.grid, { opacity: sectionAnim }]}>
+        <Animated.View style={[styles.grid, cardSlide(2)]}>
           <View style={styles.gridCell}>
             <Text style={styles.gridNumber}>{streak}</Text>
             <Text style={styles.gridLabel}>CURRENT STREAK</Text>
@@ -383,7 +391,7 @@ export default function StatsScreen() {
         </Animated.View>
 
         {/* 7-day bar chart */}
-        <View style={styles.chartCard}>
+        <Animated.View style={[styles.chartCard, cardSlide(3)]}>
           <Text style={styles.sectionLabel}>LAST 7 DAYS</Text>
           <View style={styles.chart}>
             {dailyBars.map((bar, i) => {
@@ -405,11 +413,11 @@ export default function StatsScreen() {
               );
             })}
           </View>
-        </View>
+        </Animated.View>
 
         {/* Habit Insights */}
         {categoryStats.length > 0 && (
-          <Animated.View style={[styles.insightsCard, { opacity: sectionAnim }]}>
+          <Animated.View style={[styles.insightsCard, cardSlide(4)]}>
             <Text style={styles.sectionLabel}>HABIT INSIGHTS</Text>
             {categoryStats.map((cat, i) => {
               const pct = cat.total > 0 ? Math.round((cat.done / cat.total) * 100) : 0;
@@ -430,7 +438,7 @@ export default function StatsScreen() {
         )}
 
         {/* Personal Bests */}
-        <View style={styles.bestsCard}>
+        <Animated.View style={[styles.bestsCard, cardSlide(5)]}>
           <Text style={styles.sectionLabel}>PERSONAL BESTS</Text>
           <View style={styles.pbRow}>
             <View style={[styles.pbIconView, { backgroundColor: rank.color + '18', borderColor: rank.color + '35' }]} />
@@ -449,7 +457,7 @@ export default function StatsScreen() {
             <Text style={styles.pbName}>Current rank</Text>
             <Text style={[styles.pbValue, { color: rank.color, fontSize: fscale(12), letterSpacing: 1 }]}>{rank.label}</Text>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Streak Calendar */}
         {(() => {
@@ -480,7 +488,7 @@ export default function StatsScreen() {
             return '#2a4010';
           };
           return (
-            <View style={styles.calCard}>
+            <Animated.View style={[styles.calCard, cardSlide(6)]}>
               <Text style={styles.sectionLabel}>STREAK CALENDAR</Text>
               <Text style={styles.calMonth}>{monthName}</Text>
               <View style={styles.calDayRow}>
@@ -510,13 +518,13 @@ export default function StatsScreen() {
                   </View>
                 ))}
               </View>
-            </View>
+            </Animated.View>
           );
         })()}
 
         {/* Leaderboard */}
         {leaderboard.length > 0 && (
-          <View style={styles.lbCard}>
+          <Animated.View style={[styles.lbCard, cardSlide(7)]}>
             <Text style={styles.sectionLabel}>LEADERBOARD</Text>
             {leaderboard.map((entry, i) => {
               const isMe = entry.id === currentUserId;
@@ -536,7 +544,7 @@ export default function StatsScreen() {
                 </View>
               );
             })}
-          </View>
+          </Animated.View>
         )}
         </>
         )}
@@ -606,7 +614,7 @@ const styles = StyleSheet.create({
   gridCell: {
     flex: 1, minWidth: '45%',
     backgroundColor: '#111', borderRadius: 12, padding: 16,
-    borderWidth: 1, borderColor: '#1e1e1e', alignItems: 'center',
+    borderWidth: 1, borderColor: '#1e1e1e',
   },
   gridNumber: { fontSize: fscale(28), color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 6 },
   gridLabel: { fontSize: fscale(9), color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, textAlign: 'center' },
