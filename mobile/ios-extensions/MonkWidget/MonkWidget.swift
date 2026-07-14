@@ -51,7 +51,7 @@ struct MonkProvider: TimelineProvider {
 
 // MARK: - Colors
 
-private func accentColor(_ p: String) -> Color {
+private func coachAccentColor(_ p: String) -> Color {
     switch p {
     case "drill_sergeant": return Color(red: 0.941, green: 0.376, blue: 0.376)
     case "stoic_mentor":   return Color(red: 0.722, green: 0.941, blue: 0.345)
@@ -69,7 +69,7 @@ private let bg = Color(red: 0.039, green: 0.039, blue: 0.039)
 
 struct MonkSmallView: View {
     let entry: MonkWidgetEntry
-    var accent: Color { accentColor(entry.personality) }
+    var accent: Color { coachAccentColor(entry.personality) }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -107,7 +107,7 @@ struct MonkSmallView: View {
 
 struct MonkMediumView: View {
     let entry: MonkWidgetEntry
-    var accent: Color { accentColor(entry.personality) }
+    var accent: Color { coachAccentColor(entry.personality) }
     var allDone: Bool { entry.totalCount > 0 && entry.doneCount >= entry.totalCount }
 
     var body: some View {
@@ -192,6 +192,19 @@ struct MonkWidgetEntryView: View {
     }
 }
 
+// MARK: - iOS 16/17 background compat
+
+private struct WidgetBg: ViewModifier {
+    let color: Color
+    func body(content: Content) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            content.containerBackground(color, for: .widget)
+        } else {
+            content
+        }
+    }
+}
+
 // MARK: - Widget definition
 
 struct MonkWidget: Widget {
@@ -200,7 +213,7 @@ struct MonkWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: MonkProvider()) { entry in
             MonkWidgetEntryView(entry: entry)
-                .containerBackground(bg, for: .widget)
+                .modifier(WidgetBg(color: bg))
         }
         .configurationDisplayName("Monk.ai")
         .description("Your streak and today's habits.")

@@ -1,7 +1,11 @@
 // Config plugin: adds MonkWidget WidgetKit extension to the Xcode project.
 // Runs during `expo prebuild` or `expo run:ios`.
 // Swift sources live in ios-extensions/ (tracked) and are copied into ios/ at prebuild.
-const { withXcodeProject, withEntitlementsPlist } = require('@expo/config-plugins');
+const { withXcodeProject, withEntitlementsPlist, withDangerousMod } = require('@expo/config-plugins');
+const {
+  addBuildSourceFileToGroup,
+  ensureGroupRecursively,
+} = require('@expo/config-plugins/build/ios/utils/Xcodeproj');
 const path = require('path');
 const fs   = require('fs');
 
@@ -37,7 +41,7 @@ function withWidgetExtension(config) {
       fs.copyFileSync(path.join(srcWidget, f), path.join(dstWidget, f));
     }
     const srcBridge = path.join(root, 'ios-extensions', 'MonkaiTarget');
-    const dstBridge = path.join(iosRoot, 'Monkai');
+    const dstBridge = path.join(iosRoot, MAIN_TARGET);
     for (const f of fs.readdirSync(srcBridge)) {
       fs.copyFileSync(path.join(srcBridge, f), path.join(dstBridge, f));
     }
@@ -49,10 +53,10 @@ function withWidgetExtension(config) {
     const widgetTarget = proj.addTarget(WIDGET_NAME, 'app_extension', WIDGET_NAME, WIDGET_BID);
     const widgetUuid   = widgetTarget.uuid;
 
-    // Build settings for widget target
+    // Build settings for Debug + Release configs of the widget target
     const allBuildConfigs = proj.pbxXCBuildConfigurationSection();
     const configListUuid  = proj.pbxNativeTargetSection()[widgetUuid].buildConfigurationList;
-    const configList      = proj.pbxXCConfigurationListSection()[configListUuid];
+    const configList      = proj.pbxXCConfigurationList()[configListUuid];
 
     for (const { value: cfgUuid } of (configList?.buildConfigurations ?? [])) {
       const bc = allBuildConfigs[cfgUuid];
@@ -68,7 +72,7 @@ function withWidgetExtension(config) {
         SKIP_INSTALL:                          'YES',
         ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: 'NO',
         CODE_SIGN_STYLE:                       'Automatic',
-        MARKETING_VERSION:                     '"1.0"',
+        MARKETING_VERSION:                     '"1.0.0"',
         CURRENT_PROJECT_VERSION:               '"1"',
       });
       if (bc.name === 'Debug') {
@@ -76,65 +80,132 @@ function withWidgetExtension(config) {
       }
     }
 
-    // Add widget Swift source files
+    // addTarget('app_extension') creates NO build phases — create Sources + Frameworks manually.
+    const pbxObjects    = proj.hash.project.objects;
+    const fileSection   = proj.pbxFileReferenceSection();
+    const bfSection     = proj.pbxBuildFileSection();
+    const widgetNativeTarget = proj.pbxNativeTargetSection()[widgetUuid];
+
+    // -- Sources phase --
+    const srcPhaseUuid = proj.generateUuid();
+    pbxObjects.PBXSourcesBuildPhase = pbxObjects.PBXSourcesBuildPhase || {};
+    pbxObjects.PBXSourcesBuildPhase[srcPhaseUuid] = {
+      isa: 'PBXSourcesBuildPhase', buildActionMask: 2147483647,
+      files: [], runOnlyForDeploymentPostprocessing: 0,
+    };
+    pbxObjects.PBXSourcesBuildPhase[`${srcPhaseUuid}_comment`] = 'Sources';
+    widgetNativeTarget.buildPhases.push({ value: srcPhaseUuid, comment: 'Sources' });
+
+    // -- Frameworks phase --
+    const fwkPhaseUuid = proj.generateUuid();
+    pbxObjects.PBXFrameworksBuildPhase = pbxObjects.PBXFrameworksBuildPhase || {};
+    pbxObjects.PBXFrameworksBuildPhase[fwkPhaseUuid] = {
+      isa: 'PBXFrameworksBuildPhase', buildActionMask: 2147483647,
+      files: [], runOnlyForDeploymentPostprocessing: 0,
+    };
+    pbxObjects.PBXFrameworksBuildPhase[`${fwkPhaseUuid}_comment`] = 'Frameworks';
+    widgetNativeTarget.buildPhases.push({ value: fwkPhaseUuid, comment: 'Frameworks' });
+
+    // Add Swift source files + file refs to group and widget Sources phase
+    ensureGroupRecursively(proj, WIDGET_NAME);
+    const widgetGroup = proj.pbxGroupByName(WIDGET_NAME);
+    widgetGroup.children = widgetGroup.children || [];
+    const srcPhase = pbxObjects.PBXSourcesBuildPhase[srcPhaseUuid];
+
     for (const file of ['MonkWidget.swift', 'MonkWidgetBundle.swift']) {
-      proj.addSourceFile(path.join(WIDGET_NAME, file), { target: widgetUuid }, WIDGET_NAME);
+      const frUuid = proj.generateUuid();
+      fileSection[frUuid] = {
+        isa: 'PBXFileReference', lastKnownFileType: 'sourcecode.swift',
+        name: `"${file}"`, path: `"${WIDGET_NAME}/${file}"`, sourceTree: '"<group>"',
+      };
+      fileSection[`${frUuid}_comment`] = file;
+      widgetGroup.children.push({ value: frUuid, comment: file });
+
+      const bfUuid = proj.generateUuid();
+      bfSection[bfUuid] = { isa: 'PBXBuildFile', fileRef: frUuid };
+      bfSection[`${bfUuid}_comment`] = `${file} in Sources`;
+      srcPhase.files.push({ value: bfUuid, comment: `${file} in Sources` });
     }
 
-    // Add Info.plist as resource
-    proj.addResourceFile(path.join(WIDGET_NAME, 'Info.plist'), { target: widgetUuid }, WIDGET_NAME);
+    // Add WidgetKit + SwiftUI to widget Frameworks phase
+    const fwkPhase = pbxObjects.PBXFrameworksBuildPhase[fwkPhaseUuid];
+    for (const [fwkName, sdk] of [['WidgetKit', 'WidgetKit.framework'], ['SwiftUI', 'SwiftUI.framework']]) {
+      const frUuid = proj.generateUuid();
+      fileSection[frUuid] = {
+        isa: 'PBXFileReference', lastKnownFileType: 'wrapper.framework',
+        name: `"${sdk}"`, path: `"System/Library/Frameworks/${sdk}"`, sourceTree: 'SDKROOT',
+      };
+      fileSection[`${frUuid}_comment`] = sdk;
+      const bfUuid = proj.generateUuid();
+      bfSection[bfUuid] = { isa: 'PBXBuildFile', fileRef: frUuid };
+      bfSection[`${bfUuid}_comment`] = `${sdk} in Frameworks`;
+      fwkPhase.files.push({ value: bfUuid, comment: `${sdk} in Frameworks` });
+    }
 
-    // Add WidgetKit + SwiftUI frameworks to widget target
-    proj.addFramework('WidgetKit.framework', { target: widgetUuid });
-    proj.addFramework('SwiftUI.framework',   { target: widgetUuid });
-
-    // Add bridge module files to main app target
-    const mainTarget = proj.getFirstTarget().firstTarget;
+    // Add bridge module source files to main app target
+    const mainTargetUuid = proj.getFirstTarget().uuid;
+    ensureGroupRecursively(proj, MAIN_TARGET);
     for (const file of ['MonkWidgetBridge.m', 'MonkWidgetBridge.swift']) {
-      proj.addSourceFile(path.join(MAIN_TARGET, file), { target: mainTarget.uuid }, MAIN_TARGET);
+      addBuildSourceFileToGroup({
+        filepath:   `${MAIN_TARGET}/${file}`,
+        groupName:  MAIN_TARGET,
+        project:    proj,
+        targetUuid: mainTargetUuid,
+      });
     }
 
     // Wire widget into main app build
-    proj.addTargetDependency(mainTarget.uuid, [widgetUuid]);
+    proj.addTargetDependency(mainTargetUuid, [widgetUuid]);
 
-    // Embed Foundation Extensions build phase (dstSubfolderSpec = app_extension = 13)
-    proj.addBuildPhase([], 'PBXCopyFilesBuildPhase', 'Embed Foundation Extensions',
-                       mainTarget.uuid, 'app_extension');
-
-    // Add widget product .appex to the embed phase
-    const copyFilesSection = proj.pbxCopyFilesBuildPhaseSection();
+    // addTarget already created a "Copy Files" phase + .appex entry in the main target.
+    // Add code-signing attributes to that auto-created build file entry.
     const buildFileSection = proj.pbxBuildFileSection();
-    const productGroup     = proj.productGroup();
-    const widgetProductRef = productGroup?.children?.find(
-      (c) => c.comment === `${WIDGET_NAME}.appex`,
-    );
-
-    if (widgetProductRef) {
-      const embedFileUuid = proj.generateUuid();
-      buildFileSection[embedFileUuid] = {
-        isa:      'PBXBuildFile',
-        fileRef:  widgetProductRef.value,
-        settings: { ATTRIBUTES: ['RemoveHeadersOnCopy', 'CodeSignOnCopy'] },
+    const appexBuildFileKey = Object.keys(buildFileSection)
+      .filter(k => !k.endsWith('_comment'))
+      .find(k => {
+        const comment = buildFileSection[`${k}_comment`] ?? '';
+        return comment.includes(`${WIDGET_NAME}.appex`);
+      });
+    if (appexBuildFileKey) {
+      buildFileSection[appexBuildFileKey].settings = {
+        ATTRIBUTES: ['RemoveHeadersOnCopy', 'CodeSignOnCopy'],
       };
-      buildFileSection[`${embedFileUuid}_comment`] =
-        `${WIDGET_NAME}.appex in Embed Foundation Extensions`;
-
-      for (const [phaseKey, phase] of Object.entries(copyFilesSection)) {
-        if (phaseKey.endsWith('_comment') || typeof phase !== 'object' || !phase.files) continue;
-        const comment = copyFilesSection[`${phaseKey}_comment`] ?? '';
-        if (comment.includes('Embed Foundation Extensions') ||
-            phase.name === '"Embed Foundation Extensions"') {
-          phase.files.push({
-            value:   embedFileUuid,
-            comment: `${WIDGET_NAME}.appex in Embed Foundation Extensions`,
-          });
-          break;
-        }
-      }
     }
 
     return cfg;
   });
 }
 
-module.exports = (config) => withAppGroup(withWidgetExtension(config));
+// ── 3. Podfile: fix fmt consteval errors on Xcode 16+ ────────
+function withFmtFix(config) {
+  return withDangerousMod(config, [
+    'ios',
+    (cfg) => {
+      const podfilePath = path.join(cfg.modRequest.platformProjectRoot, 'Podfile');
+      let podfile = fs.readFileSync(podfilePath, 'utf8');
+      if (!podfile.includes('disable consteval on all Apple Clang')) {
+        const fix = [
+          '    # Fix: fmt consteval incompatibility with Xcode 16 — patch fmt/base.h',
+          '    fmt_base = "#{installer.sandbox.root}/fmt/include/fmt/base.h"',
+          '    if File.exist?(fmt_base)',
+          '      File.chmod(0644, fmt_base)',
+          '      content = File.read(fmt_base)',
+          '      patched = content.gsub(',
+          "        '__apple_build_version__ < 14000029L',",
+          "        '__apple_build_version__ || 1  /* disable consteval on all Apple Clang */'",
+          '      )',
+          '      File.write(fmt_base, patched) if patched != content',
+          '    end',
+        ].join('\n');
+        podfile = podfile.replace(
+          /(\s+react_native_post_install\([\s\S]*?\)\n)(\s+end\nend)/,
+          `$1${fix}\n$2`,
+        );
+        fs.writeFileSync(podfilePath, podfile);
+      }
+      return cfg;
+    },
+  ]);
+}
+
+module.exports = (config) => withFmtFix(withAppGroup(withWidgetExtension(config)));
