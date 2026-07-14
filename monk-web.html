@@ -15,20 +15,26 @@
   <script>
     tailwind.config = {
       theme: {
+        // Replace entire color palette — drops 583 default colors that were
+        // generating ~180K+ CSS property declarations and hitting WebKit's 196607 limit.
+        colors: {
+          transparent: 'transparent',
+          current: 'currentColor',
+          white: '#ffffff',
+          black: '#000000',
+          bg:     '#0a0a0a',
+          bg2:    '#111111',
+          bg3:    '#171717',
+          border: '#1e1e1e',
+          muted:  '#555555',
+          lime:   '#b8f058',
+          crimson:'#f06060',
+          purple: '#7b6af0',
+          gold:   '#f5c840',
+          teal:   '#40f5c8',
+          amber:  '#f0a060',
+        },
         extend: {
-          colors: {
-            bg:     '#0a0a0a',
-            bg2:    '#111111',
-            bg3:    '#171717',
-            border: '#1e1e1e',
-            muted:  '#555555',
-            lime:   '#b8f058',
-            crimson:'#f06060',
-            purple: '#7b6af0',
-            gold:   '#f5c840',
-            teal:   '#40f5c8',
-            amber:  '#f0a060',
-          },
           fontFamily: {
             syne: ['Syne', 'sans-serif'],
             mono: ['"DM Mono"', 'monospace'],
@@ -81,7 +87,7 @@
 
     .typing span {
       display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-      background: #666; animation: bounce 1.2s infinite;
+      background: var(--typing-dot-color, #666); animation: bounce 1.2s infinite;
     }
     .typing span:nth-child(2) { animation-delay: 0.18s; }
     .typing span:nth-child(3) { animation-delay: 0.36s; }
@@ -114,6 +120,15 @@
       width: 2px;
       border-radius: 0 2px 2px 0;
       background: var(--coach-color, #b8f058);
+    }
+
+    /* Auth left panel slide-in */
+    @keyframes panelSlideIn {
+      from { opacity: 0; transform: translateX(-22px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .auth-panel-in {
+      animation: panelSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     /* Dot matrix bg on auth */
@@ -175,48 +190,75 @@
   </div>
 
   <!-- ─── AUTH ─── -->
-  <div v-else-if="view === 'auth'" class="min-h-screen flex items-center justify-center px-4 dot-bg" style="background-color: #0a0a0a;">
-    <!-- Strong ambient glow -->
-    <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 55% 55% at 65% 45%, rgba(184,240,88,0.07) 0%, transparent 60%), radial-gradient(ellipse 35% 40% at 20% 70%, rgba(123,106,240,0.04) 0%, transparent 60%);"></div>
-    <div class="w-full max-w-sm relative z-10">
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center gap-2 mb-4">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.2">
+  <div v-else-if="view === 'auth'" class="min-h-screen flex" style="background-color: #0a0a0a;">
+
+    <!-- Left panel (desktop only) -->
+    <div class="desktop-only auth-panel-in w-[46%] flex-shrink-0 relative overflow-hidden dot-bg border-r border-border flex flex-col justify-between p-14">
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 70% at 20% 55%, rgba(184,240,88,0.055) 0%, transparent 65%);"></div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2.5 mb-16">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.3">
             <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
           </svg>
-          <span class="font-syne font-black text-2xl text-lime tracking-tight">MONK.AI</span>
+          <span class="font-syne font-black text-base text-lime tracking-tight">MONK.AI</span>
         </div>
-        <p class="text-muted text-sm">The AI coach that doesn't let you off the hook.</p>
+        <h2 class="font-syne font-black text-white tracking-tighter leading-[1.05] mb-6" style="font-size: 2.6rem;">The coach<br>that doesn't<br>let you off.</h2>
+        <p class="text-muted text-sm leading-relaxed" style="max-width: 270px;">Six AI personalities. Real memory. No sugar-coating. Built for people who already know what to do.</p>
       </div>
-
-      <!-- Tabs -->
-      <div class="flex bg-bg2 border border-border rounded-xl p-1 mb-6">
-        <button @click="authTab='login'" :class="authTab==='login' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Sign In</button>
-        <button @click="authTab='register'" :class="authTab==='register' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Create Account</button>
+      <div class="relative z-10">
+        <div class="text-[9px] text-muted uppercase tracking-widest font-mono mb-3">Six coaches available</div>
+        <div class="divide-y divide-border/50">
+          <div v-for="(c, id) in coaches" :key="id" class="flex items-center gap-3 py-2.5">
+            <div class="w-1 h-3.5 rounded-full flex-shrink-0" :style="`background: ${c.color}`"></div>
+            <span class="text-xs font-bold" style="color: rgba(255,255,255,0.55)">{{ c.name }}</span>
+            <span class="text-[10px] text-muted ml-auto font-mono">{{ c.tagline }}</span>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="bg-bg2 border border-border rounded-2xl p-6 space-y-4">
-        <div v-if="authTab==='register'">
-          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Your Name</label>
-          <input v-model="authName" placeholder="e.g. Jordan" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" />
+    <!-- Right panel (form) -->
+    <div class="flex-1 flex items-center justify-center px-6 py-10">
+      <div class="w-full max-w-sm">
+
+        <!-- Logo (mobile only) -->
+        <div class="mobile-only text-center mb-8">
+          <div class="inline-flex items-center gap-2 mb-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8f058" stroke-width="2.2">
+              <path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/>
+            </svg>
+            <span class="font-syne font-black text-xl text-lime tracking-tight">MONK.AI</span>
+          </div>
+          <p class="text-muted text-sm">The AI coach that doesn't let you off the hook.</p>
         </div>
-        <div>
-          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Email</label>
-          <input v-model="authEmail" type="email" placeholder="you@example.com" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+
+        <!-- Tabs -->
+        <div class="flex bg-bg2 border border-border rounded-xl p-1 mb-6">
+          <button @click="authTab='login'" :class="authTab==='login' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Sign In</button>
+          <button @click="authTab='register'" :class="authTab==='register' ? 'bg-bg3 text-white' : 'text-muted'" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all">Create Account</button>
         </div>
-        <div>
-          <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Password</label>
-          <input v-model="authPassword" type="password" placeholder="••••••••" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+
+        <div class="bg-bg2 border border-border rounded-2xl p-6 space-y-4">
+          <div v-if="authTab==='register'">
+            <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Your Name</label>
+            <input v-model="authName" placeholder="e.g. Jordan" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" />
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Email</label>
+            <input v-model="authEmail" type="email" placeholder="you@example.com" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-muted uppercase tracking-widest block mb-1.5">Password</label>
+            <input v-model="authPassword" type="password" placeholder="••••••••" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white focus:border-lime/30 transition-colors" @keyup.enter="authSubmit" />
+          </div>
+          <p v-if="authError" class="text-crimson text-xs py-1">{{ authError }}</p>
+          <button @click="authSubmit" :disabled="authLoading" class="w-full bg-lime text-bg font-syne font-black py-3.5 rounded-xl text-sm hover:bg-white transition-colors disabled:opacity-50">
+            {{ authLoading ? '...' : authTab==='login' ? 'Sign In' : 'Create Account' }}
+          </button>
         </div>
-        <p v-if="authError" class="text-crimson text-xs py-1">{{ authError }}</p>
-        <button @click="authSubmit" :disabled="authLoading" class="w-full bg-lime text-bg font-syne font-black py-3.5 rounded-xl text-sm hover:bg-white transition-colors disabled:opacity-50">
-          {{ authLoading ? '...' : authTab==='login' ? 'Sign In' : 'Create Account' }}
-        </button>
+
+        <p class="text-center text-muted text-xs mt-6">Free forever to start. No excuses on price.</p>
       </div>
-
-
-      <p class="text-center text-muted text-xs mt-6">Free forever to start. No excuses on price.</p>
     </div>
   </div>
 
@@ -322,7 +364,7 @@
         <button @click="setView(nav.id)"
           :class="['sidebar-btn flex items-center justify-center h-10 rounded-xl', view===nav.id ? 'active' : '']"
           style="width: 48px;"
-          :style="view===nav.id ? `--coach-color: ${coaches[personality]?.color || '#b8f058'}` : ''">
+          :style="view===nav.id ? { '--coach-color': coaches[personality]?.color || '#b8f058' } : {}">
           <span :style="view===nav.id ? `color: ${coaches[personality]?.color || '#b8f058'}` : 'color: rgba(255,255,255,0.38)'" v-html="nav.icon"></span>
           <span class="tooltip">{{ nav.label }}</span>
         </button>
@@ -550,6 +592,8 @@ const app = createApp({
         } else {
           view.value = 'auth';
         }
+      }).catch(() => {
+        view.value = 'auth';
       });
     }
 
@@ -787,7 +831,7 @@ app.component('coach-screen', {
     return { messages, inputText, sending, chatEl, coach, coaches, personality, quickChips, send, sendPepTalk, changeCoach, formatMsg, showCoachSelect, monkMode, streak, dopamineScore, coachMemory, habits };
   },
   template: `
-  <div class="flex h-full overflow-hidden" :style="\`--coach-focus-color: \${coach.color}35\`">
+  <div class="flex h-full overflow-hidden" :style="{ '--coach-focus-color': coach.color + '35' }">
 
     <!-- Chat area -->
     <div class="flex flex-col flex-1 min-w-0 relative">
@@ -799,7 +843,7 @@ app.component('coach-screen', {
             class="flex items-center gap-2 bg-bg2 border border-border rounded-full px-3 py-1.5 hover:border-white/10 transition-colors">
             <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="\`background: \${coach.color}\`"></div>
             <span class="text-xs font-bold text-white/70">{{ coach.name }}</span>
-            <span class="text-xs text-muted">▾</span>
+            <span class="text-xs text-muted transition-transform duration-200 inline-block" :style="showCoachSelect ? 'transform: rotate(180deg)' : ''">▾</span>
           </button>
           <div v-if="monkMode" class="flex items-center gap-1.5 bg-purple/10 border border-purple/20 rounded-full px-2.5 py-1">
             <span class="w-1.5 h-1.5 rounded-full bg-purple animate-pulse"></span>
@@ -841,11 +885,11 @@ app.component('coach-screen', {
             <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" :style="\`background: \${coach.color}15; border: 1px solid \${coach.color}25\`">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/></svg>
             </div>
-            <div class="rounded-2xl rounded-tl-sm px-4 py-3" :style="\`background: \${coach.color}06; border: 1px solid \${coach.color}18; border-left: 2px solid \${coach.color}35\`">
+            <div class="rounded-2xl rounded-tl-sm px-4 py-3" :style="\`background: radial-gradient(ellipse at 0% 50%, \${coach.color}12, transparent 65%), \${coach.color}03; border: 1px solid \${coach.color}15; border-left: 2px solid \${coach.color}30\`">
               <p class="text-[13px] text-white/80 leading-relaxed" v-html="formatMsg(msg.text)"></p>
             </div>
           </div>
-          <div v-else class="max-w-[80%] rounded-2xl rounded-tr-sm px-4 py-3" :style="\`background: \${coach.color}12; border: 1px solid \${coach.color}20\`">
+          <div v-else class="max-w-[80%] rounded-2xl rounded-tr-sm px-4 py-3" :style="\`background: \${coach.color}0e; border: 1px solid \${coach.color}18; border-right: 2px solid \${coach.color}35\`">
             <p class="text-[13px] leading-relaxed font-medium" :style="\`color: \${coach.color}\`">{{ msg.text }}</p>
           </div>
         </div>
@@ -856,7 +900,7 @@ app.component('coach-screen', {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 9H3l4.5 4-1.5 6 6-3.5 6 3.5-1.5-6L21 9h-5L12 2z"/></svg>
           </div>
           <div class="bg-bg2 border border-border rounded-2xl rounded-tl-sm px-4 py-3">
-            <div class="typing flex gap-1 items-center h-4">
+            <div class="typing flex gap-1 items-center h-4" :style="{ '--typing-dot-color': coach.color + '99' }">
               <span></span><span></span><span></span>
             </div>
           </div>
@@ -866,8 +910,8 @@ app.component('coach-screen', {
       <!-- Quick chips -->
       <div class="px-4 pb-2 flex gap-2 overflow-x-auto flex-shrink-0">
         <button v-for="chip in quickChips" :key="chip.label" @click="send(chip.msg)"
-          class="flex-shrink-0 text-[11px] font-bold rounded-full px-3 py-1.5 transition-all opacity-60 hover:opacity-100"
-          :style="\`color: \${coach.color}; border: 1px solid \${coach.color}25; background: \${coach.color}08\`">
+          class="flex-shrink-0 text-[10px] font-mono font-bold uppercase tracking-widest rounded-md px-3 py-1.5 transition-all"
+          :style="\`color: \${coach.color}; background: \${coach.color}10; border: 1px solid \${coach.color}20; border-left: 2px solid \${coach.color}\`">
           {{ chip.label }}
         </button>
       </div>
@@ -924,11 +968,13 @@ app.component('coach-screen', {
 
       <!-- Coach memory -->
       <div class="px-5 py-4">
-        <div class="flex items-center gap-1.5 mb-2">
+        <div class="flex items-center gap-1.5 mb-3">
           <div class="w-1.5 h-1.5 rounded-full transition-all" :style="\`background: \${coach.color}; opacity: \${coachMemory ? '1' : '0.25'}\`"></div>
           <div class="text-[9px] text-muted uppercase tracking-widest font-mono">Coach Remembers</div>
         </div>
-        <p v-if="coachMemory" class="text-xs text-white/40 leading-relaxed italic">"{{ coachMemory.slice(0, 150) }}{{ coachMemory.length > 150 ? '…' : '' }}"</p>
+        <div v-if="coachMemory" class="rounded-xl px-3 py-2.5" :style="\`background: \${coach.color}06; border-left: 2px solid \${coach.color}30\`">
+          <p class="text-xs leading-relaxed italic" style="color: rgba(255,255,255,0.55)">"{{ coachMemory.slice(0, 150) }}{{ coachMemory.length > 150 ? '…' : '' }}"</p>
+        </div>
         <p v-else class="text-xs text-white/20 leading-relaxed">Memory builds as you talk. Chat more to give your coach context.</p>
       </div>
 
@@ -995,8 +1041,10 @@ app.component('habits-screen', {
         <p class="text-muted text-sm mt-0.5">{{ completedCount }} / {{ habits.length }} done today</p>
       </div>
       <button @click="adding=!adding" class="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
-        :style="adding ? \`border-color: \${coach.color}40; color: \${coach.color}\` : 'border-color: #252525; color: #555; hover:color: white'">
-        {{ adding ? '✕ Cancel' : '+ Add' }}
+        :style="adding ? \`border-color: \${coach.color}40; color: \${coach.color}\` : 'border-color: #252525; color: #555'">
+        <svg v-if="adding" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        <svg v-else width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg>
+        {{ adding ? 'Cancel' : 'Add' }}
       </button>
     </div>
 
@@ -1105,9 +1153,11 @@ app.component('goals-screen', {
         <h1 class="font-syne font-black text-2xl text-white tracking-tight">Goals</h1>
         <p class="text-muted text-sm mt-0.5">{{ goals.length }} active goals</p>
       </div>
-      <button @click="adding=!adding" class="text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+      <button @click="adding=!adding" class="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
         :style="adding ? \`border-color: \${coach.color}40; color: \${coach.color}\` : 'border-color: #252525; color: #555'">
-        {{ adding ? '✕ Cancel' : '+ Add' }}
+        <svg v-if="adding" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        <svg v-else width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg>
+        {{ adding ? 'Cancel' : 'Add' }}
       </button>
     </div>
 
@@ -1133,28 +1183,33 @@ app.component('goals-screen', {
         <div class="text-white/50 text-sm font-bold mb-1">No goals. No direction.</div>
         <div class="text-muted text-xs max-w-xs mx-auto leading-relaxed">Your coach needs targets to hold you to. Set a goal above — be specific enough that failing it would sting.</div>
       </div>
-      <div v-for="goal in goals" :key="goal.id" class="bg-bg2 border border-border rounded-2xl p-5 group transition-all hover:border-white/5">
-        <div class="flex items-start justify-between mb-3">
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full font-mono" :style="\`background: \${catColors[goal.category] || '#b8f058'}15; color: \${catColors[goal.category] || '#b8f058'}\`">{{ goal.category }}</span>
-              <span v-if="goal.deadline" class="text-[10px] font-mono font-bold" :class="new Date(goal.deadline) < new Date() ? 'text-crimson' : 'text-muted'">{{ formatDeadline(goal.deadline) }}</span>
+      <div v-for="goal in goals" :key="goal.id" class="bg-bg2 border border-border rounded-2xl overflow-hidden group transition-all hover:border-white/5">
+        <div class="px-5 pt-4 pb-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded font-mono" :style="\`background: \${catColors[goal.category] || '#b8f058'}12; color: \${catColors[goal.category] || '#b8f058'}\`">{{ goal.category }}</span>
+                <span v-if="goal.deadline" class="text-[10px] font-mono font-bold ml-auto" :class="new Date(goal.deadline) < new Date() ? 'text-crimson' : 'text-muted'">{{ formatDeadline(goal.deadline) }}</span>
+              </div>
+              <div class="text-sm font-bold text-white leading-snug">{{ goal.name }}</div>
+              <div v-if="goal.target" class="text-[11px] text-muted mt-0.5 truncate">{{ goal.target }}</div>
             </div>
-            <div class="text-sm font-bold text-white">{{ goal.name }}</div>
-            <div v-if="goal.target" class="text-xs text-muted mt-0.5">{{ goal.target }}</div>
+            <button @click="deleteGoal(goal.id)" class="opacity-0 group-hover:opacity-100 text-muted hover:text-crimson transition-all text-lg leading-none flex-shrink-0 mt-0.5">×</button>
           </div>
-          <button @click="deleteGoal(goal.id)" class="opacity-0 group-hover:opacity-100 text-muted hover:text-crimson transition-all ml-2 text-lg leading-none">×</button>
+          <div class="flex items-center gap-2.5 mt-3">
+            <div class="flex gap-1 flex-1">
+              <button v-for="seg in [20,40,60,80,100]" :key="seg"
+                @click="updateProgress(goal, seg - goal.progress)"
+                class="flex-1 h-1.5 rounded-full transition-all hover:opacity-80"
+                :style="goal.progress >= seg ? \`background: \${catColors[goal.category] || '#b8f058'}\` : 'background: #252525'">
+              </button>
+            </div>
+            <span class="font-mono text-[11px] font-bold text-white/40 flex-shrink-0">{{ goal.progress }}%</span>
+          </div>
         </div>
-        <!-- Progress -->
-        <div class="flex items-center gap-3">
-          <div class="flex-1 h-2 bg-bg3 rounded-full overflow-hidden">
-            <div class="h-full rounded-full progress-bar" :style="\`width: \${goal.progress}%; background: \${catColors[goal.category] || '#b8f058'}\`"></div>
-          </div>
-          <span class="font-mono text-xs font-bold text-white/50 w-8 text-right">{{ goal.progress }}%</span>
-          <div class="flex gap-1">
-            <button @click="updateProgress(goal, -10)" class="w-6 h-6 rounded-lg bg-bg3 border border-border text-muted text-xs hover:text-white transition-colors flex items-center justify-center">−</button>
-            <button @click="updateProgress(goal, 10)" class="w-6 h-6 rounded-lg bg-bg3 border border-border text-muted text-xs hover:text-white transition-colors flex items-center justify-center" :style="goal.progress > 0 ? \`border-color: \${catColors[goal.category]}40; color: \${catColors[goal.category]}\` : ''">+</button>
-          </div>
+        <!-- Progress strip at bottom edge -->
+        <div class="h-0.5 bg-bg3">
+          <div class="h-full progress-bar" :style="\`width: \${goal.progress}%; background: \${catColors[goal.category] || '#b8f058'}\`"></div>
         </div>
       </div>
     </div>
@@ -1236,36 +1291,40 @@ app.component('checkin-screen', {
 
     <!-- Morning -->
     <div v-if="tab==='morning'">
-      <div v-if="submitted.morning" class="rounded-2xl p-6 fade-in" :style="\`background: \${coach.color}06; border: 1px solid \${coach.color}20\`">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-2 h-2 rounded-full" :style="\`background: \${coach.color}\`"></div>
+      <div v-if="submitted.morning" class="rounded-2xl p-5 fade-in" :style="\`background: \${coach.color}06; border: 1px solid \${coach.color}15; border-left: 3px solid \${coach.color}\`">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" :style="\`background: \${coach.color}20\`">
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" :stroke="coach.color" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+          </div>
           <span class="text-[10px] font-mono uppercase tracking-widest text-white/40">Morning Brief Done</span>
         </div>
-        <div class="text-white font-bold mb-1">Mission locked in.</div>
-        <div class="text-muted text-sm italic">"{{ morning.mission || 'locked in' }}"</div>
+        <div class="text-xs font-bold text-white/70 mb-1">Mission locked in.</div>
+        <div class="text-sm italic leading-relaxed" :style="\`color: \${coach.color}99\`">"{{ morning.mission || 'locked in' }}"</div>
       </div>
       <div v-else class="space-y-4">
-        <div class="bg-bg2 border border-border rounded-2xl p-5">
-          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Today's Mission</label>
-          <textarea v-model="morning.mission" placeholder="I will accomplish..." rows="3" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors leading-relaxed"></textarea>
-        </div>
-        <div class="bg-bg2 border border-border rounded-2xl p-5">
-          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-3">Energy Level</label>
-          <div class="flex gap-1.5 mb-2">
-            <button v-for="n in [1,2,3,4,5]" :key="n" @click="morning.energy=n"
-              class="flex-1 h-7 rounded-md transition-all"
-              :style="morning.energy>=n ? \`background: \${coach.color}30; border: 1px solid \${coach.color}70\` : 'background: #141414; border: 1px solid #1e1e1e'">
-            </button>
+        <div class="bg-bg2 border border-border rounded-2xl overflow-hidden divide-y divide-border">
+          <div class="p-5">
+            <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Today's Mission</label>
+            <textarea v-model="morning.mission" placeholder="I will accomplish..." rows="3" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors leading-relaxed"></textarea>
           </div>
-          <div class="flex justify-between">
-            <span class="text-[9px] text-muted font-mono">Low</span>
-            <span class="text-[9px] font-mono font-bold transition-colors" :style="\`color: \${coach.color}\`">{{ ['','Low','Below avg','Average','High','Peak'][morning.energy] }}</span>
-            <span class="text-[9px] text-muted font-mono">Peak</span>
+          <div class="p-5">
+            <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-3">Energy Level</label>
+            <div class="flex gap-1.5 mb-2">
+              <button v-for="n in [1,2,3,4,5]" :key="n" @click="morning.energy=n"
+                class="flex-1 h-7 rounded-md transition-all"
+                :style="morning.energy>=n ? \`background: \${coach.color}30; border: 1px solid \${coach.color}70\` : 'background: #141414; border: 1px solid #1e1e1e'">
+              </button>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[9px] text-muted font-mono">Low</span>
+              <span class="text-[9px] font-mono font-bold transition-colors" :style="\`color: \${coach.color}\`">{{ ['','Low','Below avg','Average','High','Peak'][morning.energy] }}</span>
+              <span class="text-[9px] text-muted font-mono">Peak</span>
+            </div>
           </div>
-        </div>
-        <div class="bg-bg2 border border-border rounded-2xl p-5">
-          <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Biggest Distraction to Avoid</label>
-          <input v-model="morning.distraction" placeholder="What will try to derail you?" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors" />
+          <div class="p-5">
+            <label class="text-[9px] text-muted uppercase tracking-widest font-mono block mb-2">Biggest Distraction to Avoid</label>
+            <input v-model="morning.distraction" placeholder="What will try to derail you?" class="w-full bg-bg3 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted focus:border-lime/30 transition-colors" />
+          </div>
         </div>
         <button @click="submitMorning" :disabled="!morning.mission.trim() || submitting" class="w-full py-4 rounded-2xl text-sm font-syne font-black transition-all disabled:opacity-40" :style="\`background: \${coach.color}; color: #0a0a0a\`">
           {{ submitting ? 'Getting response...' : 'Lock In Morning Mission' }}
@@ -1275,13 +1334,15 @@ app.component('checkin-screen', {
 
     <!-- Evening -->
     <div v-if="tab==='evening'">
-      <div v-if="submitted.evening" class="rounded-2xl p-6 fade-in" :style="\`background: \${coach.color}06; border: 1px solid \${coach.color}20\`">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-2 h-2 rounded-full" style="background: #7b6af0"></div>
+      <div v-if="submitted.evening" class="rounded-2xl p-5 fade-in" style="background: rgba(123,106,240,0.05); border: 1px solid rgba(123,106,240,0.15); border-left: 3px solid #7b6af0">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background: rgba(123,106,240,0.2)">
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#7b6af0" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+          </div>
           <span class="text-[10px] font-mono uppercase tracking-widest text-white/40">Evening Debrief Done</span>
         </div>
-        <div class="text-white font-bold mb-1">Day closed.</div>
-        <div class="text-muted text-sm">See you tomorrow.</div>
+        <div class="text-xs font-bold text-white/70 mb-1">Day closed.</div>
+        <div class="text-sm text-muted">See you tomorrow.</div>
       </div>
       <div v-else class="space-y-4">
         <div class="bg-bg2 border border-border rounded-2xl p-5">
@@ -1460,12 +1521,15 @@ app.component('review-screen', {
     <h1 class="font-syne font-black text-2xl text-white tracking-tight mb-2">Weekly Review</h1>
     <p class="text-muted text-sm mb-6">Your coach's honest assessment. No sugar-coating.</p>
 
-    <div v-if="!review && !loading" class="bg-bg2 border border-dashed border-border rounded-2xl p-10 text-center">
-      <div class="mb-4 flex justify-center">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <div v-if="!review && !loading" class="bg-bg2 border border-border rounded-2xl p-10 text-center">
+      <div class="relative flex justify-center mb-5">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full" :style="\`background: \${coach.color}08\`"></div>
+        </div>
+        <svg class="relative z-10" width="34" height="34" viewBox="0 0 24 24" fill="none" :stroke="coach.color" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
       <div class="text-white font-bold mb-2">Ready for your review?</div>
-      <div class="text-muted text-sm mb-6">Your coach will analyze your week — habits, goals, check-ins, and patterns.</div>
+      <div class="text-muted text-sm mb-6 max-w-xs mx-auto leading-relaxed">Your coach analyzes your week — habits, goals, check-ins, patterns. No sugar-coating.</div>
       <button @click="generateReview" class="px-8 py-3 rounded-xl text-sm font-syne font-black transition-all" :style="\`background: \${coach.color}; color: #0a0a0a\`">
         Generate Review
       </button>

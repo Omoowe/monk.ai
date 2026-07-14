@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Landing page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/monk-landing.html');
+    await page.goto('/monk-landing.html', { waitUntil: 'domcontentloaded' });
   });
 
   test('page title and meta', async ({ page }) => {

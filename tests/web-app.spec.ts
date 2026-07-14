@@ -5,23 +5,32 @@ const APP_URL = '/monk-web.html';
 // Supabase auth takes time — set a generous default
 test.use({ actionTimeout: 15_000 });
 
+async function waitForVueMount(page: Page) {
+  // Raw HTML contains all v-if branches before Vue mounts.
+  // The config overlay (fixed inset-0 z-50) exists in raw HTML but Vue removes it
+  // on first render since supabaseConfigured=ref(true). Waiting for detach
+  // confirms Vue has mounted and processed all v-if directives.
+  await page.waitForSelector('.fixed.inset-0.z-50', { state: 'detached', timeout: 8_000 }).catch(() => null);
+}
+
 async function waitForAuthScreen(page: Page) {
-  // App starts at 'loading', transitions to 'auth' once Supabase responds
-  await page.waitForSelector('[data-view="auth"], .auth-form, input[type="email"]', {
-    timeout: 12_000,
+  // Wait for Vue to mount first (removes raw-HTML overlay), then for auth view
+  await waitForVueMount(page);
+  await page.waitForSelector('input[type="email"]', {
+    timeout: 15_000,
   }).catch(() => null);
 }
 
 test.describe('Web app — auth screen', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     await waitForAuthScreen(page);
   });
 
   test('page loads without JS errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', e => errors.push(e.message));
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(3000);
     // Filter out expected Supabase/network errors in offline mode
     const fatal = errors.filter(e =>
@@ -72,7 +81,8 @@ test.describe('Web app — auth screen', () => {
 
 test.describe('Web app — auth form interaction', () => {
   test('can type into email field', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+    await waitForAuthScreen(page);
     const email = page.locator('input[type="email"]');
     await email.waitFor({ state: 'visible', timeout: 12_000 });
     await email.fill('test@example.com');
@@ -80,7 +90,8 @@ test.describe('Web app — auth form interaction', () => {
   });
 
   test('can type into password field', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+    await waitForAuthScreen(page);
     const pwd = page.locator('input[type="password"]');
     await pwd.waitFor({ state: 'visible', timeout: 12_000 });
     await pwd.fill('TestPass123!');
@@ -88,7 +99,8 @@ test.describe('Web app — auth form interaction', () => {
   });
 
   test('empty form submit shows validation or attempts auth', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+    await waitForAuthScreen(page);
     // Auth submit button uses @click not type="submit"
     const btn = page.locator('button').filter({ hasText: /sign in|create account/i }).first();
     await btn.waitFor({ state: 'visible', timeout: 12_000 });
@@ -100,7 +112,8 @@ test.describe('Web app — auth form interaction', () => {
   });
 
   test('toggle between login and signup modes', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+    await waitForAuthScreen(page);
     const toggle = page.locator('button, span, a').filter({ hasText: /sign up|create account|register/i });
     await toggle.first().waitFor({ state: 'visible', timeout: 12_000 });
     await toggle.first().click();
@@ -111,7 +124,8 @@ test.describe('Web app — auth form interaction', () => {
 
 test.describe('Web app — design system', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+    await waitForVueMount(page);
   });
 
   test('dark background applied', async ({ page }) => {
@@ -142,7 +156,7 @@ test.describe('Web app — design system', () => {
 
   test('no horizontal scroll at 375px width', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth);
     const clientWidth = await page.evaluate(() => document.body.clientWidth);
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 2); // 2px tolerance
@@ -151,28 +165,28 @@ test.describe('Web app — design system', () => {
 
 test.describe('Web app — security', () => {
   test('no ANTHROPIC_API_KEY in page source', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     const src = await page.content();
     expect(src).not.toContain('sk-ant-');
     expect(src).not.toContain('ANTHROPIC_API_KEY');
   });
 
   test('Supabase anon key is present (public by design)', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     const src = await page.content();
     // Anon key is intentionally public per Supabase architecture
     expect(src).toContain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
   });
 
   test('no raw JWT secret or service role key exposed', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     const src = await page.content();
     // Service role keys start with these patterns
     expect(src).not.toMatch(/service_role/);
   });
 
   test('all AI calls go through Supabase Edge Functions not direct Anthropic', async ({ page }) => {
-    await page.goto(APP_URL);
+    await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
     const src = await page.content();
     expect(src).not.toContain('api.anthropic.com');
     // Should use Supabase functions.invoke
