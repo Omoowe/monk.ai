@@ -35,6 +35,8 @@ interface Challenge {
   end_date: string;
   status: string;
   winner_id: string | null;
+  challenger_habits_done: number;
+  challenged_habits_done: number;
   created_at: string;
 }
 
@@ -58,6 +60,7 @@ export default function SocialScreen() {
 
   // Challenges state
   const [challenges, setChallenges] = useState<(Challenge & { opponent: PublicProfile })[]>([]);
+  const [battleScores, setBattleScores] = useState<Record<string, { challengerDone: number; challengedDone: number }>>({});
   const [showChallengePicker, setShowChallengePicker] = useState<string | null>(null); // friend userId
   const [challengeDays, setChallengeDays] = useState<DurationDays>(7);
   const [creating, setCreating] = useState(false);
@@ -126,10 +129,31 @@ export default function SocialScreen() {
         (cp ?? []).forEach((p: PublicProfile) => { chalProfileMap[p.id] = p; });
       }
 
-      setChallenges(chalList.map(c => ({
+      const mappedChallenges = chalList.map(c => ({
         ...c,
         opponent: chalProfileMap[c.challenger_id === user.id ? c.challenged_id : c.challenger_id],
-      })).filter(c => c.opponent));
+      })).filter(c => c.opponent);
+      setChallenges(mappedChallenges);
+
+      // Settle any battles whose end_date has passed
+      const endedUnsettled = chalList.filter(c => c.status === 'active' && new Date(c.end_date) < new Date());
+      if (endedUnsettled.length > 0) {
+        await Promise.all(endedUnsettled.map(c => supabase.rpc('settle_battle', { p_battle_id: c.id })));
+      }
+
+      // Fetch live habit-completion scores for all active battles
+      const activeBattles = mappedChallenges.filter(c => c.status === 'active' && new Date(c.end_date) >= new Date());
+      if (activeBattles.length > 0) {
+        const scoreResults = await Promise.all(
+          activeBattles.map(c => supabase.rpc('get_battle_scores', { p_battle_id: c.id }))
+        );
+        const scores: Record<string, { challengerDone: number; challengedDone: number }> = {};
+        activeBattles.forEach((c, i) => {
+          const row = scoreResults[i]?.data?.[0];
+          if (row) scores[c.id] = { challengerDone: row.challenger_done, challengedDone: row.challenged_done };
+        });
+        setBattleScores(scores);
+      }
 
     } catch (err) {
       console.error('Social load error:', err instanceof Error ? err.message : String(err));
@@ -425,39 +449,35 @@ export default function SocialScreen() {
               <View style={s.section}>
                 <Text style={s.sectionLabel}>ACTIVE BATTLES</Text>
                 {activeChallenges.map(c => {
-                  const myStreak   = me.streak;
-                  const oppStreak  = c.opponent.streak;
-                  const myScore    = me.dopamine_score;
-                  const oppScore   = c.opponent.dopamine_score;
-                  const winning    = myStreak > oppStreak || (myStreak === oppStreak && myScore >= oppScore);
-                  const totalStreak = (myStreak + oppStreak) || 1;
-                  const myPct      = Math.round((myStreak / totalStreak) * 100);
-                  const start      = new Date(c.start_date);
-                  const end        = new Date(c.end_date);
-                  const now        = new Date();
-                  const elapsed    = Math.max(0, Math.min(c.duration_days, Math.round((now.getTime() - start.getTime()) / 86400000)));
-                  const battlePct  = Math.round((elapsed / c.duration_days) * 100);
+                  const sc      = battleScores[c.id];
+                  const isChal  = c.challenger_id === me.id;
+                  const myDone  = sc ? (isChal ? sc.challengerDone : sc.challengedDone) : 0;
+                  const oppDone = sc ? (isChal ? sc.challengedDone : sc.challengerDone) : 0;
+                  const winning = myDone >= oppDone;
+                  const total   = (myDone + oppDone) || 1;
+                  const myPct   = Math.round((myDone / total) * 100);
+                  const start   = new Date(c.start_date);
+                  const elapsed = Math.max(0, Math.min(c.duration_days, Math.round((Date.now() - start.getTime()) / 86400000)));
+                  const battlePct = Math.round((elapsed / c.duration_days) * 100);
                   return (
                     <View key={c.id} style={[s.battleCard, winning && s.battleCardWinning]}>
                       <View style={s.battleHeader}>
-                        <Text style={s.battleTitle}>{c.duration_days}-Day Streak Battle</Text>
+                        <Text style={s.battleTitle}>{c.duration_days}-DAY HABIT BATTLE</Text>
                         <View style={s.battleDaysLeft}>
                           <Text style={s.battleDaysLeftText}>{daysLeft(c)}d left</Text>
                         </View>
                       </View>
 
-                      {/* Battle progress timeline */}
                       <View style={s.battleTimeline}>
                         <View style={[s.battleTimelineFill, { width: `${battlePct}%` }]} />
                       </View>
                       <Text style={s.battleTimelineLabel}>Day {elapsed} of {c.duration_days}</Text>
 
-                      {/* Streak duel */}
                       <View style={s.battleScores}>
                         <View style={s.battlePlayer}>
-                          <Text style={[s.battleScore, winning && { color: '#b8f058' }]}>{myStreak}d</Text>
+                          <Text style={[s.battleScore, winning && { color: '#b8f058' }]}>{myDone}</Text>
                           <Text style={s.battlePlayerName}>You</Text>
-                          <Text style={s.battleSubScore}>{myScore} pts</Text>
+                          <Text style={s.battleSubScore}>habits done</Text>
                         </View>
                         <View style={s.battleBarCol}>
                           <View style={s.battleBar}>
@@ -465,18 +485,18 @@ export default function SocialScreen() {
                           </View>
                           <Text style={s.battleVsSmall}>VS</Text>
                           <View style={s.battleBar}>
-                            <View style={[s.battleBarFillOpp, { width: `${100 - myPct}%` }]} />
+                            <View style={[s.battleBarFillOpp, { width: `${100 - myPct}%`, alignSelf: 'flex-start' }]} />
                           </View>
                         </View>
                         <View style={[s.battlePlayer, { alignItems: 'flex-end' }]}>
-                          <Text style={[s.battleScore, !winning && { color: '#f06060' }]}>{oppStreak}d</Text>
+                          <Text style={[s.battleScore, !winning && { color: '#f06060' }]}>{oppDone}</Text>
                           <Text style={s.battlePlayerName}>{c.opponent.name.split(' ')[0]}</Text>
-                          <Text style={s.battleSubScore}>{oppScore} pts</Text>
+                          <Text style={s.battleSubScore}>habits done</Text>
                         </View>
                       </View>
 
                       <Text style={s.battleStatus}>
-                        {winning ? 'You\'re ahead — keep the streak alive.' : 'They\'re ahead — grind harder.'}
+                        {winning ? 'Ahead — don\'t let up.' : 'Behind — grind harder.'}
                       </Text>
                     </View>
                   );
@@ -489,13 +509,24 @@ export default function SocialScreen() {
               <View style={s.section}>
                 <Text style={s.sectionLabel}>PAST BATTLES</Text>
                 {pastChallenges.map(c => {
-                  const iWon = c.status === 'declined' ? false : me.streak >= c.opponent.streak;
+                  const declined    = c.status === 'declined';
+                  const iWon        = !declined && c.winner_id === me.id;
+                  const isChal      = c.challenger_id === me.id;
+                  const myFinal     = isChal ? c.challenger_habits_done : c.challenged_habits_done;
+                  const oppFinal    = isChal ? c.challenged_habits_done : c.challenger_habits_done;
                   return (
                     <View key={c.id} style={s.pastCard}>
-                      <Text style={[s.pastResult, iWon ? { color: '#b8f058' } : { color: '#f06060' }]}>
-                        {c.status === 'declined' ? 'Declined' : iWon ? 'WON' : 'LOST'}
+                      <Text style={[s.pastResult, declined ? { color: '#555' } : iWon ? { color: '#b8f058' } : { color: '#f06060' }]}>
+                        {declined ? 'DECLINED' : iWon ? 'WON' : 'LOST'}
                       </Text>
-                      <Text style={s.pastOpponent}>vs {c.opponent.name}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={s.pastOpponent}>vs {c.opponent.name}</Text>
+                        {!declined && (
+                          <Text style={[s.pastDate, { color: iWon ? '#b8f05870' : '#f0606070' }]}>
+                            {myFinal} – {oppFinal} habits
+                          </Text>
+                        )}
+                      </View>
                       <Text style={s.pastDate}>
                         {new Date(c.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – {new Date(c.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </Text>
