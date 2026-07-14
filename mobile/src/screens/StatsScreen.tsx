@@ -28,6 +28,25 @@ function getRank(score: number): { label: string; color: string; icon: string } 
   return              { label: 'AWAKENING',      color: '#f0a060', icon: '○' };
 }
 
+function RankShape({ color, score, size = 8 }: { color: string; score: number; size?: number }) {
+  if (score >= 86) {
+    return <View style={{ width: size, height: size, backgroundColor: color, transform: [{ rotate: '45deg' }] }} />;
+  }
+  if (score >= 61) {
+    return (
+      <View style={{
+        width: 0, height: 0,
+        borderLeftWidth: size * 0.6, borderRightWidth: size * 0.6, borderBottomWidth: size,
+        borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: color,
+      }} />
+    );
+  }
+  if (score >= 31) {
+    return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} />;
+  }
+  return <View style={{ width: size, height: size, borderRadius: size / 2, borderWidth: 1.5, borderColor: color }} />;
+}
+
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function getLastSevenDates(): string[] {
@@ -111,7 +130,7 @@ export default function StatsScreen() {
         setDopamineScore(score);
         setStreak(userData.streak || 0);
         countAnim.setValue(0);
-        Animated.timing(countAnim, { toValue: score, duration: 1200, useNativeDriver: false }).start();
+        Animated.spring(countAnim, { toValue: score, tension: 40, friction: 8, useNativeDriver: false }).start();
       }
 
       const morningDone = checkInsData?.filter((c: any) => c.type === 'morning').length || 0;
@@ -285,7 +304,7 @@ export default function StatsScreen() {
             </View>
             <Text style={styles.emptyTitle}>Zero data. Start training.</Text>
             <Text style={styles.emptySub}>Add habits in Check-In and complete your first check-in. Stats appear the moment you start.</Text>
-            <TouchableOpacity style={styles.emptyBtn} onPress={() => navigation.navigate('CheckIn')}>
+            <TouchableOpacity style={styles.emptyBtn} onPress={() => navigation.navigate('App', { screen: 'CheckIn' })}>
               <Text style={styles.emptyBtnText}>Add habits →</Text>
             </TouchableOpacity>
           </View>
@@ -298,9 +317,10 @@ export default function StatsScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 16, marginTop: 8 }}>
               <CountText anim={countAnim} color={rank.color} scaleAnim={scaleAnim} />
               <View style={{ flex: 1, paddingBottom: 14 }}>
-                <Text style={[styles.rankLine, { color: rank.color, marginTop: 0, marginBottom: 12 }]}>
-                  {rank.icon}  {rank.label}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <RankShape color={rank.color} score={dopamineScore} size={8} />
+                  <Text style={[styles.rankLine, { color: rank.color, marginTop: 0, marginBottom: 0 }]}>{rank.label}</Text>
+                </View>
                 <View style={styles.scoreBar}>
                   <View style={[styles.scoreFillBg, { width: '100%', backgroundColor: rank.color + '60' }]} />
                   <View style={[styles.scoreFill, { width: `${dopamineScore}%` as any, backgroundColor: rank.color }]} />
@@ -408,7 +428,7 @@ export default function StatsScreen() {
           </View>
           <View style={[styles.pbRow, { borderBottomWidth: 0 }]}>
             <View style={[styles.pbIconView, { backgroundColor: rank.color + '18', borderColor: rank.color + '35' }]}>
-              <Text style={{ fontSize: 8, color: rank.color, fontWeight: '800' }}>{rank.icon}</Text>
+              <RankShape color={rank.color} score={dopamineScore} size={8} />
             </View>
             <Text style={styles.pbName}>Current rank</Text>
             <Text style={[styles.pbValue, { color: rank.color, fontSize: 12, letterSpacing: 1 }]}>{rank.label}</Text>

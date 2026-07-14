@@ -155,6 +155,7 @@ export default function CheckInScreen() {
   const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
   const scrollRef = useRef<ScrollView>(null);
   const checkAnimMap = useRef<Record<string, Animated.Value>>({});
+  const habitItemAnims = useRef<Animated.Value[]>([]);
   const getCheckAnim = (id: string): Animated.Value => {
     if (!checkAnimMap.current[id]) checkAnimMap.current[id] = new Animated.Value(1);
     return checkAnimMap.current[id];
@@ -186,6 +187,15 @@ export default function CheckInScreen() {
       setHabitsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (!habitsLoading && habits.length > 0) {
+      habitItemAnims.current = habits.map(() => new Animated.Value(0));
+      Animated.stagger(40, habitItemAnims.current.map(a =>
+        Animated.spring(a, { toValue: 1, tension: 80, friction: 14, useNativeDriver: true })
+      )).start();
+    }
+  }, [habitsLoading]);
 
   const checkTodayStatus = useCallback(async () => {
     try {
@@ -599,8 +609,17 @@ export default function CheckInScreen() {
                 </TouchableOpacity>
               )}
               {habits.map((habit, hIdx) => (
-                <Swipeable
+                <Animated.View
                   key={habit.id}
+                  style={{
+                    opacity: habitItemAnims.current[hIdx] ?? 1,
+                    transform: [{ translateY: habitItemAnims.current[hIdx]
+                      ? habitItemAnims.current[hIdx].interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
+                      : 0 }],
+                  }}
+                >
+                <Swipeable
+                  key={`s-${habit.id}`}
                   ref={(ref) => { swipeableRefs.current[habit.id] = ref; }}
                   onSwipeableOpen={() => {
                     Object.entries(swipeableRefs.current).forEach(([id, ref]) => {
@@ -680,6 +699,7 @@ export default function CheckInScreen() {
                     </Animated.View>
                   </TouchableOpacity>
                 </Swipeable>
+                </Animated.View>
               ))}
             </View>
           </>

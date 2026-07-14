@@ -49,6 +49,7 @@ const linking = {
       },
       Profile:  'profile',
       MonkMode: 'monkmode',
+      Review:   'review',
     },
   },
 };
@@ -102,7 +103,7 @@ function AppTabs() {
           paddingBottom: 18,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: '#b8f058',
+        tabBarActiveTintColor: badgeColor,
         tabBarInactiveTintColor: '#666666',
         tabBarLabelStyle: {
           fontSize: 10,
@@ -261,20 +262,15 @@ export default function App() {
                 <Stack.Screen name="Login"   component={LoginScreen} />
               </>
             ) : onboardingDone === false ? (
-              <>
-                <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-                <Stack.Screen name="App"        component={AppTabs} options={{ headerShown: true, header: () => <GlobalHeader /> }} />
-                <Stack.Screen name="Profile"    component={ProfileScreen}  options={{ presentation: 'modal' }} />
-                <Stack.Screen name="MonkMode"   component={MonkModeScreen} options={{ presentation: 'modal', headerShown: false }} />
-                <Stack.Screen name="Review"     component={ReviewScreen}   options={{ presentation: 'modal', headerShown: false }} />
-              </>
-            ) : (
-              <>
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            ) : null}
+            {session && (
+              <Stack.Group>
                 <Stack.Screen name="App"      component={AppTabs} options={{ headerShown: true, header: () => <GlobalHeader /> }} />
                 <Stack.Screen name="Profile"  component={ProfileScreen}  options={{ presentation: 'modal' }} />
                 <Stack.Screen name="MonkMode" component={MonkModeScreen} options={{ presentation: 'modal', headerShown: false }} />
                 <Stack.Screen name="Review"   component={ReviewScreen}   options={{ presentation: 'modal', headerShown: false }} />
-              </>
+              </Stack.Group>
             )}
           </Stack.Navigator>
         </NavigationContainer>

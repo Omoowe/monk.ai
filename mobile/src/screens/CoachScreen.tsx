@@ -635,7 +635,7 @@ export default function CoachScreen() {
           delayLongPress={500}
           style={[
             styles.msgBubble,
-            item.role === 'user' ? [styles.msgBubbleUser, { borderRightWidth: 3, borderRightColor: color + '28' }] : [styles.msgBubbleAI, { borderLeftColor: item.isError ? '#f06060' : color }],
+            item.role === 'user' ? [styles.msgBubbleUser, { borderRightWidth: 3, borderRightColor: color + '30', backgroundColor: color + '14', borderColor: color + '20' }] : [styles.msgBubbleAI, { borderLeftColor: item.isError ? '#f06060' : color }],
             item.isError && styles.msgBubbleError,
             item.role === 'ai' && starredIds.has(item.id) && styles.msgBubbleStarred,
           ]}
