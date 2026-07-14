@@ -732,11 +732,11 @@ const s = StyleSheet.create({
   battleSubScore: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
   pastCard: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: '#0d0d0d', borderRadius: 10, padding: 14,
+    backgroundColor: '#111111', borderRadius: 10, padding: 14,
     borderWidth: 1, borderColor: '#1a1a1a',
   },
   pastResult: { fontSize: fscale(13), fontWeight: '700', width: 80 },
-  pastOpponent: { flex: 1, fontSize: fscale(13), color: '#ccc' },
+  pastOpponent: { flex: 1, fontSize: fscale(13), color: '#aaaaaa' },
   pastDate: { fontSize: fscale(10), color: '#999', fontFamily: 'DMMono_400Regular' },
   empty: { alignItems: 'center', paddingVertical: 48, gap: 12 },
   emptyIconBox: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
@@ -744,7 +744,7 @@ const s = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: '#181818', borderWidth: 2, borderColor: '#2a2a2a',
   },
-  emptyTitle: { fontSize: fscale(17), fontWeight: '700', color: '#ccc' },
+  emptyTitle: { fontSize: fscale(17), fontWeight: '700', color: '#aaaaaa' },
   emptySub: { fontSize: fscale(13), color: '#666', textAlign: 'center', paddingHorizontal: 32, lineHeight: fscale(20) },
   pickerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#000000bb', justifyContent: 'flex-end' },
   pickerSheet: {

@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   },
   pickCardMorning: { flex: 1.5 },
   pickCardNewDone: { borderColor: '#b8f058', backgroundColor: '#0a130a' },
-  pickCardNewLocked: { backgroundColor: '#0d0d0d', borderColor: '#1a1a1a', opacity: 0.6 },
+  pickCardNewLocked: { backgroundColor: '#111111', borderColor: '#1a1a1a', opacity: 0.6 },
   pickCardIcon: { marginBottom: 8 },
   pickSunOrb: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   pickCardTitleNew: {
@@ -1054,7 +1054,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#b8f05850',
   },
   missionPreviewChipText: { fontSize: fscale(9), color: '#b8f058', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5 },
-  missionPreviewText: { fontSize: fscale(15), color: '#e0e0e0', lineHeight: fscale(22) },
+  missionPreviewText: { fontSize: fscale(15), color: '#aaaaaa', lineHeight: fscale(22) },
 
   dayCompleteRow: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   },
   habitRowDone: { borderColor: '#b8f05870', backgroundColor: '#0f2010' },
   habitRowEmoji: { fontSize: fscale(20) },
-  habitRowName: { flex: 1, fontSize: fscale(14), fontWeight: '600', color: '#ccc' },
+  habitRowName: { flex: 1, fontSize: fscale(14), fontWeight: '600', color: '#aaaaaa' },
   habitRowNameDone: { color: '#b8f058' },
   habitRowStreak: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 3, borderWidth: 1 },
@@ -1149,7 +1149,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#b8f05840',
   },
   missionReminderLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  missionReminderText: { fontSize: fscale(14), color: '#ccc', fontStyle: 'italic', lineHeight: 20 },
+  missionReminderText: { fontSize: fscale(14), color: '#aaaaaa', fontStyle: 'italic', lineHeight: 20 },
 
   form: { gap: 16 },
   formHeading: { fontSize: fscale(22), fontWeight: '700', color: '#fff', lineHeight: fscale(30) },
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111', borderRadius: 12, padding: 20,
     borderWidth: 1, borderColor: '#252525', borderLeftWidth: 3, borderLeftColor: '#b8f058',
   },
-  resultText: { fontSize: fscale(15), color: '#ddd', lineHeight: fscale(26) },
+  resultText: { fontSize: fscale(15), color: '#aaaaaa', lineHeight: fscale(26) },
 
   // Add habit modal
   modalOverlay: { flex: 1, backgroundColor: '#000000bb', justifyContent: 'flex-end' },

@@ -908,7 +908,7 @@ const styles = StyleSheet.create({
   searchCancel: { fontSize: fscale(13), color: '#aaa', paddingHorizontal: 4 },
 
   quoteCard: {
-    backgroundColor: '#0d0d0d', borderRadius: 10, padding: 14,
+    backgroundColor: '#111111', borderRadius: 10, padding: 14,
     borderTopWidth: 1, marginBottom: 10,
     flexDirection: 'row', alignItems: 'flex-start', gap: 10,
   },
@@ -925,7 +925,7 @@ const styles = StyleSheet.create({
   todayDate: { fontSize: fscale(11), letterSpacing: 1.5, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 8 },
   todayRow: { flexDirection: 'row', gap: 16 },
   todayStat: { alignItems: 'center', gap: 2 },
-  todayStatVal: { fontSize: fscale(13), fontWeight: '700', color: '#ccc' },
+  todayStatVal: { fontSize: fscale(13), fontWeight: '700', color: '#aaaaaa' },
   todayStatLbl: { fontSize: fscale(9), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1 },
   checkinDots: { flexDirection: 'row', gap: 4, paddingVertical: 2 },
   checkinDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#333' },
@@ -949,7 +949,7 @@ const styles = StyleSheet.create({
   aiLabelDot: { width: 7, height: 7, borderRadius: 3.5, flexShrink: 0 },
   aiLabelName: { fontSize: fscale(11), fontWeight: '700', fontFamily: 'DMMono_400Regular' },
   msgBubble: { maxWidth: '85%', borderRadius: 12, padding: scale(12) },
-  msgBubbleUser: { backgroundColor: '#1e1e1e', borderWidth: 1, borderColor: '#2e2e2e' },
+  msgBubbleUser: { backgroundColor: '#1e1e1e', borderWidth: 1, borderColor: '#252525' },
   msgBubbleAI: {
     backgroundColor: 'rgba(255,255,255,0.035)',
     borderWidth: 1, borderColor: '#2a2a2a', borderLeftWidth: 4,
@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
   msgBubbleStarred: { borderTopColor: '#f5c84040', borderTopWidth: 1 },
   aiLabelStar: { fontSize: fscale(11), marginLeft: 2 },
   msgText: { fontSize: fscale(15), lineHeight: fscale(22), color: '#fff' },
-  msgTextUser: { color: '#e0e0e0' },
+  msgTextUser: { color: '#aaaaaa' },
   msgTime: { fontSize: fscale(11), color: '#aaa', marginTop: 4, fontFamily: 'DMMono_400Regular' },
 
   inputArea: {
@@ -987,7 +987,7 @@ const styles = StyleSheet.create({
   },
   micBtn: { width: scale(36), height: scale(36), justifyContent: 'center', alignItems: 'center' },
   actionIcon: { fontSize: fscale(20) },
-  micActive: { color: '#ff4444' },
+  micActive: { color: '#f06060' },
   sendBtn: {
     width: scale(38), height: scale(38), borderRadius: scale(19),
     justifyContent: 'center', alignItems: 'center',
@@ -1025,8 +1025,8 @@ const styles = StyleSheet.create({
   pickerSub: { fontSize: fscale(12), color: '#aaa', marginBottom: 4 },
   pickerCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
-    backgroundColor: '#161616', borderRadius: 14,
-    borderWidth: 1, borderColor: '#2e2e2e',
+    backgroundColor: '#181818', borderRadius: 14,
+    borderWidth: 1, borderColor: '#252525',
     padding: scale(14), marginBottom: 10,
     shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 4,
   },

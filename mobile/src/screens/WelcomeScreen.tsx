@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   },
   bulletText: {
     fontSize: fscale(15),
-    color: '#ccc',
+    color: '#aaaaaa',
     fontFamily: 'DMMono_400Regular',
     letterSpacing: 0.3,
   },

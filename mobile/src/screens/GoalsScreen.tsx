@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
   filterRow: { paddingHorizontal: 16, paddingVertical: 10, gap: 8, flexDirection: 'row' },
   filterChip: {
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20,
-    borderWidth: 1, borderColor: '#383838', backgroundColor: '#161616',
+    borderWidth: 1, borderColor: '#2a2a2a', backgroundColor: '#181818',
     flexDirection: 'row', alignItems: 'center', gap: 5,
   },
   filterChipText: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1 },
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
   },
   milestoneBoxHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   milestoneBoxLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
-  milestoneBoxText: { fontSize: fscale(13), color: '#ccc', lineHeight: 20 },
+  milestoneBoxText: { fontSize: fscale(13), color: '#aaaaaa', lineHeight: 20 },
 
   adviceBox: {
     marginTop: 12, backgroundColor: '#0d1a07',
@@ -866,7 +866,7 @@ const styles = StyleSheet.create({
   adviceBoxHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   adviceBoxLabel: { fontSize: fscale(11), letterSpacing: 1.5, fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   adviceClose: { fontSize: fscale(13), color: '#aaa' },
-  adviceText: { fontSize: fscale(13), color: '#bbb', lineHeight: 20 },
+  adviceText: { fontSize: fscale(13), color: '#aaaaaa', lineHeight: 20 },
 
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyIconView: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, borderColor: '#b8f05840', backgroundColor: '#b8f05808', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },

@@ -1085,7 +1085,7 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: '#252525', borderLeftWidth: 3,
   },
   memoryEmpty: { fontSize: fscale(13), color: '#555', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
-  memoryText: { fontSize: fscale(13), color: '#ccc', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
+  memoryText: { fontSize: fscale(13), color: '#aaaaaa', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
   memoryFooter: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1e1e1e',

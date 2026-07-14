@@ -13,8 +13,8 @@ import { fscale, scale } from '../utils/scale';
 
 type Props = { navigation: NativeStackNavigationProp<any> };
 
-// Steps: 0=Coach, 1=Identity, 2=Commit
-const TOTAL_STEPS = 3;
+// Steps: 0=Quiz, 1=Coach, 2=Identity, 3=Commit
+const TOTAL_STEPS = 4;
 
 const COACHES = [
   { id: 'stoic_mentor',   name: 'Stoic Mentor',  color: '#b8f058', tag: 'Measured. Marcus.' },
@@ -24,6 +24,52 @@ const COACHES = [
   { id: 'ceo_coach',      name: 'CEO Coach',       color: '#40f5c8', tag: 'Ship. Iterate. Win.' },
   { id: 'calm_therapist', name: 'Calm Therapist', color: '#f0a060', tag: "You're doing great." },
 ];
+
+const QUIZ_QUESTIONS = [
+  {
+    key: 'q1',
+    question: 'How do you work best?',
+    options: [
+      { value: 'structured',  label: 'Structured routine',   sub: 'Same time, same place, every day' },
+      { value: 'spontaneous', label: 'Spontaneous flow',     sub: 'I move when the energy hits' },
+      { value: 'balanced',    label: 'Somewhere in between', sub: 'Depends on the week' },
+    ],
+  },
+  {
+    key: 'q2',
+    question: "What trips you up most?",
+    options: [
+      { value: 'starting',    label: 'Getting started',  sub: 'Procrastination kills my momentum' },
+      { value: 'finishing',   label: 'Finishing things', sub: 'I start a lot, complete less' },
+      { value: 'distraction', label: 'Staying focused',  sub: 'Too many tabs, too many ideas' },
+      { value: 'burnout',     label: 'Going too hard',   sub: 'I overdo it, then crash' },
+    ],
+  },
+  {
+    key: 'q3',
+    question: 'What kind of push do you need?',
+    options: [
+      { value: 'hard',   label: 'Push me hard',       sub: 'No hand-holding. Get it done.' },
+      { value: 'steady', label: 'Keep me consistent', sub: 'Measured, sustainable progress' },
+      { value: 'gentle', label: 'Go easy on me',      sub: 'Encouragement over pressure' },
+    ],
+  },
+] as const;
+
+type QuizKey = 'q1' | 'q2' | 'q3';
+
+function getRecommendation(q1: string, q2: string, q3: string): string {
+  if (q3 === 'gentle') return 'calm_therapist';
+  if (q3 === 'hard') {
+    if (q2 === 'burnout') return 'ceo_coach';
+    if (q2 === 'finishing') return 'drill_sergeant';
+    return 'goggins';
+  }
+  // steady
+  if (q1 === 'spontaneous' || q2 === 'distraction') return 'anime_sensei';
+  if (q2 === 'burnout') return 'calm_therapist';
+  return 'stoic_mentor';
+}
 
 const IDENTITY_EXAMPLES = [
   'I am a runner who never skips Mondays.',
@@ -39,10 +85,11 @@ const COMMIT_POINTS = [
 
 export default function OnboardingScreen({ navigation }: Props) {
   const { width } = useWindowDimensions();
-  const [step, setStep]             = useState(0);
+  const [step, setStep]               = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<QuizKey, string>>({ q1: '', q2: '', q3: '' });
   const [personality, setPersonality] = useState('stoic_mentor');
-  const [identity, setIdentity]     = useState('');
-  const [saving, setSaving]         = useState(false);
+  const [identity, setIdentity]       = useState('');
+  const [saving, setSaving]           = useState(false);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim  = useRef(new Animated.Value(1)).current;
@@ -68,6 +115,12 @@ export default function OnboardingScreen({ navigation }: Props) {
     });
   };
 
+  const handleQuizContinue = () => {
+    const rec = getRecommendation(quizAnswers.q1, quizAnswers.q2, quizAnswers.q3);
+    setPersonality(rec);
+    goTo(1);
+  };
+
   const handleFinish = async () => {
     setSaving(true);
     try {
@@ -88,7 +141,11 @@ export default function OnboardingScreen({ navigation }: Props) {
       const granted = await requestNotificationPermission();
       if (granted) {
         const times = await getNotificationTimes();
-        await scheduleDailyReminders(times.morningH, times.morningM, times.eveningH, times.eveningM).catch(() => {});
+        await scheduleDailyReminders(
+          times.morningH, times.morningM,
+          times.eveningH, times.eveningM,
+          personality as any,
+        ).catch(() => {});
       }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -100,6 +157,7 @@ export default function OnboardingScreen({ navigation }: Props) {
     }
   };
 
+  const quizComplete = !!(quizAnswers.q1 && quizAnswers.q2 && quizAnswers.q3);
   const selectedCoach = COACHES.find(c => c.id === personality)!;
 
   return (
@@ -121,13 +179,69 @@ export default function OnboardingScreen({ navigation }: Props) {
 
       <Animated.View style={[s.animWrap, { opacity: fadeAnim, transform: [{ translateX: slideAnim }] }]}>
 
-        {/* ── Step 0: Coach picker ──────────────────────────────────────── */}
+        {/* ── Step 0: Quiz ──────────────────────────────────────────────── */}
         {step === 0 && (
           <ScrollView contentContainerStyle={s.stepScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <View style={s.stepHeader}>
-              <Text style={s.stepEyebrow}>STEP 1 OF 3</Text>
-              <Text style={s.heading}>Pick your{'\n'}coach.</Text>
-              <Text style={s.sub}>You can swap them out anytime. Each shapes the tone of every reply.</Text>
+              <Text style={s.stepEyebrow}>STEP 1 OF 4</Text>
+              <Text style={s.heading}>Find your{'\n'}coach.</Text>
+              <Text style={s.sub}>Three questions. We'll match you with the right voice.</Text>
+            </View>
+
+            {QUIZ_QUESTIONS.map((q, qi) => (
+              <View key={q.key} style={s.quizBlock}>
+                <Text style={s.quizQ}>
+                  <Text style={s.quizNum}>{qi + 1}{'  '}</Text>
+                  {q.question}
+                </Text>
+                <View style={s.quizOptions}>
+                  {q.options.map(opt => {
+                    const selected = quizAnswers[q.key as QuizKey] === opt.value;
+                    return (
+                      <TouchableOpacity
+                        key={opt.value}
+                        style={[s.quizOpt, selected && s.quizOptSelected]}
+                        onPress={() => {
+                          Haptics.selectionAsync();
+                          setQuizAnswers(prev => ({ ...prev, [q.key]: opt.value }));
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <View style={[s.quizRadio, selected && s.quizRadioSelected]} />
+                        <View style={s.quizOptText}>
+                          <Text style={[s.quizOptLabel, selected && s.quizOptLabelSelected]}>{opt.label}</Text>
+                          <Text style={s.quizOptSub}>{opt.sub}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={[s.cta, !quizComplete && s.ctaDisabled]}
+              onPress={handleQuizContinue}
+              disabled={!quizComplete}
+              activeOpacity={0.85}
+            >
+              <Text style={s.ctaText}>See my match →</Text>
+            </TouchableOpacity>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
+
+        {/* ── Step 1: Coach picker ──────────────────────────────────────── */}
+        {step === 1 && (
+          <ScrollView contentContainerStyle={s.stepScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <View style={s.stepHeader}>
+              <Text style={s.stepEyebrow}>STEP 2 OF 4</Text>
+              <Text style={s.heading}>Your match.</Text>
+              <Text style={s.sub}>
+                We recommend{' '}
+                <Text style={{ color: selectedCoach.color, fontFamily: 'Syne_800ExtraBold' }}>{selectedCoach.name}</Text>
+                {' '}based on your answers. Swap anytime.
+              </Text>
             </View>
 
             <View style={s.coachGrid}>
@@ -164,18 +278,18 @@ export default function OnboardingScreen({ navigation }: Props) {
               })}
             </View>
 
-            <TouchableOpacity style={s.cta} onPress={() => goTo(1)} activeOpacity={0.85}>
+            <TouchableOpacity style={s.cta} onPress={() => goTo(2)} activeOpacity={0.85}>
               <Text style={s.ctaText}>Continue →</Text>
             </TouchableOpacity>
             <View style={{ height: 20 }} />
           </ScrollView>
         )}
 
-        {/* ── Step 1: Identity ─────────────────────────────────────────── */}
-        {step === 1 && (
+        {/* ── Step 2: Identity ─────────────────────────────────────────── */}
+        {step === 2 && (
           <ScrollView contentContainerStyle={s.stepScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <View style={s.stepHeader}>
-              <Text style={s.stepEyebrow}>STEP 2 OF 3</Text>
+              <Text style={s.stepEyebrow}>STEP 3 OF 4</Text>
               <Text style={s.heading}>Who are you becoming?</Text>
               <Text style={s.sub}>Write it like it's already true. We'll remind you, every day.</Text>
             </View>
@@ -207,22 +321,22 @@ export default function OnboardingScreen({ navigation }: Props) {
               </TouchableOpacity>
             ))}
 
-            <TouchableOpacity style={[s.cta, { marginTop: 16 }]} onPress={() => goTo(2)} activeOpacity={0.85}>
+            <TouchableOpacity style={[s.cta, { marginTop: 16 }]} onPress={() => goTo(3)} activeOpacity={0.85}>
               <Text style={s.ctaText}>Continue →</Text>
             </TouchableOpacity>
             {!identity.trim() && (
-              <TouchableOpacity style={s.skipBtn} onPress={() => goTo(2)}>
+              <TouchableOpacity style={s.skipBtn} onPress={() => goTo(3)}>
                 <Text style={s.skipText}>Skip for now</Text>
               </TouchableOpacity>
             )}
           </ScrollView>
         )}
 
-        {/* ── Step 2: Commit ───────────────────────────────────────────── */}
-        {step === 2 && (
+        {/* ── Step 3: Commit ───────────────────────────────────────────── */}
+        {step === 3 && (
           <View style={s.commitWrap}>
             <View style={s.commitContent}>
-              <Text style={[s.stepEyebrow, { textAlign: 'center' }]}>STEP 3 OF 3 · COMMITMENT</Text>
+              <Text style={[s.stepEyebrow, { textAlign: 'center' }]}>STEP 4 OF 4 · COMMITMENT</Text>
               <View style={s.commitIconWrap}>
                 <Text style={s.commitIcon}>✦</Text>
               </View>
@@ -287,6 +401,33 @@ const s = StyleSheet.create({
     letterSpacing: -0.5, marginBottom: 10,
   },
   sub: { fontSize: fscale(14), color: '#888', lineHeight: fscale(22) },
+
+  // Quiz
+  quizBlock: { marginBottom: 28 },
+  quizQ: {
+    fontSize: fscale(15), color: '#fff', fontFamily: 'Syne_800ExtraBold',
+    marginBottom: 12, lineHeight: fscale(22),
+  },
+  quizNum: {
+    fontSize: fscale(10), color: '#b8f058', fontFamily: 'DMMono_400Regular',
+    letterSpacing: 1,
+  },
+  quizOptions: { gap: 8 },
+  quizOpt: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: '#111', borderRadius: 12, padding: scale(14),
+    borderWidth: 1, borderColor: '#1e1e1e',
+  },
+  quizOptSelected: { borderColor: '#b8f05860', backgroundColor: '#b8f05808' },
+  quizRadio: {
+    width: 18, height: 18, borderRadius: 9,
+    borderWidth: 1.5, borderColor: '#333',
+  },
+  quizRadioSelected: { borderColor: '#b8f058', backgroundColor: '#b8f058' },
+  quizOptText: { flex: 1 },
+  quizOptLabel: { fontSize: fscale(14), color: '#aaaaaa', fontWeight: '600', marginBottom: 2 },
+  quizOptLabelSelected: { color: '#fff' },
+  quizOptSub: { fontSize: fscale(11), color: '#555', lineHeight: fscale(16) },
 
   // Coach grid
   coachGrid: {

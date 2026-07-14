@@ -256,7 +256,7 @@ const s = StyleSheet.create({
     gap: 10, alignSelf: 'flex-start', marginBottom: 10,
   },
   perkDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: '#b8f058' },
-  perkText: { fontSize: fscale(14), color: '#ccc', fontWeight: '600' },
+  perkText: { fontSize: fscale(14), color: '#aaaaaa', fontWeight: '600' },
   upgradBtn: {
     width: '100%', backgroundColor: '#b8f058', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center', marginTop: 24, marginBottom: 12,
@@ -275,7 +275,7 @@ const s = StyleSheet.create({
   },
   planBtn: {
     flex: 1, borderRadius: 12, padding: 14,
-    backgroundColor: '#161616', borderWidth: 1.5, borderColor: '#2a2a2a',
+    backgroundColor: '#181818', borderWidth: 1.5, borderColor: '#2a2a2a',
     alignItems: 'center', gap: 3,
   },
   planBtnActive: {

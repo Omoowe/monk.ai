@@ -592,14 +592,14 @@ const styles = StyleSheet.create({
   profileBtnText: { fontSize: fscale(16), color: '#aaa' },
   headerActions: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#161616', borderRadius: 12,
-    borderWidth: 1, borderColor: '#2e2e2e', marginTop: 8,
+    backgroundColor: '#181818', borderRadius: 12,
+    borderWidth: 1, borderColor: '#252525', marginTop: 8,
     overflow: 'hidden',
   },
   headerActionBtn: { paddingHorizontal: 12, paddingVertical: 8, justifyContent: 'center', alignItems: 'center', gap: 3 },
   headerActionText: { fontSize: fscale(15), color: '#aaa' },
   headerActionLabel: { fontSize: fscale(8), color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 0.8 },
-  headerActionDivider: { width: 1, height: 28, backgroundColor: '#2e2e2e' },
+  headerActionDivider: { width: 1, height: 28, backgroundColor: '#252525' },
 
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   emptyState: { alignItems: 'center', paddingVertical: 60, gap: 12 },
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#1a1a1a', gap: 10,
   },
   pbIconView: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  pbName: { flex: 1, fontSize: fscale(14), color: '#ccc', fontWeight: '500' },
+  pbName: { flex: 1, fontSize: fscale(14), color: '#aaaaaa', fontWeight: '500' },
   pbValue: { fontSize: fscale(18), fontFamily: 'DMMono_400Regular', fontWeight: '700' },
 
   insightsCard: {
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
   lbRankBadge: { width: 28, height: 28, borderRadius: 7, borderWidth: 1, borderColor: '#252525', alignItems: 'center', justifyContent: 'center' },
   lbRankText: { fontSize: fscale(12), color: '#999', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   lbAvatar: { fontSize: fscale(18), width: 26 },
-  lbName: { flex: 1, fontSize: fscale(14), color: '#ccc', fontWeight: '600' },
+  lbName: { flex: 1, fontSize: fscale(14), color: '#aaaaaa', fontWeight: '600' },
   lbScores: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   lbScore: { fontSize: fscale(18), color: '#fff', fontFamily: 'DMMono_400Regular' },
   lbStreak: { fontSize: fscale(11), color: '#555', fontFamily: 'DMMono_400Regular' },
