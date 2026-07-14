@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   backBtn: { marginBottom: 12 },
   backBtnText: { fontSize: fscale(13), color: '#666', fontFamily: 'DMMono_400Regular' },
   eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: fscale(26), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  title: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
   weekLabel: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
 
   content: { padding: 16, paddingBottom: 40, gap: 12 },

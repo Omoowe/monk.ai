@@ -26,17 +26,9 @@ export default function GlobalHeader() {
       >
         {monkMode && <View style={styles.monkDot} />}
         <View style={[styles.streakDiamond, { backgroundColor: color }]} />
-        <View style={styles.streakBlock}>
-          <Text style={[styles.streakNum, { color }]}>{streak}</Text>
-          <Text style={[styles.streakLabel, { color: color + '80' }]}>
-            {streak === 0 ? 'START' : streak < 7 ? 'DAYS' : 'STREAK'}
-          </Text>
-        </View>
-        <View style={[styles.avatarCircle, { borderColor: color + '60' }]}>
-          <Text style={[styles.avatarInitial, { color }]}>
-            {profile?.name ? profile.name.trim()[0].toUpperCase() : 'M'}
-          </Text>
-        </View>
+        <Text style={[styles.streakNum, { color }]}>
+          {streak}<Text style={[styles.streakSuffix, { color: color + '80' }]}>d</Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -62,14 +54,6 @@ const styles = StyleSheet.create({
   right: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   monkDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#b8f058' },
   streakDiamond: { width: 7, height: 7, borderRadius: 2, transform: [{ rotate: '45deg' }] },
-  streakBlock: { alignItems: 'flex-end' },
-  streakNum: { fontSize: fscale(18), fontWeight: '700', fontFamily: 'DMMono_400Regular', lineHeight: 20 },
-  streakLabel: { fontSize: fscale(8), fontFamily: 'DMMono_400Regular', letterSpacing: 1, lineHeight: 10 },
-  avatarCircle: {
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: '#1a1a1a', borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center',
-    marginLeft: 2,
-  },
-  avatarInitial: { fontSize: fscale(13), fontWeight: '700', fontFamily: 'DMMono_400Regular' },
+  streakNum: { fontSize: fscale(15), fontWeight: '700', fontFamily: 'DMMono_400Regular' },
+  streakSuffix: { fontSize: fscale(10), fontFamily: 'DMMono_400Regular' },
 });

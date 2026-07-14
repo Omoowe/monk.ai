@@ -660,65 +660,34 @@ export default function CoachScreen() {
     >
     <SafeAreaView style={{ flex: 1 }} edges={['bottom', 'left', 'right']}>
       {/* Coach identity bar */}
-      <View style={[styles.coachBar, monkMode && { backgroundColor: '#120808', borderBottomColor: '#f0606030' }]}>
+      <View style={[styles.coachBar, monkMode && { backgroundColor: '#0f0808', borderBottomColor: '#f0606030' }]}>
         <TouchableOpacity testID="coach-identity-bar" style={styles.coachLeft} onPress={() => setShowCoachPicker(true)} activeOpacity={0.7}>
           <Animated.View style={[styles.coachColorDot, { backgroundColor: color, transform: [{ scale: dotPulseScale }], opacity: dotPulseOpacity }]} />
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <Text style={[styles.coachName, { color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{PERSONALITY_NAMES[personality]}</Text>
+              <Text style={[styles.coachName, { color }]} numberOfLines={1}>{PERSONALITY_NAMES[personality]}</Text>
               <Text style={styles.coachSwitch}>▾</Text>
             </View>
-            <Text style={styles.coachQuote} numberOfLines={1}>"{PERSONALITY_QUOTES[personality]}"</Text>
+            {(todayMission || identity) ? (
+              <Text style={styles.coachContextLine} numberOfLines={1}>
+                {todayMission ?? `"${identity}"`}
+              </Text>
+            ) : (
+              <Text style={styles.coachQuote} numberOfLines={1}>"{PERSONALITY_QUOTES[personality]}"</Text>
+            )}
           </View>
         </TouchableOpacity>
         <View style={styles.coachRight}>
+          {monkMode && (
+            <TouchableOpacity onPress={() => navigation.navigate('MonkMode')} style={styles.monkModePill}>
+              <Text style={styles.monkModePillText}>◆ MONK</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={openMoreMenu} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
             <Text style={styles.moreBtn}>···</Text>
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Monk Mode strip */}
-      <TouchableOpacity
-        testID="monkmode-btn"
-        style={[styles.monkModeStrip, monkMode && styles.monkModeStripActive]}
-        onPress={() => navigation.navigate('MonkMode')}
-        activeOpacity={0.7}
-      >
-        <Text style={[styles.monkModeIcon, monkMode && { color: '#f06060' }]}>
-          {monkMode ? '◆' : '◇'}
-        </Text>
-        <Text style={[styles.monkModeLabel, monkMode && { color: '#f06060' }]}>MONK MODE</Text>
-        <Text style={styles.monkModeSep}>  |  </Text>
-        <Text style={[styles.monkModeStatus, monkMode && { color: '#f0606099' }]}>
-          {monkMode ? 'ON · ACTIVE' : 'OFF · TAP TO ENABLE'}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Identity strip */}
-      {identity ? (
-        <View style={styles.identityStrip}>
-          <Text style={styles.identityText} numberOfLines={1}>
-            <Text style={styles.identityLabel}>You: </Text>
-            "{identity}"
-          </Text>
-        </View>
-      ) : null}
-
-      {/* Today's mission strip */}
-      {!searchActive && todayMission ? (
-        <View style={[styles.identityStrip, styles.missionStrip]}>
-          <Text style={styles.identityText} numberOfLines={1}>
-            <Text style={[styles.identityLabel, { color: '#f5c840' }]}>MISSION: </Text>
-            {todayMission}
-          </Text>
-          {habitsToday.total > 0 && (
-            <Text style={styles.habitsLine}>
-              {habitsToday.done}/{habitsToday.total} HABITS DONE TODAY
-            </Text>
-          )}
-        </View>
-      ) : null}
 
       {/* Search bar */}
       {searchActive && (
@@ -785,8 +754,8 @@ export default function CoachScreen() {
       />
 
         {searchActive ? null : <View style={styles.inputArea}>
-          {/* Quick action chips */}
-          <View style={styles.chipsRow}>
+          {/* Quick action chips — horizontal scroll, no wrap */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
             {quickActions.map((action) => (
               <TouchableOpacity
                 key={action.label}
@@ -797,7 +766,7 @@ export default function CoachScreen() {
                 <Text style={[styles.chipText, { color: color + 'cc' }]}>{action.label}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
 
           {/* Input box */}
           <View style={[
@@ -906,40 +875,24 @@ const styles = StyleSheet.create({
 
   coachBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: scale(20), paddingVertical: scale(10), minHeight: scale(64),
+    paddingHorizontal: scale(20), paddingVertical: scale(10),
     backgroundColor: '#111',
     borderBottomWidth: 1, borderBottomColor: '#1e1e1e',
   },
   coachLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
   coachColorDot: {
-    width: scale(10), height: scale(10), borderRadius: scale(5), flexShrink: 0,
+    width: scale(9), height: scale(9), borderRadius: scale(5), flexShrink: 0,
   },
   coachName: { fontSize: fscale(14), fontWeight: '800', fontFamily: 'Syne_800ExtraBold' },
-  coachQuote: { fontSize: fscale(11), color: '#aaa', fontStyle: 'italic', marginTop: 1 },
-  coachRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  statInline: { fontSize: fscale(13), color: '#f5c840', fontWeight: '700', fontFamily: 'DMMono_400Regular' },
-  moreBtn: { fontSize: fscale(18), color: '#555', letterSpacing: 2, paddingLeft: 2 },
-
-  monkModeStrip: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: scale(20), paddingVertical: scale(8),
-    borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
-    backgroundColor: '#0a0a0a',
+  coachQuote: { fontSize: fscale(11), color: '#555', fontStyle: 'italic', marginTop: 1 },
+  coachContextLine: { fontSize: fscale(11), color: '#666', marginTop: 1 },
+  coachRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  moreBtn: { fontSize: fscale(18), color: '#444', letterSpacing: 2, paddingLeft: 2 },
+  monkModePill: {
+    backgroundColor: '#f0606018', borderRadius: 6, borderWidth: 1, borderColor: '#f0606040',
+    paddingHorizontal: 8, paddingVertical: 4,
   },
-  monkModeStripActive: { backgroundColor: '#1a0808', borderBottomColor: '#f0606030' },
-  monkModeIcon: { fontSize: fscale(14), marginRight: 6, color: '#4a8a4a' },
-  monkModeLabel: { fontSize: fscale(11), fontWeight: '700', color: '#4a8a4a', fontFamily: 'DMMono_400Regular', letterSpacing: 1 },
-  monkModeSep: { fontSize: fscale(11), color: '#333' },
-  monkModeStatus: { fontSize: fscale(11), color: '#444', fontFamily: 'DMMono_400Regular' },
-  habitsLine: { fontSize: fscale(10), color: '#666', fontFamily: 'DMMono_400Regular', marginTop: 3, letterSpacing: 0.5 },
-
-  identityStrip: {
-    paddingHorizontal: scale(20), paddingVertical: scale(7),
-    borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
-  },
-  identityLabel: { color: '#b8f058', fontWeight: '700', fontSize: fscale(11) },
-  identityText: { fontSize: fscale(11), color: '#aaa', fontStyle: 'italic' },
-  missionStrip: { backgroundColor: '#0d160a' },
+  monkModePillText: { fontSize: fscale(9), color: '#f06060', fontFamily: 'DMMono_400Regular', letterSpacing: 1, fontWeight: '700' },
   searchBar: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16, paddingVertical: 10,
@@ -1014,7 +967,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingTop: 10, paddingBottom: 8,
     gap: 8,
   },
-  chipsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  chipsRow: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
   chip: {
     borderRadius: 8,
     paddingHorizontal: scale(11), paddingVertical: scale(7),

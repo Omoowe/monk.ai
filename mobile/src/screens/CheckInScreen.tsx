@@ -1014,7 +1014,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#222',
   },
   eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  title: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
   subtitle: { fontSize: fscale(13), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   scroll: { padding: scale(20), paddingBottom: scale(40), gap: 20 },
 

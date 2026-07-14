@@ -287,7 +287,11 @@ export default function SocialScreen() {
       {/* No username prompt */}
       {!me.username && (
         <TouchableOpacity style={s.usernamePrompt} onPress={() => navigation.navigate('Profile')}>
-          <Text style={s.usernamePromptText}>Set a username to find friends →</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={s.usernamePromptDot} />
+            <Text style={s.usernamePromptText}>Create a username to find rivals</Text>
+            <Text style={s.usernamePromptArrow}>→</Text>
+          </View>
         </TouchableOpacity>
       )}
 
@@ -400,9 +404,12 @@ export default function SocialScreen() {
               </View>
             ) : searchQuery.length === 0 ? (
               <View style={s.empty}>
-                <View style={s.emptyIconDot} />
-                <Text style={s.emptyTitle}>No friends yet.</Text>
-                <Text style={s.emptySub}>Search by username above to add your first rival.</Text>
+                <View style={s.emptyIconBox}>
+                  <View style={s.emptyIconInner} />
+                  <View style={[s.emptyIconInner, { marginLeft: -8 }]} />
+                </View>
+                <Text style={s.emptyTitle}>No rivals yet</Text>
+                <Text style={s.emptySub}>Search a username above. Compete on streaks, habits, dopamine score.</Text>
               </View>
             ) : null}
           </>
@@ -539,9 +546,12 @@ export default function SocialScreen() {
 
             {activeChallenges.length === 0 && pendingChallenges.length === 0 && pastChallenges.length === 0 && (
               <View style={s.empty}>
-                <View style={s.emptyIconDot} />
-                <Text style={s.emptyTitle}>No battles yet.</Text>
-                <Text style={s.emptySub}>Go to Friends and tap VS to challenge someone.</Text>
+                <View style={s.emptyIconBox}>
+                  <View style={s.emptyIconInner} />
+                  <View style={[s.emptyIconInner, { marginLeft: -8 }]} />
+                </View>
+                <Text style={s.emptyTitle}>No battles yet</Text>
+                <Text style={s.emptySub}>Go to Friends and tap VS to challenge someone to a streak battle.</Text>
               </View>
             )}
           </>
@@ -594,17 +604,22 @@ const s = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#222',
   },
   eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
+  title: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
   reviewBtn: {
     borderWidth: 1, borderColor: '#2a2a2a', borderRadius: 8,
     paddingHorizontal: 12, paddingVertical: 6, marginTop: 4,
   },
   reviewBtnText: { fontSize: fscale(12), color: '#aaa' },
   usernamePrompt: {
-    backgroundColor: '#0d1a07', borderBottomWidth: 1, borderBottomColor: '#b8f05820',
-    paddingHorizontal: 20, paddingVertical: 12,
+    backgroundColor: '#0d1a07', borderBottomWidth: 1, borderBottomColor: '#b8f05830',
+    borderLeftWidth: 3, borderLeftColor: '#b8f058',
+    paddingHorizontal: 20, paddingVertical: 14,
   },
-  usernamePromptText: { fontSize: fscale(13), color: '#b8f058' },
+  usernamePromptDot: {
+    width: 7, height: 7, borderRadius: 4, backgroundColor: '#b8f058',
+  },
+  usernamePromptText: { flex: 1, fontSize: fscale(13), color: '#b8f058', fontWeight: '700' },
+  usernamePromptArrow: { fontSize: fscale(14), color: '#b8f05880' },
   segmentBar: {
     flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
     paddingHorizontal: 20, gap: 0,
@@ -615,7 +630,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 2, borderBottomColor: 'transparent',
   },
   segBtnActive: { borderBottomColor: '#b8f058' },
-  segBtnText: { fontSize: fscale(10), letterSpacing: 2, color: '#aaa', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  segBtnText: { fontSize: fscale(9), letterSpacing: 1, color: '#aaa', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   segBtnTextActive: { color: '#b8f058' },
   badge: {
     backgroundColor: '#f06060', borderRadius: 8,
@@ -723,10 +738,14 @@ const s = StyleSheet.create({
   pastResult: { fontSize: fscale(13), fontWeight: '700', width: 80 },
   pastOpponent: { flex: 1, fontSize: fscale(13), color: '#ccc' },
   pastDate: { fontSize: fscale(10), color: '#999', fontFamily: 'DMMono_400Regular' },
-  empty: { alignItems: 'center', paddingVertical: 48, gap: 10 },
-  emptyIconDot: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: '#333', marginBottom: 12 },
-  emptyTitle: { fontSize: fscale(18), fontWeight: '700', color: '#999' },
-  emptySub: { fontSize: fscale(13), color: '#888', textAlign: 'center', paddingHorizontal: 20 },
+  empty: { alignItems: 'center', paddingVertical: 48, gap: 12 },
+  emptyIconBox: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  emptyIconInner: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#181818', borderWidth: 2, borderColor: '#2a2a2a',
+  },
+  emptyTitle: { fontSize: fscale(17), fontWeight: '700', color: '#ccc' },
+  emptySub: { fontSize: fscale(13), color: '#666', textAlign: 'center', paddingHorizontal: 32, lineHeight: fscale(20) },
   pickerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#000000bb', justifyContent: 'flex-end' },
   pickerSheet: {
     backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24,

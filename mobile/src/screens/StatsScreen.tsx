@@ -88,8 +88,10 @@ export default function StatsScreen() {
   const [focusMinutesWeek, setFocusMinutesWeek] = useState(0);
   const [focusSessionsWeek, setFocusSessionsWeek] = useState(0);
   const barAnims = useRef<Animated.Value[]>(Array.from({ length: 7 }, () => new Animated.Value(0)));
+  const catBarAnims = useRef<Animated.Value[]>(Array.from({ length: 10 }, () => new Animated.Value(0)));
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const countAnim = useRef(new Animated.Value(0)).current;
+  const sectionAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.spring(scaleAnim, { toValue: 1, tension: 80, friction: 10, useNativeDriver: true }).start();
@@ -199,6 +201,12 @@ export default function StatsScreen() {
         }))
         .sort((a, b) => (b.done / b.total) - (a.done / a.total));
       setCategoryStats(catArr);
+      catArr.forEach((cat, i) => {
+        const pct = cat.total > 0 ? cat.done / cat.total : 0;
+        Animated.spring(catBarAnims.current[i], {
+          toValue: pct, useNativeDriver: false, tension: 45, friction: 9, delay: 200 + i * 80,
+        }).start();
+      });
 
       // Monthly heatmap data
       const now = new Date();
@@ -232,6 +240,7 @@ export default function StatsScreen() {
       console.error('Failed to load stats:', err instanceof Error ? err.message : String(err));
     } finally {
       setDataLoading(false);
+      Animated.timing(sectionAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
     }
   };
 
@@ -312,38 +321,41 @@ export default function StatsScreen() {
         )}
         {/* Score card — only when there's data */}
         {weekStats.total > 0 && (
-          <View style={[styles.scoreCard, { overflow: 'hidden' }]}>
-            <View style={{ position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: rank.color + '0b' }} />
-            <Text style={styles.scoreLabel}>DOPAMINE SCORE</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 16, marginTop: 8 }}>
-              <CountText anim={countAnim} color={rank.color} scaleAnim={scaleAnim} />
-              <View style={{ flex: 1, paddingBottom: 14 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                  <RankShape color={rank.color} score={dopamineScore} size={8} />
-                  <Text style={[styles.rankLine, { color: rank.color, marginTop: 0, marginBottom: 0 }]}>{rank.label}</Text>
-                </View>
-                <View style={styles.scoreBar}>
-                  <View style={[styles.scoreFillBg, { width: '100%', backgroundColor: rank.color + '60' }]} />
-                  <View style={[styles.scoreFill, { width: `${dopamineScore}%` as any, backgroundColor: rank.color }]} />
-                </View>
+          <Animated.View style={[styles.scoreCard, { overflow: 'hidden', opacity: sectionAnim, transform: [{ scale: scaleAnim }] }]}>
+            <View style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: rank.color + '09' }} />
+            <View style={styles.scoreMeta}>
+              <Text style={styles.scoreLabel}>DOPAMINE SCORE</Text>
+              <View style={[styles.rankBadge, { backgroundColor: rank.color + '15', borderColor: rank.color + '40' }]}>
+                <RankShape color={rank.color} score={dopamineScore} size={7} />
+                <Text style={[styles.rankLine, { color: rank.color }]}>{rank.label}</Text>
               </View>
             </View>
-          </View>
+            <CountText anim={countAnim} color={rank.color} scaleAnim={new Animated.Value(1)} />
+            <View style={styles.scoreBarWrap}>
+              <View style={[styles.scoreBarTrack, { backgroundColor: rank.color + '20' }]}>
+                <Animated.View style={[styles.scoreFill, {
+                  width: countAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }) as any,
+                  backgroundColor: rank.color,
+                }]} />
+              </View>
+              <Text style={[styles.scorePct, { color: rank.color + 'aa' }]}>{dopamineScore}/100</Text>
+            </View>
+          </Animated.View>
         )}
 
         {/* Hero row — 2 dominant stats */}
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={[styles.gridCellHero, { borderColor: rank.color + '40' }]}>
+        <Animated.View style={{ flexDirection: 'row', gap: 10, opacity: sectionAnim }}>
+          <View style={[styles.gridCellHero, { borderTopColor: rank.color, borderTopWidth: 2 }]}>
             <Text style={[styles.gridNumberHero, { color: rank.color }]}>{weekStats.completed}</Text>
             <Text style={styles.gridLabel}>HABITS THIS WEEK</Text>
           </View>
-          <View style={[styles.gridCellHero, { borderColor: rank.color + '25' }]}>
+          <View style={[styles.gridCellHero, { borderTopColor: rank.color + '70', borderTopWidth: 2 }]}>
             <Text style={[styles.gridNumberHero, { color: rank.color }]}>{completionPct}%</Text>
             <Text style={styles.gridLabel}>COMPLETION RATE</Text>
           </View>
-        </View>
+        </Animated.View>
         {/* Secondary grid */}
-        <View style={styles.grid}>
+        <Animated.View style={[styles.grid, { opacity: sectionAnim }]}>
           <View style={styles.gridCell}>
             <Text style={styles.gridNumber}>{streak}</Text>
             <Text style={styles.gridLabel}>CURRENT STREAK</Text>
@@ -368,7 +380,7 @@ export default function StatsScreen() {
             <Text style={[styles.gridNumber, focusMinutesWeek > 0 && { color: '#b8f058' }]}>{focusMinutesWeek}</Text>
             <Text style={styles.gridLabel}>FOCUS MINUTES</Text>
           </View>
-        </View>
+        </Animated.View>
 
         {/* 7-day bar chart */}
         <View style={styles.chartCard}>
@@ -397,21 +409,24 @@ export default function StatsScreen() {
 
         {/* Habit Insights */}
         {categoryStats.length > 0 && (
-          <View style={styles.insightsCard}>
+          <Animated.View style={[styles.insightsCard, { opacity: sectionAnim }]}>
             <Text style={styles.sectionLabel}>HABIT INSIGHTS</Text>
-            {categoryStats.map((cat) => {
+            {categoryStats.map((cat, i) => {
               const pct = cat.total > 0 ? Math.round((cat.done / cat.total) * 100) : 0;
+              const animW = catBarAnims.current[i].interpolate({
+                inputRange: [0, 1], outputRange: ['0%', '100%'],
+              });
               return (
                 <View key={cat.id} style={styles.catRow}>
                   <Text style={[styles.catLabel, { color: cat.color }]}>{cat.label.toUpperCase()}</Text>
                   <View style={styles.catBarBg}>
-                    <View style={[styles.catBarFill, { width: `${pct}%` as any, backgroundColor: cat.color }]} />
+                    <Animated.View style={[styles.catBarFill, { width: animW as any, backgroundColor: cat.color }]} />
                   </View>
-                  <Text style={styles.catPct}>{pct}%</Text>
+                  <Text style={[styles.catPct, { color: cat.color }]}>{pct}%</Text>
                 </View>
               );
             })}
-          </View>
+          </Animated.View>
         )}
 
         {/* Personal Bests */}
@@ -538,7 +553,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
   },
   eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  title: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
   weekLabel: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   profileBtn: {
     width: 36, height: 36, borderRadius: 18,
@@ -566,29 +581,35 @@ const styles = StyleSheet.create({
   emptyBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: fscale(14) },
 
   scoreCard: {
-    backgroundColor: '#111', borderRadius: 14, padding: 24,
+    backgroundColor: '#111', borderRadius: 16, padding: 24,
     borderWidth: 1, borderColor: '#252525',
   },
-  scoreLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular' },
-  scoreNumber: { fontSize: fscale(80), fontFamily: 'DMMono_400Regular', lineHeight: 88 },
-  rankLine: { fontSize: fscale(13), fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
-  scoreBar: { width: '100%', height: 10, backgroundColor: '#222', borderRadius: 5, overflow: 'hidden' },
-  scoreFillBg: { position: 'absolute', height: 10, borderRadius: 5 },
-  scoreFill: { height: 10, borderRadius: 5 },
+  scoreMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  scoreLabel: { fontSize: fscale(10), letterSpacing: 2, color: '#555', fontFamily: 'DMMono_400Regular' },
+  rankBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderRadius: 8, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 5,
+  },
+  rankLine: { fontSize: fscale(10), fontFamily: 'DMMono_400Regular', letterSpacing: 1.5 },
+  scoreNumber: { fontSize: fscale(76), fontFamily: 'DMMono_400Regular', lineHeight: fscale(82), marginVertical: 4 },
+  scoreBarWrap: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
+  scoreBarTrack: { flex: 1, height: 4, borderRadius: 2, overflow: 'hidden' },
+  scoreFill: { height: 4, borderRadius: 2 },
+  scorePct: { fontSize: fscale(10), fontFamily: 'DMMono_400Regular', letterSpacing: 1 },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   gridCellHero: {
     flex: 1, backgroundColor: '#111', borderRadius: 14, padding: 20,
-    borderWidth: 1,
+    borderWidth: 1, borderColor: '#252525',
   },
-  gridNumberHero: { fontSize: fscale(42), fontFamily: 'DMMono_400Regular', marginBottom: 6 },
+  gridNumberHero: { fontSize: fscale(40), fontFamily: 'DMMono_400Regular', marginBottom: 6 },
   gridCell: {
     flex: 1, minWidth: '45%',
-    backgroundColor: '#111', borderRadius: 12, padding: 14,
+    backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#1e1e1e', alignItems: 'center',
   },
-  gridNumber: { fontSize: fscale(26), color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  gridLabel: { fontSize: fscale(9), color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, textAlign: 'center' },
+  gridNumber: { fontSize: fscale(28), color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 6 },
+  gridLabel: { fontSize: fscale(9), color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, textAlign: 'center' },
 
   chartCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 16,
@@ -632,10 +653,10 @@ const styles = StyleSheet.create({
     fontFamily: 'DMMono_400Regular', width: 48, textAlign: 'right',
   },
   catBarBg: {
-    flex: 1, height: 20, backgroundColor: '#1e1e1e',
-    borderRadius: 6, overflow: 'hidden',
+    flex: 1, height: 4, backgroundColor: '#1e1e1e',
+    borderRadius: 2, overflow: 'hidden',
   },
-  catBarFill: { height: 20, borderRadius: 6 },
+  catBarFill: { height: 4, borderRadius: 2 },
 
   lbCard: { backgroundColor: '#111', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: '#252525' },
   lbRow: {

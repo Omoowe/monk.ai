@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#222' },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  title: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
   subtitle: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   addBtn: { borderWidth: 1, borderColor: '#b8f058', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 9 },
   addBtnText: { color: '#b8f058', fontSize: fscale(13), fontWeight: '700' },
