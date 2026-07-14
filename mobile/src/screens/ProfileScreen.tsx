@@ -97,6 +97,8 @@ export default function ProfileScreen({ navigation }: Props) {
   const [streakFreezes, setStreakFreezes] = useState(0);
   const [freezeUsedOn, setFreezeUsedOn] = useState<string | null>(null);
   const [freezeLoading, setFreezeLoading] = useState(false);
+  const [clearingMemory, setClearingMemory] = useState(false);
+  const [memoryCleared, setMemoryCleared] = useState(false);
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(true);
   const [notifyCoachNudges, setNotifyCoachNudges] = useState(true);
   const [avatar, setAvatar] = useState('🧘');
@@ -279,6 +281,34 @@ export default function ProfileScreen({ navigation }: Props) {
             setFreezeLoading(false);
           }
         }},
+      ]
+    );
+  };
+
+  const clearCoachMemory = () => {
+    Alert.alert(
+      'Clear Coach Memory',
+      'Your coach will forget everything it learned about you. Conversations continue, but context resets. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear Memory',
+          style: 'destructive',
+          onPress: async () => {
+            setClearingMemory(true);
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (!user) return;
+              await supabase.from('users').update({ coach_memory: null }).eq('id', user.id);
+              updateProfileField({ coachMemory: '' });
+              setMemoryCleared(true);
+            } catch {
+              Alert.alert('Error', 'Could not clear memory. Try again.');
+            } finally {
+              setClearingMemory(false);
+            }
+          },
+        },
       ]
     );
   };
@@ -554,6 +584,36 @@ export default function ProfileScreen({ navigation }: Props) {
               </TouchableOpacity>
             );
           })}
+        </View>
+
+        {/* Coach Memory */}
+        <Text style={sectionLabelStyle}>WHAT YOUR COACH REMEMBERS</Text>
+        <View style={[s.memoryCard, { borderLeftColor: coachColor + '60' }]}>
+          {memoryCleared || !profile?.coachMemory ? (
+            <Text style={s.memoryEmpty}>
+              {memoryCleared
+                ? 'Memory cleared. Your coach starts fresh.'
+                : 'Your coach hasn\'t learned anything about you yet. Start chatting.'}
+            </Text>
+          ) : (
+            <>
+              <Text style={s.memoryText}>{profile.coachMemory}</Text>
+              <View style={s.memoryFooter}>
+                <Text style={[s.memoryMeta, { color: coachColor + '99' }]}>
+                  Updated as you chat
+                </Text>
+                <TouchableOpacity
+                  onPress={clearCoachMemory}
+                  disabled={clearingMemory}
+                  hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                >
+                  {clearingMemory
+                    ? <ActivityIndicator size={12} color="#555" />
+                    : <Text style={s.memoryClearBtn}>Clear</Text>}
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </View>
 
         {/* Settings group */}
@@ -1016,6 +1076,19 @@ const s = StyleSheet.create({
   catChipTextActive: { color: '#b8f058' },
 
   lockIcon: { fontSize: 14, position: 'absolute', top: 8, right: 8 },
+
+  memoryCard: {
+    backgroundColor: '#111', borderRadius: 12, padding: 16,
+    borderWidth: 1, borderColor: '#252525', borderLeftWidth: 3,
+  },
+  memoryEmpty: { fontSize: 13, color: '#555', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
+  memoryText: { fontSize: 13, color: '#ccc', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
+  memoryFooter: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1e1e1e',
+  },
+  memoryMeta: { fontSize: 10, letterSpacing: 0.8, fontFamily: 'DMMono_400Regular' },
+  memoryClearBtn: { fontSize: 12, color: '#f06060', fontFamily: 'DMMono_400Regular' },
 
   exportBtn: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
