@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet,
   ActivityIndicator, ScrollView,
@@ -173,29 +174,29 @@ const styles = StyleSheet.create({
   },
   handle: { width: 36, height: 4, backgroundColor: '#333', borderRadius: 2, alignSelf: 'center', marginBottom: 16 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 },
-  habitEmoji: { fontSize: 24 },
-  habitName: { flex: 1, fontSize: 18, color: '#fff', fontWeight: '700' },
+  habitEmoji: { fontSize: fscale(24) },
+  habitName: { flex: 1, fontSize: fscale(18), color: '#fff', fontWeight: '700' },
   closeBtn: { padding: 6 },
-  closeBtnText: { fontSize: 16, color: '#666' },
+  closeBtnText: { fontSize: fscale(16), color: '#666' },
 
   statsRow: {
     flexDirection: 'row', backgroundColor: '#1a1a1a', borderRadius: 12,
     padding: 16, marginBottom: 16, alignItems: 'center',
   },
   statCell: { flex: 1, alignItems: 'center', gap: 4 },
-  statVal: { fontSize: 22, color: '#fff', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
-  statLbl: { fontSize: 8, color: '#888', fontFamily: 'DMMono_400Regular', letterSpacing: 1, textAlign: 'center' },
+  statVal: { fontSize: fscale(22), color: '#fff', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  statLbl: { fontSize: fscale(8), color: '#888', fontFamily: 'DMMono_400Regular', letterSpacing: 1, textAlign: 'center' },
   statDivider: { width: 1, height: 36, backgroundColor: '#2a2a2a' },
 
   calCard: { backgroundColor: '#1a1a1a', borderRadius: 12, padding: 14 },
   dayLabels: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 8 },
-  dayLabel: { width: 34, textAlign: 'center', fontSize: 9, color: '#777', fontFamily: 'DMMono_400Regular' },
+  dayLabel: { width: 34, textAlign: 'center', fontSize: fscale(9), color: '#777', fontFamily: 'DMMono_400Regular' },
   weekRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 6 },
   cell: { width: 34, height: 34, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   cellDone: { backgroundColor: '#1a3a0a', borderWidth: 1, borderColor: '#4a7020' },
   cellToday: { borderWidth: 1, borderColor: '#b8f058' },
   cellFuture: { opacity: 0.25 },
-  cellNum: { fontSize: 11, color: '#888', fontFamily: 'DMMono_400Regular' },
+  cellNum: { fontSize: fscale(11), color: '#888', fontFamily: 'DMMono_400Regular' },
   cellNumDone: { color: '#b8f058' },
   cellNumFuture: { color: '#333' },
 });

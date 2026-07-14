@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Linking,
 } from 'react-native';
@@ -239,14 +240,14 @@ const s = StyleSheet.create({
     backgroundColor: '#333', marginBottom: 24,
   },
   title: {
-    fontSize: 22, fontWeight: '800', color: '#fff',
+    fontSize: fscale(22), fontWeight: '800', color: '#fff',
     fontFamily: 'Syne_800ExtraBold', textAlign: 'center',
     marginBottom: 6, letterSpacing: -0.5,
   },
-  sub: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 20 },
+  sub: { fontSize: fscale(14), color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: fscale(20) },
   divider: { width: '100%', height: 1, backgroundColor: '#1e1e1e', marginBottom: 20 },
   perksLabel: {
-    fontSize: 10, fontWeight: '700', color: '#b8f058',
+    fontSize: fscale(10), fontWeight: '700', color: '#b8f058',
     letterSpacing: 1.5, marginBottom: 14, alignSelf: 'flex-start',
     fontFamily: 'DMMono_400Regular',
   },
@@ -255,18 +256,18 @@ const s = StyleSheet.create({
     gap: 10, alignSelf: 'flex-start', marginBottom: 10,
   },
   perkDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: '#b8f058' },
-  perkText: { fontSize: 14, color: '#ccc', fontWeight: '600' },
+  perkText: { fontSize: fscale(14), color: '#ccc', fontWeight: '600' },
   upgradBtn: {
     width: '100%', backgroundColor: '#b8f058', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center', marginTop: 24, marginBottom: 12,
     minHeight: 52, justifyContent: 'center',
   },
   upgradBtnText: {
-    fontSize: 15, fontWeight: '800', color: '#0a0a0a',
+    fontSize: fscale(15), fontWeight: '800', color: '#0a0a0a',
     fontFamily: 'Syne_800ExtraBold', letterSpacing: -0.3,
   },
   trialSub: {
-    fontSize: 12, color: '#888', textAlign: 'center',
+    fontSize: fscale(12), color: '#888', textAlign: 'center',
     marginTop: -6, marginBottom: 6,
   },
   planToggle: {
@@ -281,23 +282,23 @@ const s = StyleSheet.create({
     borderColor: '#b8f058', backgroundColor: '#0d1a07',
   },
   planBtnAnnualRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  planBtnLabel: { fontSize: 9, letterSpacing: 2, color: '#888', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  planBtnLabel: { fontSize: fscale(9), letterSpacing: 2, color: '#888', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   planBtnLabelActive: { color: '#b8f058' },
-  planBtnPrice: { fontSize: 18, fontWeight: '800', color: '#777', fontFamily: 'Syne_800ExtraBold' },
+  planBtnPrice: { fontSize: fscale(18), fontWeight: '800', color: '#777', fontFamily: 'Syne_800ExtraBold' },
   planBtnPriceActive: { color: '#fff' },
-  planBtnSub: { fontSize: 10, color: '#777', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
+  planBtnSub: { fontSize: fscale(10), color: '#777', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
   savingsBadge: {
     backgroundColor: '#b8f058', borderRadius: 4,
     paddingHorizontal: 5, paddingVertical: 2,
   },
-  savingsBadgeText: { fontSize: 8, fontWeight: '800', color: '#0a0a0a', letterSpacing: 0.5 },
+  savingsBadgeText: { fontSize: fscale(8), fontWeight: '800', color: '#0a0a0a', letterSpacing: 0.5 },
   restoreBtn: { paddingVertical: 10 },
-  restoreText: { fontSize: 13, color: '#666', fontWeight: '600' },
+  restoreText: { fontSize: fscale(13), color: '#666', fontWeight: '600' },
   dismissBtn: { paddingVertical: 6 },
-  dismissText: { fontSize: 13, color: '#333', fontWeight: '500' },
+  dismissText: { fontSize: fscale(13), color: '#333', fontWeight: '500' },
   legalText: {
-    fontSize: 10, color: '#333', textAlign: 'center',
-    marginTop: 12, lineHeight: 15,
+    fontSize: fscale(10), color: '#333', textAlign: 'center',
+    marginTop: 12, lineHeight: fscale(15),
   },
   legalLink: { color: '#888', textDecorationLine: 'underline' },
 });

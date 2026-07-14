@@ -1,4 +1,5 @@
 import React from 'react';
+import { fscale, scale } from '../utils/scale';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface State { hasError: boolean; message: string }
@@ -37,11 +38,11 @@ const s = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', padding: 32,
   },
   warningIcon: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: '#f06060', marginBottom: 16 },
-  title: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 8, textAlign: 'center' },
-  sub: { fontSize: 13, color: '#888', textAlign: 'center', marginBottom: 32, lineHeight: 20 },
+  title: { fontSize: fscale(20), fontWeight: '800', color: '#fff', marginBottom: 8, textAlign: 'center' },
+  sub: { fontSize: fscale(13), color: '#888', textAlign: 'center', marginBottom: 32, lineHeight: 20 },
   btn: {
     backgroundColor: '#b8f058', borderRadius: 10,
     paddingVertical: 14, paddingHorizontal: 32,
   },
-  btnText: { fontSize: 14, fontWeight: '700', color: '#0a0a0a' },
+  btnText: { fontSize: fscale(14), fontWeight: '700', color: '#0a0a0a' },
 });

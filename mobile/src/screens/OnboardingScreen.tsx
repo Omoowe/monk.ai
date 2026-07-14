@@ -267,7 +267,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4, gap: 12,
   },
   backBtn: { width: 36, height: 36, justifyContent: 'center' },
-  backText: { fontSize: 22, color: '#b8f058' },
+  backText: { fontSize: fscale(22), color: '#b8f058' },
   progressBar: { flex: 1, flexDirection: 'row', gap: 5 },
   progressSeg: { flex: 1, height: 3, borderRadius: 2, backgroundColor: '#1e1e1e' },
   progressDone:   { backgroundColor: '#3a5a12' },
@@ -306,7 +306,7 @@ const s = StyleSheet.create({
     width: 20, height: 20, borderRadius: 10,
     justifyContent: 'center', alignItems: 'center',
   },
-  coachCheckMark: { fontSize: 11, color: '#0a0a0a', fontWeight: '800' },
+  coachCheckMark: { fontSize: fscale(11), color: '#0a0a0a', fontWeight: '800' },
   coachColorBar: { height: 4, borderRadius: 2, marginBottom: 12, overflow: 'hidden' },
   coachColorBarInner: { width: 24, height: 4, borderRadius: 2 },
   coachName: {
@@ -347,7 +347,7 @@ const s = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 32, marginTop: 16,
   },
-  commitIcon: { fontSize: 28, color: '#b8f058' },
+  commitIcon: { fontSize: fscale(28), color: '#b8f058' },
   commitHeading: {
     fontSize: fscale(36), fontWeight: '800', color: '#fff',
     fontFamily: 'Syne_800ExtraBold', lineHeight: fscale(44),

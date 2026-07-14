@@ -1,4 +1,5 @@
 import React from 'react';
+import { fscale, scale } from '../utils/scale';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1a1a1a',
   },
   wordmark: {
-    fontSize: 26,
+    fontSize: fscale(26),
     fontWeight: '800',
     color: '#fff',
     fontFamily: 'Syne_800ExtraBold',
@@ -62,13 +63,13 @@ const styles = StyleSheet.create({
   monkDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#b8f058' },
   streakDiamond: { width: 7, height: 7, borderRadius: 2, transform: [{ rotate: '45deg' }] },
   streakBlock: { alignItems: 'flex-end' },
-  streakNum: { fontSize: 18, fontWeight: '700', fontFamily: 'DMMono_400Regular', lineHeight: 20 },
-  streakLabel: { fontSize: 8, fontFamily: 'DMMono_400Regular', letterSpacing: 1, lineHeight: 10 },
+  streakNum: { fontSize: fscale(18), fontWeight: '700', fontFamily: 'DMMono_400Regular', lineHeight: 20 },
+  streakLabel: { fontSize: fscale(8), fontFamily: 'DMMono_400Regular', letterSpacing: 1, lineHeight: 10 },
   avatarCircle: {
     width: 30, height: 30, borderRadius: 15,
     backgroundColor: '#1a1a1a', borderWidth: 1,
     justifyContent: 'center', alignItems: 'center',
     marginLeft: 2,
   },
-  avatarInitial: { fontSize: 13, fontWeight: '700', fontFamily: 'DMMono_400Regular' },
+  avatarInitial: { fontSize: fscale(13), fontWeight: '700', fontFamily: 'DMMono_400Regular' },
 });

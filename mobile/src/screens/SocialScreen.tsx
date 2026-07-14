@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
   StyleSheet, ActivityIndicator, Alert, RefreshControl,
@@ -392,7 +393,7 @@ export default function SocialScreen() {
                       <Text style={s.challengeBtnText}>VS</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => removeFriend(f.id, f.profile.name)} style={{ padding: 8 }}>
-                      <Text style={{ color: '#333', fontSize: 16 }}>×</Text>
+                      <Text style={{ color: '#333', fontSize: fscale(16) }}>×</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -576,7 +577,7 @@ export default function SocialScreen() {
                 : <Text style={s.sendChalBtnText}>Send Challenge</Text>}
             </TouchableOpacity>
             <TouchableOpacity style={{ alignItems: 'center', padding: 12 }} onPress={() => setShowChallengePicker(null)}>
-              <Text style={{ color: '#aaa', fontSize: 13 }}>Cancel</Text>
+              <Text style={{ color: '#aaa', fontSize: fscale(13) }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -592,18 +593,18 @@ const s = StyleSheet.create({
     paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16,
     borderBottomWidth: 1, borderBottomColor: '#222',
   },
-  eyebrow: { fontSize: 11, letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: 28, fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
+  eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
   reviewBtn: {
     borderWidth: 1, borderColor: '#2a2a2a', borderRadius: 8,
     paddingHorizontal: 12, paddingVertical: 6, marginTop: 4,
   },
-  reviewBtnText: { fontSize: 12, color: '#aaa' },
+  reviewBtnText: { fontSize: fscale(12), color: '#aaa' },
   usernamePrompt: {
     backgroundColor: '#0d1a07', borderBottomWidth: 1, borderBottomColor: '#b8f05820',
     paddingHorizontal: 20, paddingVertical: 12,
   },
-  usernamePromptText: { fontSize: 13, color: '#b8f058' },
+  usernamePromptText: { fontSize: fscale(13), color: '#b8f058' },
   segmentBar: {
     flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
     paddingHorizontal: 20, gap: 0,
@@ -614,21 +615,21 @@ const s = StyleSheet.create({
     borderBottomWidth: 2, borderBottomColor: 'transparent',
   },
   segBtnActive: { borderBottomColor: '#b8f058' },
-  segBtnText: { fontSize: 10, letterSpacing: 2, color: '#aaa', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  segBtnText: { fontSize: fscale(10), letterSpacing: 2, color: '#aaa', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   segBtnTextActive: { color: '#b8f058' },
   badge: {
     backgroundColor: '#f06060', borderRadius: 8,
     paddingHorizontal: 5, paddingVertical: 1,
     minWidth: 16, alignItems: 'center',
   },
-  badgeText: { fontSize: 9, color: '#fff', fontWeight: '700' },
+  badgeText: { fontSize: fscale(9), color: '#fff', fontWeight: '700' },
   scroll: { padding: 16, paddingBottom: 40, gap: 16 },
   section: { gap: 8 },
-  sectionLabel: { fontSize: 11, letterSpacing: 1.5, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  sectionLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
   searchRow: { position: 'relative' },
   searchInput: {
     backgroundColor: '#111', borderRadius: 10, borderWidth: 1, borderColor: '#2a2a2a',
-    paddingHorizontal: 14, paddingVertical: 12, color: '#fff', fontSize: 14,
+    paddingHorizontal: 14, paddingVertical: 12, color: '#fff', fontSize: fscale(14),
   },
   userRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
@@ -644,107 +645,107 @@ const s = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: '#1e1e1e', justifyContent: 'center', alignItems: 'center',
   },
-  userAvatarText: { fontSize: 16, color: '#b8f058', fontWeight: '700' },
-  userName: { fontSize: 14, fontWeight: '700', color: '#fff', marginBottom: 2 },
-  userHandle: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
-  sentText: { fontSize: 11, color: '#aaa' },
+  userAvatarText: { fontSize: fscale(16), color: '#b8f058', fontWeight: '700' },
+  userName: { fontSize: fscale(14), fontWeight: '700', color: '#fff', marginBottom: 2 },
+  userHandle: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  sentText: { fontSize: fscale(11), color: '#aaa' },
   addBtn: {
     borderWidth: 1, borderColor: '#b8f058', borderRadius: 6,
     paddingHorizontal: 12, paddingVertical: 5,
   },
-  addBtnText: { color: '#b8f058', fontSize: 12, fontWeight: '700' },
+  addBtnText: { color: '#b8f058', fontSize: fscale(12), fontWeight: '700' },
   acceptBtn: {
     width: 32, height: 32, borderRadius: 8,
     backgroundColor: '#b8f05820', borderWidth: 1, borderColor: '#b8f058',
     justifyContent: 'center', alignItems: 'center',
   },
-  acceptBtnText: { color: '#b8f058', fontSize: 14, fontWeight: '700' },
+  acceptBtnText: { color: '#b8f058', fontSize: fscale(14), fontWeight: '700' },
   declineBtn: {
     width: 32, height: 32, borderRadius: 8,
     backgroundColor: '#f0606015', borderWidth: 1, borderColor: '#f06060',
     justifyContent: 'center', alignItems: 'center',
   },
-  declineBtnText: { color: '#f06060', fontSize: 14, fontWeight: '700' },
+  declineBtnText: { color: '#f06060', fontSize: fscale(14), fontWeight: '700' },
   challengeBtn: {
     width: 32, height: 32, borderRadius: 8,
     backgroundColor: '#1e1e1e', justifyContent: 'center', alignItems: 'center',
   },
-  challengeBtnText: { fontSize: 16 },
+  challengeBtnText: { fontSize: fscale(16) },
   challengeCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#2a2a2a', gap: 6,
   },
-  challengeTitle: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  challengeSub: { fontSize: 12, color: '#aaa' },
+  challengeTitle: { fontSize: fscale(15), fontWeight: '700', color: '#fff' },
+  challengeSub: { fontSize: fscale(12), color: '#aaa' },
   challengeActions: { flexDirection: 'row', gap: 10, marginTop: 6 },
   acceptChalBtn: {
     flex: 1, backgroundColor: '#b8f058', borderRadius: 8,
     paddingVertical: 10, alignItems: 'center',
   },
-  acceptChalBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: 13 },
+  acceptChalBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: fscale(13) },
   declineChalBtn: {
     flex: 1, backgroundColor: '#1a1a1a', borderRadius: 8,
     paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#333',
   },
-  declineChalBtnText: { color: '#aaa', fontSize: 13 },
+  declineChalBtnText: { color: '#aaa', fontSize: fscale(13) },
   battleCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 18,
     borderWidth: 1, borderColor: '#2a2a2a', gap: 12,
   },
   battleCardWinning: { borderColor: '#b8f05840', backgroundColor: '#0a150a' },
   battleHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  battleTitle: { fontSize: 13, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  battleTitle: { fontSize: fscale(13), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   battleDaysLeft: {
     backgroundColor: '#1e1e1e', borderRadius: 6,
     paddingHorizontal: 8, paddingVertical: 3,
   },
-  battleDaysLeftText: { fontSize: 10, color: '#f5c840', fontFamily: 'DMMono_400Regular' },
+  battleDaysLeftText: { fontSize: fscale(10), color: '#f5c840', fontFamily: 'DMMono_400Regular' },
   battleScores: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20 },
   battlePlayer: { alignItems: 'center', flex: 1 },
-  battleScore: { fontSize: 44, fontWeight: '800', color: '#fff', fontFamily: 'DMMono_400Regular' },
-  battlePlayerName: { fontSize: 12, color: '#999', marginTop: 2 },
-  battleVs: { fontSize: 14, color: '#333', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
-  battleStatus: { fontSize: 12, color: '#aaa', textAlign: 'center', marginTop: 8 },
+  battleScore: { fontSize: fscale(44), fontWeight: '800', color: '#fff', fontFamily: 'DMMono_400Regular' },
+  battlePlayerName: { fontSize: fscale(12), color: '#999', marginTop: 2 },
+  battleVs: { fontSize: fscale(14), color: '#333', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  battleStatus: { fontSize: fscale(12), color: '#aaa', textAlign: 'center', marginTop: 8 },
   battleTimeline: { height: 4, backgroundColor: '#1a1a1a', borderRadius: 2, marginVertical: 8, overflow: 'hidden' },
   battleTimelineFill: { height: 4, backgroundColor: '#b8f05880', borderRadius: 2 },
-  battleTimelineLabel: { fontSize: 9, color: '#999', fontFamily: 'DMMono_400Regular', textAlign: 'center', marginBottom: 12 },
+  battleTimelineLabel: { fontSize: fscale(9), color: '#999', fontFamily: 'DMMono_400Regular', textAlign: 'center', marginBottom: 12 },
   battleBarCol: { flex: 1, alignItems: 'center', gap: 4 },
   battleBar: { width: '100%', height: 5, backgroundColor: '#1a1a1a', borderRadius: 3, overflow: 'hidden' },
   battleBarFillMe: { height: 5, backgroundColor: '#b8f058', borderRadius: 3 },
   battleBarFillOpp: { height: 5, backgroundColor: '#f06060', borderRadius: 3, alignSelf: 'flex-end' },
-  battleVsSmall: { fontSize: 8, color: '#999', fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
-  battleSubScore: { fontSize: 10, color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
+  battleVsSmall: { fontSize: fscale(8), color: '#999', fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
+  battleSubScore: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
   pastCard: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     backgroundColor: '#0d0d0d', borderRadius: 10, padding: 14,
     borderWidth: 1, borderColor: '#1a1a1a',
   },
-  pastResult: { fontSize: 13, fontWeight: '700', width: 80 },
-  pastOpponent: { flex: 1, fontSize: 13, color: '#ccc' },
-  pastDate: { fontSize: 10, color: '#999', fontFamily: 'DMMono_400Regular' },
+  pastResult: { fontSize: fscale(13), fontWeight: '700', width: 80 },
+  pastOpponent: { flex: 1, fontSize: fscale(13), color: '#ccc' },
+  pastDate: { fontSize: fscale(10), color: '#999', fontFamily: 'DMMono_400Regular' },
   empty: { alignItems: 'center', paddingVertical: 48, gap: 10 },
   emptyIconDot: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: '#333', marginBottom: 12 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#999' },
-  emptySub: { fontSize: 13, color: '#888', textAlign: 'center', paddingHorizontal: 20 },
+  emptyTitle: { fontSize: fscale(18), fontWeight: '700', color: '#999' },
+  emptySub: { fontSize: fscale(13), color: '#888', textAlign: 'center', paddingHorizontal: 20 },
   pickerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#000000bb', justifyContent: 'flex-end' },
   pickerSheet: {
     backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24,
     padding: 24, paddingBottom: 40, borderTopWidth: 1, borderTopColor: '#1e1e1e',
   },
   pickerHandle: { width: 36, height: 4, backgroundColor: '#333', borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
-  pickerTitle: { fontSize: 18, fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 20, textAlign: 'center' },
+  pickerTitle: { fontSize: fscale(18), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 20, textAlign: 'center' },
   durationRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
   durationBtn: {
     flex: 1, backgroundColor: '#1a1a1a', borderRadius: 12, paddingVertical: 16,
     alignItems: 'center', borderWidth: 1.5, borderColor: '#2a2a2a',
   },
   durationBtnActive: { borderColor: '#b8f058', backgroundColor: '#0d1a07' },
-  durationText: { fontSize: 28, fontWeight: '800', color: '#999', fontFamily: 'DMMono_400Regular' },
+  durationText: { fontSize: fscale(28), fontWeight: '800', color: '#999', fontFamily: 'DMMono_400Regular' },
   durationTextActive: { color: '#b8f058' },
-  durationSub: { fontSize: 10, color: '#999', letterSpacing: 1 },
+  durationSub: { fontSize: fscale(10), color: '#999', letterSpacing: 1 },
   sendChalBtn: {
     backgroundColor: '#b8f058', borderRadius: 12, paddingVertical: 16,
     alignItems: 'center', marginBottom: 4,
   },
-  sendChalBtnText: { fontSize: 15, fontWeight: '800', color: '#0a0a0a', fontFamily: 'Syne_800ExtraBold' },
+  sendChalBtnText: { fontSize: fscale(15), fontWeight: '800', color: '#0a0a0a', fontFamily: 'Syne_800ExtraBold' },
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View,
   Text,
@@ -300,7 +301,7 @@ export default function StatsScreen() {
         {weekStats.total === 0 && (
           <View style={styles.emptyState}>
             <View style={[styles.emptyIconView, { borderColor: '#252525' }]}>
-              <Text style={{ fontSize: 28, color: '#333' }}>◆</Text>
+              <Text style={{ fontSize: fscale(28), color: '#333' }}>◆</Text>
             </View>
             <Text style={styles.emptyTitle}>Zero data. Start training.</Text>
             <Text style={styles.emptySub}>Add habits in Check-In and complete your first check-in. Stats appear the moment you start.</Text>
@@ -431,7 +432,7 @@ export default function StatsScreen() {
               <RankShape color={rank.color} score={dopamineScore} size={8} />
             </View>
             <Text style={styles.pbName}>Current rank</Text>
-            <Text style={[styles.pbValue, { color: rank.color, fontSize: 12, letterSpacing: 1 }]}>{rank.label}</Text>
+            <Text style={[styles.pbValue, { color: rank.color, fontSize: fscale(12), letterSpacing: 1 }]}>{rank.label}</Text>
           </View>
         </View>
 
@@ -536,15 +537,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#222',
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
   },
-  eyebrow: { fontSize: 11, letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: 28, fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
-  weekLabel: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  title: { fontSize: fscale(28), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  weekLabel: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   profileBtn: {
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#333',
     justifyContent: 'center', alignItems: 'center', marginTop: 4,
   },
-  profileBtnText: { fontSize: 16, color: '#aaa' },
+  profileBtnText: { fontSize: fscale(16), color: '#aaa' },
   headerActions: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: '#161616', borderRadius: 12,
@@ -552,25 +553,25 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   headerActionBtn: { paddingHorizontal: 12, paddingVertical: 8, justifyContent: 'center', alignItems: 'center', gap: 3 },
-  headerActionText: { fontSize: 15, color: '#aaa' },
-  headerActionLabel: { fontSize: 8, color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 0.8 },
+  headerActionText: { fontSize: fscale(15), color: '#aaa' },
+  headerActionLabel: { fontSize: fscale(8), color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 0.8 },
   headerActionDivider: { width: 1, height: 28, backgroundColor: '#2e2e2e' },
 
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   emptyState: { alignItems: 'center', paddingVertical: 60, gap: 12 },
   emptyIconView: { width: 64, height: 64, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  emptyTitle: { fontSize: 22, fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
-  emptySub: { fontSize: 14, color: '#999', textAlign: 'center', lineHeight: 20, paddingHorizontal: 24 },
+  emptyTitle: { fontSize: fscale(22), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
+  emptySub: { fontSize: fscale(14), color: '#999', textAlign: 'center', lineHeight: 20, paddingHorizontal: 24 },
   emptyBtn: { marginTop: 8, backgroundColor: '#b8f058', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 },
-  emptyBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: 14 },
+  emptyBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: fscale(14) },
 
   scoreCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 24,
     borderWidth: 1, borderColor: '#252525',
   },
-  scoreLabel: { fontSize: 11, letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular' },
-  scoreNumber: { fontSize: 80, fontFamily: 'DMMono_400Regular', lineHeight: 88 },
-  rankLine: { fontSize: 13, fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
+  scoreLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular' },
+  scoreNumber: { fontSize: fscale(80), fontFamily: 'DMMono_400Regular', lineHeight: 88 },
+  rankLine: { fontSize: fscale(13), fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
   scoreBar: { width: '100%', height: 10, backgroundColor: '#222', borderRadius: 5, overflow: 'hidden' },
   scoreFillBg: { position: 'absolute', height: 10, borderRadius: 5 },
   scoreFill: { height: 10, borderRadius: 5 },
@@ -580,26 +581,26 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: '#111', borderRadius: 14, padding: 20,
     borderWidth: 1,
   },
-  gridNumberHero: { fontSize: 42, fontFamily: 'DMMono_400Regular', marginBottom: 6 },
+  gridNumberHero: { fontSize: fscale(42), fontFamily: 'DMMono_400Regular', marginBottom: 6 },
   gridCell: {
     flex: 1, minWidth: '45%',
     backgroundColor: '#111', borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: '#1e1e1e', alignItems: 'center',
   },
-  gridNumber: { fontSize: 26, color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  gridLabel: { fontSize: 9, color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, textAlign: 'center' },
+  gridNumber: { fontSize: fscale(26), color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  gridLabel: { fontSize: fscale(9), color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, textAlign: 'center' },
 
   chartCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 16,
     borderWidth: 1, borderColor: '#252525',
   },
-  sectionLabel: { fontSize: 11, letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 16 },
+  sectionLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 16 },
   chart: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   chartCol: { flex: 1, alignItems: 'center', gap: 4 },
-  chartPct: { fontSize: 9, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  chartPct: { fontSize: fscale(9), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   barBg: { width: '85%', backgroundColor: '#1a1a1a', borderRadius: 4, justifyContent: 'flex-end' },
   barFill: { width: '100%', borderTopLeftRadius: 4, borderTopRightRadius: 4, borderRadius: 4 },
-  chartDay: { fontSize: 9, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  chartDay: { fontSize: fscale(9), color: '#aaa', fontFamily: 'DMMono_400Regular' },
 
   bestsCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 20,
@@ -610,8 +611,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#1a1a1a', gap: 10,
   },
   pbIconView: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  pbName: { flex: 1, fontSize: 14, color: '#ccc', fontWeight: '500' },
-  pbValue: { fontSize: 18, fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  pbName: { flex: 1, fontSize: fscale(14), color: '#ccc', fontWeight: '500' },
+  pbValue: { fontSize: fscale(18), fontFamily: 'DMMono_400Regular', fontWeight: '700' },
 
   insightsCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 20,
@@ -623,11 +624,11 @@ const styles = StyleSheet.create({
   },
   catMeta: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   catLabel: {
-    fontSize: 13, fontWeight: '800', fontFamily: 'DMMono_400Regular',
+    fontSize: fscale(13), fontWeight: '800', fontFamily: 'DMMono_400Regular',
     letterSpacing: 1, width: 110,
   },
   catPct: {
-    fontSize: 18, fontWeight: '700', color: '#fff',
+    fontSize: fscale(18), fontWeight: '700', color: '#fff',
     fontFamily: 'DMMono_400Regular', width: 48, textAlign: 'right',
   },
   catBarBg: {
@@ -643,23 +644,23 @@ const styles = StyleSheet.create({
   },
   lbRowMe: { backgroundColor: '#1a1a1a', borderRadius: 8, paddingHorizontal: 8, marginHorizontal: -8 },
   lbRankBadge: { width: 28, height: 28, borderRadius: 7, borderWidth: 1, borderColor: '#252525', alignItems: 'center', justifyContent: 'center' },
-  lbRankText: { fontSize: 12, color: '#999', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
-  lbAvatar: { fontSize: 18, width: 26 },
-  lbName: { flex: 1, fontSize: 14, color: '#ccc', fontWeight: '600' },
+  lbRankText: { fontSize: fscale(12), color: '#999', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  lbAvatar: { fontSize: fscale(18), width: 26 },
+  lbName: { flex: 1, fontSize: fscale(14), color: '#ccc', fontWeight: '600' },
   lbScores: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  lbScore: { fontSize: 18, color: '#fff', fontFamily: 'DMMono_400Regular' },
-  lbStreak: { fontSize: 11, color: '#555', fontFamily: 'DMMono_400Regular' },
+  lbScore: { fontSize: fscale(18), color: '#fff', fontFamily: 'DMMono_400Regular' },
+  lbStreak: { fontSize: fscale(11), color: '#555', fontFamily: 'DMMono_400Regular' },
 
   calCard: { backgroundColor: '#111', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#252525' },
-  calMonth: { fontSize: 11, letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 12 },
+  calMonth: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 12 },
   calDayRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 6 },
-  calDayLabel: { fontSize: 9, color: '#999', fontFamily: 'DMMono_400Regular', width: 32, textAlign: 'center' },
+  calDayLabel: { fontSize: fscale(9), color: '#999', fontFamily: 'DMMono_400Regular', width: 32, textAlign: 'center' },
   calWeekRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 4 },
   calCell: { width: 32, height: 32, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   calCellToday: { borderWidth: 1, borderColor: '#b8f058' },
-  calDayNum: { fontSize: 10, fontFamily: 'DMMono_400Regular' },
+  calDayNum: { fontSize: fscale(10), fontFamily: 'DMMono_400Regular' },
   calLegend: { flexDirection: 'row', gap: 12, marginTop: 12, justifyContent: 'flex-end' },
   calLegendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   calLegendDot: { width: 10, height: 10, borderRadius: 3 },
-  calLegendText: { fontSize: 9, color: '#999', fontFamily: 'DMMono_400Regular' },
+  calLegendText: { fontSize: fscale(9), color: '#999', fontFamily: 'DMMono_400Regular' },
 });

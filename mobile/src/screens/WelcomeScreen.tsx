@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View,
   Text,
@@ -117,17 +118,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#b8f058',
   },
   eyebrow: {
-    fontSize: 10,
+    fontSize: fscale(10),
     letterSpacing: 3,
     color: '#b8f058',
     fontFamily: 'DMMono_400Regular',
   },
   heading: {
-    fontSize: 48,
+    fontSize: fscale(48),
     fontWeight: '800',
     color: '#fff',
     fontFamily: 'Syne_800ExtraBold',
-    lineHeight: 54,
+    lineHeight: fscale(54),
     letterSpacing: -1,
     marginBottom: 28,
   },
@@ -136,9 +137,9 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: fscale(16),
     color: '#666',
-    lineHeight: 26,
+    lineHeight: fscale(26),
     maxWidth: 320,
     marginBottom: 32,
   },
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   bulletText: {
-    fontSize: 15,
+    fontSize: fscale(15),
     color: '#ccc',
     fontFamily: 'DMMono_400Regular',
     letterSpacing: 0.3,
@@ -177,13 +178,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ctaText: {
-    fontSize: 18,
+    fontSize: fscale(18),
     fontWeight: '700',
     color: '#0a0a0a',
     textAlign: 'center',
   },
   footnote: {
-    fontSize: 13,
+    fontSize: fscale(13),
     color: '#888',
     textAlign: 'center',
   },

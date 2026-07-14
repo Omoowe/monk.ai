@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { fscale, scale } from '../utils/scale';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import type { Milestone } from '../services/milestones';
 
@@ -50,26 +51,26 @@ const s = StyleSheet.create({
     alignItems: 'center', borderWidth: 1, borderColor: '#b8f05840',
     width: '100%', maxWidth: 340,
   },
-  emoji: { fontSize: 64, marginBottom: 16 },
+  emoji: { fontSize: fscale(64), marginBottom: 16 },
   badge: {
-    fontSize: 9, letterSpacing: 3, color: '#b8f058',
+    fontSize: fscale(9), letterSpacing: 3, color: '#b8f058',
     fontFamily: 'DMMono_400Regular', marginBottom: 12,
   },
   title: {
-    fontSize: 28, fontWeight: '800', color: '#fff',
+    fontSize: fscale(28), fontWeight: '800', color: '#fff',
     fontFamily: 'Syne_800ExtraBold', textAlign: 'center',
     marginBottom: 10, letterSpacing: -0.5,
   },
   sub: {
-    fontSize: 14, color: '#666', textAlign: 'center',
-    lineHeight: 21, marginBottom: 32,
+    fontSize: fscale(14), color: '#666', textAlign: 'center',
+    lineHeight: fscale(21), marginBottom: 32,
   },
   btn: {
     backgroundColor: '#b8f058', borderRadius: 14,
     paddingVertical: 14, paddingHorizontal: 40,
   },
   btnText: {
-    fontSize: 15, fontWeight: '800', color: '#0a0a0a',
+    fontSize: fscale(15), fontWeight: '800', color: '#0a0a0a',
     fontFamily: 'Syne_800ExtraBold',
   },
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View, Text, TouchableOpacity, Switch, StyleSheet, ScrollView, Alert,
 } from 'react-native';
@@ -421,9 +422,9 @@ const s = StyleSheet.create({
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   headerAccentDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#7b6af020', borderWidth: 2, borderColor: '#7b6af0', marginRight: 4 },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#b8f058', fontFamily: 'Syne_800ExtraBold' },
-  headerSub: { fontSize: 12, color: '#aaa', marginTop: 2 },
-  closeBtn: { fontSize: 18, color: '#aaa' },
+  headerTitle: { fontSize: fscale(20), fontWeight: '800', color: '#b8f058', fontFamily: 'Syne_800ExtraBold' },
+  headerSub: { fontSize: fscale(12), color: '#aaa', marginTop: 2 },
+  closeBtn: { fontSize: fscale(18), color: '#aaa' },
 
   content: { padding: 16, gap: 12, paddingBottom: 40 },
 
@@ -431,8 +432,8 @@ const s = StyleSheet.create({
     backgroundColor: '#111', borderRadius: 16, padding: 20,
     borderWidth: 1, borderColor: '#222',
   },
-  cardLabel: { fontSize: 15, fontWeight: '700', color: '#fff', marginBottom: 4 },
-  cardSub: { fontSize: 12, color: '#aaa', marginBottom: 24 },
+  cardLabel: { fontSize: fscale(15), fontWeight: '700', color: '#fff', marginBottom: 4 },
+  cardSub: { fontSize: fscale(12), color: '#aaa', marginBottom: 24 },
 
   timerWrap: { alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
   ringOuter: { width: 200, height: 200, borderRadius: 100, overflow: 'hidden' },
@@ -447,8 +448,8 @@ const s = StyleSheet.create({
     borderRadius: 86, backgroundColor: '#111',
     justifyContent: 'center', alignItems: 'center',
   },
-  timerText: { fontSize: 48, color: '#fff', fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
-  timerState: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, marginTop: 4 },
+  timerText: { fontSize: fscale(48), color: '#fff', fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
+  timerState: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1.5, marginTop: 4 },
 
   presets: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   presetBtn: {
@@ -456,7 +457,7 @@ const s = StyleSheet.create({
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#2a2a2a', alignItems: 'center',
   },
   presetActive: { backgroundColor: '#1a2a0a', borderColor: '#b8f058' },
-  presetText: { fontSize: 13, color: '#999', fontWeight: '600' },
+  presetText: { fontSize: fscale(13), color: '#999', fontWeight: '600' },
   presetTextActive: { color: '#b8f058' },
 
   customRow: {
@@ -468,17 +469,17 @@ const s = StyleSheet.create({
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#333',
     alignItems: 'center', justifyContent: 'center',
   },
-  stepBtnText: { fontSize: 22, color: '#fff', fontWeight: '300' },
+  stepBtnText: { fontSize: fscale(22), color: '#fff', fontWeight: '300' },
   customCenter: { alignItems: 'center', minWidth: 80 },
-  customMins: { fontSize: 18, color: '#fff', fontWeight: '700' },
-  customStep: { fontSize: 10, color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
+  customMins: { fontSize: fscale(18), color: '#fff', fontWeight: '700' },
+  customStep: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
 
   startBtn: {
     backgroundColor: '#b8f058', borderRadius: 14, paddingVertical: 18, alignItems: 'center',
   },
   pauseBtn: { backgroundColor: '#f06060', borderWidth: 0 },
   doneBtn: { backgroundColor: '#2a2a2a', borderWidth: 1, borderColor: '#b8f058' },
-  startBtnText: { fontSize: 16, fontWeight: '800', color: '#0a0a0a', fontFamily: 'Syne_800ExtraBold' },
+  startBtnText: { fontSize: fscale(16), fontWeight: '800', color: '#0a0a0a', fontFamily: 'Syne_800ExtraBold' },
 
   toggleCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 16,
@@ -489,19 +490,19 @@ const s = StyleSheet.create({
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   toggleIconDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#444', marginRight: 4, marginTop: 2 },
   toggleText: { flex: 1 },
-  toggleTitle: { fontSize: 15, fontWeight: '700', color: '#fff', marginBottom: 3 },
-  toggleSub: { fontSize: 12, color: '#aaa', lineHeight: 17 },
+  toggleTitle: { fontSize: fscale(15), fontWeight: '700', color: '#fff', marginBottom: 3 },
+  toggleSub: { fontSize: fscale(12), color: '#aaa', lineHeight: 17 },
 
   expansionRed: {
     marginTop: 12, backgroundColor: '#2a0a0a', borderRadius: 8, padding: 12,
     borderLeftWidth: 3, borderLeftColor: '#f06060',
   },
-  expansionTextRed: { fontSize: 13, color: '#f09090', lineHeight: 19 },
+  expansionTextRed: { fontSize: fscale(13), color: '#f09090', lineHeight: 19 },
   expansionGreen: {
     marginTop: 12, backgroundColor: '#0d1a07', borderRadius: 8, padding: 12,
     borderLeftWidth: 3, borderLeftColor: '#b8f058',
   },
-  expansionTextGreen: { fontSize: 13, color: '#a0d060', lineHeight: 19 },
+  expansionTextGreen: { fontSize: fscale(13), color: '#a0d060', lineHeight: 19 },
 
   summaryRow: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
@@ -509,11 +510,11 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: '#b8f05840',
   },
   comingSoonBadge: { backgroundColor: '#1a1a1a', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: '#333', alignItems: 'center' },
-  comingSoonText: { fontSize: 9, color: '#aaa', letterSpacing: 2, fontFamily: 'DMMono_400Regular' },
-  comingSoonSub: { fontSize: 8, color: '#555', fontFamily: 'DMMono_400Regular', marginTop: 2 },
+  comingSoonText: { fontSize: fscale(9), color: '#aaa', letterSpacing: 2, fontFamily: 'DMMono_400Regular' },
+  comingSoonSub: { fontSize: fscale(8), color: '#555', fontFamily: 'DMMono_400Regular', marginTop: 2 },
   summaryIcon: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#b8f058', marginTop: 4, marginRight: 4 },
-  summaryTitle: { fontSize: 14, fontWeight: '700', color: '#b8f058' },
-  summarySub: { fontSize: 12, color: '#6a9030', marginTop: 2 },
+  summaryTitle: { fontSize: fscale(14), fontWeight: '700', color: '#b8f058' },
+  summarySub: { fontSize: fscale(12), color: '#6a9030', marginTop: 2 },
 
   soundRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
   soundChip: {
@@ -522,17 +523,17 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: '#2a2a2a',
   },
   soundChipActive: { backgroundColor: '#0d1a07', borderColor: '#b8f058' },
-  soundEmoji: { fontSize: 18 },
-  soundLabel: { fontSize: 10, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 0.5 },
+  soundEmoji: { fontSize: fscale(18) },
+  soundLabel: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 0.5 },
   soundLabelActive: { color: '#b8f058' },
   statsCard: {
     backgroundColor: '#111', borderRadius: 14, padding: 16,
     borderWidth: 1, borderColor: '#222',
   },
-  statsCardLabel: { fontSize: 11, letterSpacing: 1.5, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 14 },
+  statsCardLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 14 },
   statsRow: { flexDirection: 'row', alignItems: 'center' },
   statCol: { flex: 1, alignItems: 'center', gap: 4 },
-  statNum: { fontSize: 28, color: '#fff', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
-  statLbl: { fontSize: 8, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, textAlign: 'center' },
+  statNum: { fontSize: fscale(28), color: '#fff', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  statLbl: { fontSize: fscale(8), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, textAlign: 'center' },
   statDivider: { width: 1, height: 40, backgroundColor: '#1a1a1a' },
 });

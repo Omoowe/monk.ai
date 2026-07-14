@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View,
   Text,
@@ -441,7 +442,7 @@ export default function ReviewScreen() {
                           </View>
                         )}
                         {isExpanded && (
-                          <MarkdownText style={[styles.reviewText, { marginTop: 12, fontSize: 14 }]}>{r.content}</MarkdownText>
+                          <MarkdownText style={[styles.reviewText, { marginTop: 12, fontSize: fscale(14) }]}>{r.content}</MarkdownText>
                         )}
                       </TouchableOpacity>
                     );
@@ -464,10 +465,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#222',
   },
   backBtn: { marginBottom: 12 },
-  backBtnText: { fontSize: 13, color: '#666', fontFamily: 'DMMono_400Regular' },
-  eyebrow: { fontSize: 11, letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  title: { fontSize: 26, fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
-  weekLabel: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  backBtnText: { fontSize: fscale(13), color: '#666', fontFamily: 'DMMono_400Regular' },
+  eyebrow: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  title: { fontSize: fscale(26), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 2 },
+  weekLabel: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
 
   content: { padding: 16, paddingBottom: 40, gap: 12 },
 
@@ -477,8 +478,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#252525', alignItems: 'center',
   },
-  gridNumber: { fontSize: 32, color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  gridLabel: { fontSize: 9, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 2, textAlign: 'center' },
+  gridNumber: { fontSize: fscale(32), color: '#fff', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  gridLabel: { fontSize: fscale(9), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 2, textAlign: 'center' },
 
   bestCard: {
     backgroundColor: '#0d1a07', borderRadius: 12, padding: 16,
@@ -488,71 +489,71 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a0808', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#f0606040',
   },
-  habitCardLabel: { fontSize: 11, letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 6 },
-  habitCardName: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 4 },
-  habitCardSub: { fontSize: 12, color: '#999' },
+  habitCardLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 6 },
+  habitCardName: { fontSize: fscale(18), fontWeight: '700', color: '#fff', marginBottom: 4 },
+  habitCardSub: { fontSize: fscale(12), color: '#999' },
 
   goalsCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#252525', gap: 12,
   },
-  sectionLabel: { fontSize: 11, letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  sectionLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
   goalRow: { gap: 6 },
-  goalName: { fontSize: 13, color: '#ccc', fontWeight: '600' },
+  goalName: { fontSize: fscale(13), color: '#ccc', fontWeight: '600' },
   goalBarWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   goalBarBg: { flex: 1, height: 8, backgroundColor: '#222', borderRadius: 4 },
   goalBarFill: { height: 8, borderRadius: 4 },
-  goalPct: { fontSize: 11, fontFamily: 'DMMono_400Regular', width: 34 },
+  goalPct: { fontSize: fscale(11), fontFamily: 'DMMono_400Regular', width: 34 },
 
   aiSection: { gap: 10 },
   generateBox: {
     backgroundColor: '#111', borderRadius: 12, padding: 24,
     borderWidth: 1, borderColor: '#252525', alignItems: 'center', gap: 10,
   },
-  generateTitle: { fontSize: 17, fontWeight: '700', color: '#fff', textAlign: 'center' },
-  generateSub: { fontSize: 13, color: '#aaa', textAlign: 'center' },
+  generateTitle: { fontSize: fscale(17), fontWeight: '700', color: '#fff', textAlign: 'center' },
+  generateSub: { fontSize: fscale(13), color: '#aaa', textAlign: 'center' },
   cta: {
     backgroundColor: '#b8f058', borderRadius: 10,
     paddingVertical: 14, paddingHorizontal: 28, alignItems: 'center', marginTop: 4,
   },
-  ctaText: { color: '#0a0a0a', fontWeight: '700', fontSize: 14 },
+  ctaText: { color: '#0a0a0a', fontWeight: '700', fontSize: fscale(14) },
   disabled: { opacity: 0.4 },
   teaserBox: {
     width: '100%', backgroundColor: '#0d1a07', borderRadius: 10, padding: 14,
     borderWidth: 1, borderColor: '#b8f05830', gap: 8,
   },
-  teaserItem: { fontSize: 13, color: '#6a9030', lineHeight: 20 },
+  teaserItem: { fontSize: fscale(13), color: '#6a9030', lineHeight: 20 },
 
   reviewBox: { gap: 10 },
   reviewCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 20,
     borderWidth: 1, borderColor: '#252525', borderLeftWidth: 3, borderLeftColor: '#b8f058',
   },
-  reviewText: { fontSize: 15, color: '#ddd', lineHeight: 26 },
-  generatedAt: { fontSize: 11, color: '#999', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
+  reviewText: { fontSize: fscale(15), color: '#ddd', lineHeight: 26 },
+  generatedAt: { fontSize: fscale(11), color: '#999', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
   regenerateBtn: { alignItems: 'center', paddingVertical: 10, borderWidth: 1, borderColor: '#2a2a2a', borderRadius: 10 },
-  regenerateBtnText: { color: '#aaa', fontSize: 13 },
+  regenerateBtnText: { color: '#aaa', fontSize: fscale(13) },
 
   historySection: { gap: 8, marginTop: 4 },
-  historySectionLabel: { fontSize: 11, letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  historySectionLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#999', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
   historyCard: {
     backgroundColor: '#0d0d0d', borderRadius: 10, padding: 14,
     borderWidth: 1, borderColor: '#252525',
   },
   historyCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  historyDate: { fontSize: 13, color: '#ccc', fontFamily: 'DMMono_400Regular' },
-  historyChevron: { fontSize: 10, color: '#aaa' },
+  historyDate: { fontSize: fscale(13), color: '#ccc', fontFamily: 'DMMono_400Regular' },
+  historyChevron: { fontSize: fscale(10), color: '#aaa' },
   historyStats: { flexDirection: 'row', gap: 8, marginTop: 10 },
   historyStatPill: {
     flex: 1, backgroundColor: '#161616', borderRadius: 8, paddingVertical: 8,
     alignItems: 'center', borderWidth: 1, borderColor: '#252525',
   },
-  historyStatVal: { fontSize: 16, fontWeight: '700', color: '#b8f058', fontFamily: 'DMMono_400Regular' },
-  historyStatLbl: { fontSize: 8, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 2 },
+  historyStatVal: { fontSize: fscale(16), fontWeight: '700', color: '#b8f058', fontFamily: 'DMMono_400Regular' },
+  historyStatLbl: { fontSize: fscale(8), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 2 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 12, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#1a1a1a' },
-  ratingLabel: { fontSize: 9, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 2, flex: 1 },
+  ratingLabel: { fontSize: fscale(9), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 2, flex: 1 },
   stars: { flexDirection: 'row', gap: 8 },
-  star: { fontSize: 24, color: '#2a2a2a' },
+  star: { fontSize: fscale(24), color: '#2a2a2a' },
   starActive: { color: '#f5c840' },
-  historyRating: { fontSize: 11, color: '#aaa' },
+  historyRating: { fontSize: fscale(11), color: '#aaa' },
 });

@@ -949,10 +949,10 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1, backgroundColor: '#1a1a1a', borderRadius: 10,
     paddingHorizontal: 12, paddingVertical: 8,
-    color: '#fff', fontSize: 14,
+    color: '#fff', fontSize: fscale(14),
     borderWidth: 1, borderColor: '#333',
   },
-  searchCancel: { fontSize: 13, color: '#aaa', paddingHorizontal: 4 },
+  searchCancel: { fontSize: fscale(13), color: '#aaa', paddingHorizontal: 4 },
 
   quoteCard: {
     backgroundColor: '#0d0d0d', borderRadius: 10, padding: 14,
@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
   quoteColorDot: { width: 6, height: 6, borderRadius: 3, marginTop: 5, flexShrink: 0 },
   quoteText: { flex: 1, fontSize: fscale(13), lineHeight: fscale(20), fontStyle: 'italic', color: 'rgba(255,255,255,0.5)' },
   quoteDismiss: { paddingTop: 2 },
-  quoteDismissText: { fontSize: 12, color: '#555' },
+  quoteDismissText: { fontSize: fscale(12), color: '#555' },
 
   todayCard: {
     backgroundColor: '#111', borderRadius: 10, padding: 12,
@@ -1004,7 +1004,7 @@ const styles = StyleSheet.create({
   },
   msgBubbleError: { backgroundColor: '#1a0808', borderColor: '#f0606030' },
   msgBubbleStarred: { borderTopColor: '#f5c84040', borderTopWidth: 1 },
-  aiLabelStar: { fontSize: 11, marginLeft: 2 },
+  aiLabelStar: { fontSize: fscale(11), marginLeft: 2 },
   msgText: { fontSize: fscale(15), lineHeight: fscale(22), color: '#fff' },
   msgTextUser: { color: '#e0e0e0' },
   msgTime: { fontSize: fscale(11), color: '#aaa', marginTop: 4, fontFamily: 'DMMono_400Regular' },
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
   },
   typingDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#b8f058' },
 
-  coachSwitch: { fontSize: 12, color: '#aaa' },
+  coachSwitch: { fontSize: fscale(12), color: '#aaa' },
 
   pickerOverlay: { flex: 1, backgroundColor: '#00000088' },
   pickerSheet: {

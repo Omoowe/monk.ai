@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { fscale, scale } from '../utils/scale';
 import {
   View,
   Text,
@@ -825,7 +826,7 @@ export default function ProfileScreen({ navigation }: Props) {
                     style={[s.emojiOption, newHabitEmoji === em && s.emojiOptionActive]}
                     onPress={() => setNewHabitEmoji(em)}
                   >
-                    <Text style={{ fontSize: 22 }}>{em}</Text>
+                    <Text style={{ fontSize: fscale(22) }}>{em}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -958,31 +959,31 @@ const s = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#222',
   },
   backBtn: { paddingVertical: 4 },
-  backText: { fontSize: 13, color: '#aaa' },
-  title: { fontSize: 17, fontWeight: '700', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
+  backText: { fontSize: fscale(13), color: '#aaa' },
+  title: { fontSize: fscale(17), fontWeight: '700', color: '#fff', fontFamily: 'Syne_800ExtraBold' },
   saveBtn: { backgroundColor: '#b8f058', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 },
   saveBtnDisabled: { opacity: 0.4 },
-  saveBtnText: { fontSize: 13, fontWeight: '700', color: '#0a0a0a' },
+  saveBtnText: { fontSize: fscale(13), fontWeight: '700', color: '#0a0a0a' },
 
   scroll: { padding: 20, paddingBottom: 60, gap: 8 },
   sectionLabel: {
-    fontSize: 11, letterSpacing: 1.5, color: '#aaa',
+    fontSize: fscale(11), letterSpacing: 1.5, color: '#aaa',
     fontFamily: 'DMMono_400Regular', marginTop: 16, marginBottom: 8,
   },
 
   card: { backgroundColor: '#111', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: '#252525' },
-  cardLabel: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  cardValue: { fontSize: 15, color: '#fff' },
+  cardLabel: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  cardValue: { fontSize: fscale(15), color: '#fff' },
   groupCard: { backgroundColor: '#111', borderRadius: 12, borderWidth: 1, borderColor: '#252525', overflow: 'hidden' },
   groupRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 12 },
   groupDivider: { height: 1, backgroundColor: '#1e1e1e', marginLeft: 14 },
-  groupRowLabel: { fontSize: 9, color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 1, width: 52 },
-  groupRowValue: { flex: 1, fontSize: 14, color: '#777' },
-  groupRowInput: { flex: 1, fontSize: 14, color: '#fff', padding: 0 },
+  groupRowLabel: { fontSize: fscale(9), color: '#555', fontFamily: 'DMMono_400Regular', letterSpacing: 1, width: 52 },
+  groupRowValue: { flex: 1, fontSize: fscale(14), color: '#777' },
+  groupRowInput: { flex: 1, fontSize: fscale(14), color: '#fff', padding: 0 },
 
   input: {
     backgroundColor: '#111', borderRadius: 10, borderWidth: 1, borderColor: '#333',
-    padding: 14, color: '#fff', fontSize: 15,
+    padding: 14, color: '#fff', fontSize: fscale(15),
   },
   inputMulti: { minHeight: 80, textAlignVertical: 'top' },
 
@@ -996,11 +997,11 @@ const s = StyleSheet.create({
     position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
   },
   dot: { width: 10, height: 10, borderRadius: 5, marginBottom: 8 },
-  personalityName: { fontSize: 13, fontWeight: '700', color: '#fff', marginBottom: 2 },
-  personalityDesc: { fontSize: 11, color: '#aaa' },
-  personalityPreview: { fontSize: 11, color: '#999', lineHeight: 16, marginTop: 4, fontStyle: 'italic' },
-  lockBadge: { fontSize: 9, color: '#555', letterSpacing: 1, marginTop: 4, fontWeight: '700' },
-  personalityProBadge: { fontSize: 8, letterSpacing: 2, fontFamily: 'DMMono_400Regular', alignSelf: 'flex-end', marginBottom: 4 },
+  personalityName: { fontSize: fscale(13), fontWeight: '700', color: '#fff', marginBottom: 2 },
+  personalityDesc: { fontSize: fscale(11), color: '#aaa' },
+  personalityPreview: { fontSize: fscale(11), color: '#999', lineHeight: 16, marginTop: 4, fontStyle: 'italic' },
+  lockBadge: { fontSize: fscale(9), color: '#555', letterSpacing: 1, marginTop: 4, fontWeight: '700' },
+  personalityProBadge: { fontSize: fscale(8), letterSpacing: 2, fontFamily: 'DMMono_400Regular', alignSelf: 'flex-end', marginBottom: 4 },
 
   monkModeCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
@@ -1008,43 +1009,43 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
   },
   monkModeLeft: { gap: 3 },
-  monkModeTitle: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  monkModeSub: { fontSize: 12, color: '#aaa' },
+  monkModeTitle: { fontSize: fscale(15), fontWeight: '700', color: '#fff' },
+  monkModeSub: { fontSize: fscale(12), color: '#aaa' },
   freezeBadge: { paddingHorizontal: 16, paddingVertical: 10 },
-  freezeText: { fontSize: 13, color: '#aaa' },
+  freezeText: { fontSize: fscale(13), color: '#aaa' },
   freezeCard: {
     backgroundColor: '#0d1a2a', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#1a3a5a',
     flexDirection: 'row', alignItems: 'center', gap: 12,
   },
-  freezeTitle: { fontSize: 14, fontWeight: '700', color: '#7ab8f0' },
-  freezeSub: { fontSize: 12, color: '#aaa', marginTop: 2, lineHeight: 16 },
+  freezeTitle: { fontSize: fscale(14), fontWeight: '700', color: '#7ab8f0' },
+  freezeSub: { fontSize: fscale(12), color: '#aaa', marginTop: 2, lineHeight: 16 },
   freezeBtn: {
     backgroundColor: '#7ab8f0', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8,
     alignItems: 'center', justifyContent: 'center', minWidth: 60,
   },
   freezeBtnDisabled: { backgroundColor: '#2a2a2a' },
-  freezeBtnText: { fontSize: 12, fontWeight: '700', color: '#0a0a0a' },
+  freezeBtnText: { fontSize: fscale(12), fontWeight: '700', color: '#0a0a0a' },
 
   // Habits
   habitsCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: '#252525', gap: 2,
   },
-  habitsEmpty: { fontSize: 13, color: '#aaa', paddingVertical: 8 },
+  habitsEmpty: { fontSize: fscale(13), color: '#aaa', paddingVertical: 8 },
   habitRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
   },
-  habitEmoji: { fontSize: 20 },
+  habitEmoji: { fontSize: fscale(20) },
   habitEditInput: {
-    fontSize: 14, fontWeight: '600', color: '#fff',
+    fontSize: fscale(14), fontWeight: '600', color: '#fff',
     borderBottomWidth: 1, borderBottomColor: '#b8f058', paddingVertical: 2,
   },
-  habitName: { fontSize: 14, fontWeight: '600', color: '#fff' },
-  habitCat: { fontSize: 10, color: '#999', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 1 },
-  habitStreak: { fontSize: 11, color: '#999', fontFamily: 'DMMono_400Regular' },
-  habitDelete: { color: '#aaa', fontSize: 16 },
+  habitName: { fontSize: fscale(14), fontWeight: '600', color: '#fff' },
+  habitCat: { fontSize: fscale(10), color: '#999', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 1 },
+  habitStreak: { fontSize: fscale(11), color: '#999', fontFamily: 'DMMono_400Regular' },
+  habitDelete: { color: '#aaa', fontSize: fscale(16) },
 
   addHabitForm: { gap: 10, marginTop: 10 },
   emojiPicker: { flexDirection: 'row' },
@@ -1059,12 +1060,12 @@ const s = StyleSheet.create({
     backgroundColor: '#b8f058', borderRadius: 8, paddingVertical: 12, alignItems: 'center',
   },
   addBtnDisabled: { opacity: 0.4 },
-  addBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: 14 },
+  addBtnText: { color: '#0a0a0a', fontWeight: '700', fontSize: fscale(14) },
   addHabitBtn: {
     borderWidth: 1, borderColor: '#333', borderStyle: 'dashed', borderRadius: 8,
     paddingVertical: 12, alignItems: 'center', marginTop: 8,
   },
-  addHabitBtnText: { color: '#aaa', fontSize: 14 },
+  addHabitBtnText: { color: '#aaa', fontSize: fscale(14) },
 
   catChip: {
     borderWidth: 1, borderColor: '#333', borderRadius: 6,
@@ -1072,56 +1073,56 @@ const s = StyleSheet.create({
     backgroundColor: '#1a1a1a',
   },
   catChipActive: { borderColor: '#b8f058', backgroundColor: '#1e2a1e' },
-  catChipText: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  catChipText: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   catChipTextActive: { color: '#b8f058' },
 
-  lockIcon: { fontSize: 14, position: 'absolute', top: 8, right: 8 },
+  lockIcon: { fontSize: fscale(14), position: 'absolute', top: 8, right: 8 },
 
   memoryCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#252525', borderLeftWidth: 3,
   },
-  memoryEmpty: { fontSize: 13, color: '#555', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
-  memoryText: { fontSize: 13, color: '#ccc', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
+  memoryEmpty: { fontSize: fscale(13), color: '#555', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
+  memoryText: { fontSize: fscale(13), color: '#ccc', lineHeight: 20, fontFamily: 'DMMono_400Regular' },
   memoryFooter: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1e1e1e',
   },
-  memoryMeta: { fontSize: 10, letterSpacing: 0.8, fontFamily: 'DMMono_400Regular' },
-  memoryClearBtn: { fontSize: 12, color: '#f06060', fontFamily: 'DMMono_400Regular' },
+  memoryMeta: { fontSize: fscale(10), letterSpacing: 0.8, fontFamily: 'DMMono_400Regular' },
+  memoryClearBtn: { fontSize: fscale(12), color: '#f06060', fontFamily: 'DMMono_400Regular' },
 
   exportBtn: {
     backgroundColor: '#111', borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: '#252525', gap: 4,
   },
-  exportBtnTitle: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  exportBtnSub: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  exportBtnTitle: { fontSize: fscale(15), fontWeight: '700', color: '#fff' },
+  exportBtnSub: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   proBanner: {
     marginHorizontal: 16, marginBottom: 8, paddingVertical: 14, paddingHorizontal: 16,
     borderRadius: 12, borderWidth: 1, borderColor: '#b8f05840', backgroundColor: '#b8f05808',
     flexDirection: 'row', alignItems: 'center', gap: 10,
   },
-  proBannerLabel: { fontSize: 11, fontWeight: '700', color: '#b8f058', letterSpacing: 1.5 },
-  proBannerSub: { fontSize: 12, color: '#666', flex: 1 },
+  proBannerLabel: { fontSize: fscale(11), fontWeight: '700', color: '#b8f058', letterSpacing: 1.5 },
+  proBannerSub: { fontSize: fscale(12), color: '#666', flex: 1 },
   upgradeBtn: {
     marginHorizontal: 16, marginBottom: 8, paddingVertical: 16, paddingHorizontal: 16,
     borderRadius: 12, borderWidth: 1, borderColor: '#b8f05860', backgroundColor: '#b8f05812',
     alignItems: 'center',
   },
-  upgradeBtnTitle: { fontSize: 15, fontWeight: '700', color: '#b8f058', marginBottom: 3 },
-  upgradeBtnSub: { fontSize: 12, color: '#888' },
+  upgradeBtnTitle: { fontSize: fscale(15), fontWeight: '700', color: '#b8f058', marginBottom: 3 },
+  upgradeBtnSub: { fontSize: fscale(12), color: '#888' },
   restoreBtn: {
     marginHorizontal: 16, marginBottom: 8, paddingVertical: 14,
     borderRadius: 12, borderWidth: 1, borderColor: '#333', alignItems: 'center',
   },
-  restoreText: { fontSize: 14, color: '#999', fontWeight: '600' },
+  restoreText: { fontSize: fscale(14), color: '#999', fontWeight: '600' },
   signOutBtn: {
     marginTop: 24, borderRadius: 12, paddingVertical: 18, alignItems: 'center',
     borderWidth: 1, borderColor: '#f0606040', backgroundColor: '#1a0808',
   },
-  signOutText: { fontSize: 15, fontWeight: '700', color: '#f06060' },
+  signOutText: { fontSize: fscale(15), fontWeight: '700', color: '#f06060' },
   deleteAccountBtn: { alignItems: 'center', paddingVertical: 16, marginBottom: 8 },
-  deleteAccountText: { fontSize: 13, color: '#999' },
+  deleteAccountText: { fontSize: fscale(13), color: '#999' },
 
   timePickerCard: {
     backgroundColor: '#111', borderRadius: 12,
@@ -1132,15 +1133,15 @@ const s = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 14,
     borderBottomWidth: 1, borderBottomColor: '#1a1a1a',
   },
-  timeLabel: { fontSize: 14, color: '#aaa', fontWeight: '600' },
+  timeLabel: { fontSize: fscale(14), color: '#aaa', fontWeight: '600' },
   timeControls: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   timeBtn: {
     width: 32, height: 32, borderRadius: 8,
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#333',
     justifyContent: 'center', alignItems: 'center',
   },
-  timeBtnText: { fontSize: 18, color: '#b8f058', lineHeight: 22 },
-  timeValue: { fontSize: 15, color: '#fff', fontFamily: 'DMMono_400Regular', minWidth: 80, textAlign: 'center' },
+  timeBtnText: { fontSize: fscale(18), color: '#b8f058', lineHeight: 22 },
+  timeValue: { fontSize: fscale(15), color: '#fff', fontFamily: 'DMMono_400Regular', minWidth: 80, textAlign: 'center' },
 
   avatarSection: { alignItems: 'center', paddingVertical: 20 },
   avatarCircle: {
@@ -1148,8 +1149,8 @@ const s = StyleSheet.create({
     backgroundColor: '#1a1a1a', borderWidth: 2, borderColor: '#2a2a2a',
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarEmoji: { fontSize: 40 },
-  avatarHint: { fontSize: 10, color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 8 },
+  avatarEmoji: { fontSize: fscale(40) },
+  avatarHint: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, marginTop: 8 },
   avatarGrid: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 10,
     justifyContent: 'center', paddingBottom: 16, paddingHorizontal: 8,
@@ -1160,5 +1161,5 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   avatarOptionActive: { borderColor: '#b8f058', backgroundColor: '#0d1a07' },
-  avatarOptionEmoji: { fontSize: 24 },
+  avatarOptionEmoji: { fontSize: fscale(24) },
 });

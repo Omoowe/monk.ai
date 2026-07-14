@@ -1022,7 +1022,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1400', borderRadius: 8, padding: 10,
     borderWidth: 1, borderColor: '#f5c84040',
   },
-  syncBannerText: { fontSize: 11, color: '#f5c840', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
+  syncBannerText: { fontSize: fscale(11), color: '#f5c840', fontFamily: 'DMMono_400Regular', textAlign: 'center' },
   pickGrid: { flexDirection: 'row', gap: 12 },
   pickCardNew: {
     flex: 1, backgroundColor: '#111', borderRadius: 16, padding: scale(20),
@@ -1062,10 +1062,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#b8f05840',
   },
   dayCompleteIconView: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#b8f058' },
-  dayCompleteTitle: { fontSize: 14, fontWeight: '700', color: '#b8f058' },
-  dayCompleteSub: { fontSize: 12, color: '#6a9030', marginTop: 2 },
+  dayCompleteTitle: { fontSize: fscale(14), fontWeight: '700', color: '#b8f058' },
+  dayCompleteSub: { fontSize: fscale(12), color: '#6a9030', marginTop: 2 },
   textLocked: { color: '#333' },
-  lockedHint: { fontSize: 11, color: '#f5c840', fontStyle: 'italic' },
+  lockedHint: { fontSize: fscale(11), color: '#f5c840', fontStyle: 'italic' },
 
   // Inline habit tracker
   habitsSection: { gap: 8 },
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#252525', borderStyle: 'dashed',
     alignItems: 'center', gap: 6,
   },
-  habitEmptyIcon: { fontSize: 28, color: '#333' },
+  habitEmptyIcon: { fontSize: fscale(28), color: '#333' },
   habitEmptyText: { fontSize: fscale(15), fontWeight: '700', color: '#999' },
   habitEmptySub: { fontSize: fscale(12), color: '#2a2a2a', textAlign: 'center' },
   habitRow: {
@@ -1110,26 +1110,26 @@ const styles = StyleSheet.create({
   habitRowEmoji: { fontSize: fscale(20) },
   habitRowName: { flex: 1, fontSize: fscale(14), fontWeight: '600', color: '#ccc' },
   habitRowNameDone: { color: '#b8f058' },
-  habitRowStreak: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  habitRowStreak: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 3, borderWidth: 1 },
   streakKing: { backgroundColor: '#f5c84022', borderColor: '#f5c84060' },
   streakHot:  { backgroundColor: '#f0a06022', borderColor: '#f0a06060' },
   streakNew:  { backgroundColor: '#b8f05822', borderColor: '#b8f05860' },
   streakBar: { width: 3, height: 12, borderRadius: 2 },
   streakDot: { width: 6, height: 6, borderRadius: 3 },
-  streakDays: { fontSize: 10, fontFamily: 'DMMono_400Regular', fontWeight: '700' },
+  streakDays: { fontSize: fscale(10), fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   templateChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     backgroundColor: '#1a1a1a', borderRadius: 10,
     paddingHorizontal: 10, paddingVertical: 8,
     borderWidth: 1, borderColor: '#2a2a2a',
   },
-  templateChipEmoji: { fontSize: 15 },
-  templateChipText: { fontSize: 11, color: '#aaa', fontFamily: 'DMMono_400Regular' },
+  templateChipEmoji: { fontSize: fscale(15) },
+  templateChipText: { fontSize: fscale(11), color: '#aaa', fontFamily: 'DMMono_400Regular' },
   habitEmojiWrap: { position: 'relative', width: 28, alignItems: 'center', justifyContent: 'center' },
   habitCatDot: { position: 'absolute', bottom: -1, right: -1, width: 9, height: 9, borderRadius: 5, borderWidth: 1, borderColor: '#0a0a0a' },
   habitReorder: { flexDirection: 'column', alignItems: 'center', marginRight: 6, gap: 2 },
-  habitReorderBtn: { fontSize: 10, color: '#aaa', paddingHorizontal: 2 },
+  habitReorderBtn: { fontSize: fscale(10), color: '#aaa', paddingHorizontal: 2 },
   habitReorderBtnDisabled: { color: '#2a2a2a' },
   habitCheck: {
     width: 24, height: 24, borderRadius: 6,
@@ -1137,19 +1137,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   habitCheckDone: { backgroundColor: '#b8f058', borderColor: '#b8f058' },
-  habitCheckMark: { fontSize: 13, color: '#0a0a0a', fontWeight: '700' },
+  habitCheckMark: { fontSize: fscale(13), color: '#0a0a0a', fontWeight: '700' },
   effortPill: {
     borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2,
     borderWidth: 1, marginRight: 2,
   },
-  effortPillText: { fontSize: 9, fontFamily: 'DMMono_400Regular', fontWeight: '700', letterSpacing: 0.5 },
+  effortPillText: { fontSize: fscale(9), fontFamily: 'DMMono_400Regular', fontWeight: '700', letterSpacing: 0.5 },
 
   missionReminder: {
     backgroundColor: '#0a150a', borderRadius: 10, padding: 12,
     borderWidth: 1, borderColor: '#b8f05840',
   },
-  missionReminderLabel: { fontSize: 11, letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
-  missionReminderText: { fontSize: 14, color: '#ccc', fontStyle: 'italic', lineHeight: 20 },
+  missionReminderLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular', marginBottom: 4 },
+  missionReminderText: { fontSize: fscale(14), color: '#ccc', fontStyle: 'italic', lineHeight: 20 },
 
   form: { gap: 16 },
   formHeading: { fontSize: fscale(22), fontWeight: '700', color: '#fff', lineHeight: fscale(30) },
@@ -1161,7 +1161,7 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 100, textAlignVertical: 'top' },
 
   energyWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  energyAxisLabel: { fontSize: 9, color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1, width: 28, textAlign: 'center' },
+  energyAxisLabel: { fontSize: fscale(9), color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1, width: 28, textAlign: 'center' },
   energyRow: { flex: 1, flexDirection: 'row', gap: 6 },
   energyDot: {
     flex: 1, height: 48, borderRadius: 8,
@@ -1191,7 +1191,7 @@ const styles = StyleSheet.create({
   ctaText: { fontSize: fscale(16), fontWeight: '700', color: '#0a0a0a' },
 
   backBtn: { alignItems: 'center', paddingVertical: 8 },
-  backText: { fontSize: 13, color: '#aaa' },
+  backText: { fontSize: fscale(13), color: '#aaa' },
 
   result: { gap: 16 },
   resultLabel: { fontSize: fscale(11), letterSpacing: 1.5, color: '#b8f058', fontFamily: 'DMMono_400Regular' },
@@ -1209,7 +1209,7 @@ const styles = StyleSheet.create({
   },
   modalHandle: { width: 36, height: 4, backgroundColor: '#333', borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
   modalTitle: { fontSize: fscale(20), fontWeight: '800', color: '#fff', fontFamily: 'Syne_800ExtraBold', marginBottom: 4 },
-  habitErrorText: { color: '#f06060', fontSize: 12, backgroundColor: '#f0606015', borderRadius: 6, padding: 10 },
+  habitErrorText: { color: '#f06060', fontSize: fscale(12), backgroundColor: '#f0606015', borderRadius: 6, padding: 10 },
   habitInput: {
     backgroundColor: '#1a1a1a', borderRadius: 10, borderWidth: 1, borderColor: '#333',
     padding: scale(14), color: '#fff', fontSize: fscale(16),
