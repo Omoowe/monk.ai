@@ -811,8 +811,8 @@ const styles = StyleSheet.create({
   goalTarget: { fontSize: fscale(12), color: '#aaa', fontFamily: 'DMMono_400Regular', marginBottom: 12 },
 
   progressBarWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  progressBarBg: { flex: 1, height: 10, backgroundColor: '#2a2a2a', borderRadius: 5 },
-  progressBarFill: { height: 10, borderRadius: 5 },
+  progressBarBg: { flex: 1, height: 4, backgroundColor: '#1e1e1e', borderRadius: 2 },
+  progressBarFill: { height: 4, borderRadius: 2 },
   progressPct: { fontSize: fscale(12), fontFamily: 'DMMono_400Regular', fontWeight: '700', width: 36 },
   progressPctInput: {
     fontSize: fscale(12), fontFamily: 'DMMono_400Regular', fontWeight: '700',
