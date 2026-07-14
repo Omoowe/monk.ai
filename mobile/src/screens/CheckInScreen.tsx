@@ -141,6 +141,9 @@ export default function CheckInScreen() {
   // Habits (shown on pick screen)
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitsLoading, setHabitsLoading] = useState(false);
+  const [graceEligible, setGraceEligible] = useState(false);
+  const [graceStreak, setGraceStreak] = useState(0);
+  const [recoverySucceeded, setRecoverySucceeded] = useState(false);
 
   // Habit management
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
@@ -172,7 +175,7 @@ export default function CheckInScreen() {
         supabase.from('habit_completions').select('habit_id, effort_level').eq('user_id', user.id).eq('date', today),
       ]);
       const completionMap = new Map((completionsData ?? []).map((c: any) => [c.habit_id, c.effort_level ?? 2]));
-      setHabits((habitsData ?? []).map((h: any) => ({
+      const loadedHabits = (habitsData ?? []).map((h: any) => ({
         id: h.id, name: h.name,
         emoji: h.emoji || '✅',
         streak_days: h.streak_days || 0,
@@ -180,7 +183,16 @@ export default function CheckInScreen() {
         effort_level: completionMap.get(h.id) ?? 2,
         sort_order: h.sort_order ?? 0,
         category: h.category || 'other',
-      })));
+      }));
+      setHabits(loadedHabits);
+
+      // Check grace window (yesterday missed, day before had activity)
+      const { data: grace } = await supabase.rpc('check_streak_grace', { p_user_id: user.id });
+      if (grace) {
+        const { data: userData } = await supabase.from('users').select('streak_before_break').eq('id', user.id).single();
+        setGraceEligible(true);
+        setGraceStreak(userData?.streak_before_break ?? 0);
+      }
     } catch (err) {
       console.error('Failed to load habits:', err instanceof Error ? err.message : String(err));
     } finally {
@@ -474,6 +486,23 @@ export default function CheckInScreen() {
 
   const doneCount = habits.filter((h) => h.completedToday).length;
 
+  // Auto-claim recovery when all habits are done and grace is active
+  useEffect(() => {
+    if (!graceEligible || recoverySucceeded || habits.length === 0) return;
+    if (doneCount < habits.length) return;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: claimed } = await supabase.rpc('claim_streak_recovery', { p_user_id: user.id });
+        if (claimed) {
+          setGraceEligible(false);
+          setRecoverySucceeded(true);
+        }
+      } catch {}
+    })();
+  }, [doneCount, graceEligible, recoverySucceeded, habits.length]);
+
   const dynamicEyebrow = (() => {
     const h = new Date().getHours();
     const day = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
@@ -601,6 +630,34 @@ export default function CheckInScreen() {
                   <HabitRowSkeleton />
                 </View>
               )}
+              {/* Streak recovery banner */}
+              {!habitsLoading && habits.length > 0 && (graceEligible || recoverySucceeded) && (
+                <View style={[styles.graceCard, recoverySucceeded && { borderColor: accent + '60', backgroundColor: accent + '0d' }]}>
+                  {recoverySucceeded ? (
+                    <>
+                      <Text style={[styles.graceTitle, { color: accent }]}>Streak Recovered</Text>
+                      <Text style={styles.graceSub}>
+                        You came back and finished strong. Yesterday filled in.
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={[styles.graceTitle, { color: '#f5c840' }]}>Grace Day Active</Text>
+                      <Text style={styles.graceSub}>
+                        You missed yesterday{graceStreak > 0 ? ` (${graceStreak}-day streak at stake)` : ''}. Complete every habit today to save it.
+                      </Text>
+                      <View style={styles.graceProgress}>
+                        <View style={[styles.graceProgressFill, {
+                          width: habits.length > 0 ? `${Math.round((doneCount / habits.length) * 100)}%` : '0%' as any,
+                          backgroundColor: doneCount === habits.length ? accent : '#f5c840',
+                        }]} />
+                      </View>
+                      <Text style={styles.graceProgressLabel}>{doneCount}/{habits.length} habits done</Text>
+                    </>
+                  )}
+                </View>
+              )}
+
               {!habitsLoading && habits.length === 0 && (
                 <TouchableOpacity style={styles.habitEmptyCard} onPress={openAddHabit}>
                   <Text style={styles.habitEmptyIcon}>+</Text>
@@ -1010,6 +1067,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4,
   },
   addHabitBtnText: { fontSize: fscale(9), color: '#b8f058', fontFamily: 'DMMono_400Regular', letterSpacing: 1, fontWeight: '700' },
+  graceCard: {
+    backgroundColor: '#1a1500', borderRadius: 12, padding: 14,
+    borderWidth: 1, borderColor: '#f5c84040', marginBottom: 10, gap: 6,
+  },
+  graceTitle: { fontSize: fscale(12), fontWeight: '700', fontFamily: 'DMMono_400Regular', letterSpacing: 1 },
+  graceSub: { fontSize: fscale(12), color: '#aaa', lineHeight: 18 },
+  graceProgress: {
+    height: 3, backgroundColor: '#2a2a2a', borderRadius: 2, overflow: 'hidden', marginTop: 4,
+  },
+  graceProgressFill: { height: 3, borderRadius: 2 },
+  graceProgressLabel: { fontSize: fscale(10), color: '#666', fontFamily: 'DMMono_400Regular' },
+
   habitEmptyCard: {
     backgroundColor: '#111', borderRadius: 12, padding: 20,
     borderWidth: 1, borderColor: '#252525', borderStyle: 'dashed',
