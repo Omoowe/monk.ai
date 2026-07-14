@@ -8,13 +8,15 @@ import {
   StyleSheet,
   Animated,
   RefreshControl,
-  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { captureRef } from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
 import { supabase } from '../lib/supabase';
 import { StatsScoreSkeleton, StatsBarChartSkeleton, StatCardSkeleton } from '../components/Skeleton';
+import ShareCard from '../components/ShareCard';
 
 interface DayBar {
   label: string;
@@ -256,11 +258,18 @@ export default function StatsScreen() {
     transform: [{ translateY: cardAnims.current[i].interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) }],
   });
 
+  const shareCardRef = useRef<View>(null);
+
   const shareStats = async () => {
-    const rankInfo = getRank(dopamineScore);
-    await Share.share({
-      message: `${rankInfo.icon} Monk.ai — Week ${completionPct}% completion · ${dopamineScore} dopamine score · ${streak} day streak · rank: ${rankInfo.label}\n\nmonkai://stats`,
-    });
+    try {
+      const uri = await captureRef(shareCardRef, { format: 'png', quality: 1, result: 'tmpfile' });
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Share your Monk stats' });
+      }
+    } catch (err) {
+      console.error('Share failed:', err instanceof Error ? err.message : String(err));
+    }
   };
 
   const weekOf = (() => {
@@ -549,6 +558,18 @@ export default function StatsScreen() {
         </>
         )}
       </ScrollView>
+
+      {/* Off-screen card captured for sharing */}
+      <View style={{ position: 'absolute', left: -9999, top: 0 }} pointerEvents="none">
+        <ShareCard
+          ref={shareCardRef}
+          score={dopamineScore}
+          streak={streak}
+          rank={rank}
+          completionPct={completionPct}
+          habitsThisWeek={weekStats.completed}
+        />
+      </View>
     </SafeAreaView>
   );
 }
