@@ -435,7 +435,7 @@ export default function StatsScreen() {
               });
               return (
                 <View key={cat.id} style={styles.catRow}>
-                  <Text style={[styles.catLabel, { color: cat.color }]}>{cat.label.toUpperCase()}</Text>
+                  <Text style={[styles.catLabel, { color: cat.color }]} numberOfLines={1}>{cat.label.toUpperCase()}</Text>
                   <View style={styles.catBarBg}>
                     <Animated.View style={[styles.catBarFill, { width: animW as any, backgroundColor: cat.color }]} />
                   </View>
@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
   },
   catMeta: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   catLabel: {
-    fontSize: fscale(13), fontWeight: '800', fontFamily: 'DMMono_400Regular',
+    fontSize: fscale(11), fontWeight: '800', fontFamily: 'DMMono_400Regular',
     letterSpacing: 1, width: 110,
   },
   catPct: {

@@ -545,7 +545,7 @@ export default function ProfileScreen({ navigation }: Props) {
           <View style={[s.groupRow, { alignItems: 'flex-start', paddingVertical: 14 }]}>
             <Text style={[s.groupRowLabel, { paddingTop: 2 }]}>IDENTITY</Text>
             <TextInput
-              style={[s.groupRowInput, { minHeight: 60, textAlignVertical: 'top' }]}
+              style={[s.groupRowInput, { minHeight: scale(60), textAlignVertical: 'top' }]}
               placeholder="I am the type of person who..."
               placeholderTextColor="#444"
               value={identity}
@@ -987,7 +987,7 @@ const s = StyleSheet.create({
     backgroundColor: '#111', borderRadius: 10, borderWidth: 1, borderColor: '#333',
     padding: 14, color: '#fff', fontSize: fscale(15),
   },
-  inputMulti: { minHeight: 80, textAlignVertical: 'top' },
+  inputMulti: { minHeight: scale(80), textAlignVertical: 'top' },
 
   personalityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   personalityCardWrap: { flex: 1, minWidth: '45%' },
@@ -1158,7 +1158,7 @@ const s = StyleSheet.create({
     justifyContent: 'center', paddingBottom: 16, paddingHorizontal: 8,
   },
   avatarOption: {
-    width: 48, height: 48, borderRadius: 12,
+    width: scale(48), height: scale(48), borderRadius: 12,
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#2a2a2a',
     alignItems: 'center', justifyContent: 'center',
   },

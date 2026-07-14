@@ -436,16 +436,16 @@ const s = StyleSheet.create({
   cardSub: { fontSize: fscale(12), color: '#aaa', marginBottom: 24 },
 
   timerWrap: { alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, overflow: 'hidden' },
-  ringBgLayer: { position: 'absolute', width: 200, height: 200, backgroundColor: '#1a1a1a' },
-  ringClipRight: { position: 'absolute', left: 100, width: 100, height: 200, overflow: 'hidden' },
-  ringInnerRight: { position: 'absolute', left: -100, width: 200, height: 200 },
-  ringClipLeft: { position: 'absolute', left: 0, width: 100, height: 200, overflow: 'hidden' },
-  ringInnerLeft: { position: 'absolute', left: 0, width: 200, height: 200 },
-  ringHalfBlock: { position: 'absolute', left: 100, width: 100, height: 200 },
+  ringOuter: { width: scale(200), height: scale(200), borderRadius: scale(100), overflow: 'hidden' },
+  ringBgLayer: { position: 'absolute', width: scale(200), height: scale(200), backgroundColor: '#1a1a1a' },
+  ringClipRight: { position: 'absolute', left: scale(100), width: scale(100), height: scale(200), overflow: 'hidden' },
+  ringInnerRight: { position: 'absolute', left: -scale(100), width: scale(200), height: scale(200) },
+  ringClipLeft: { position: 'absolute', left: 0, width: scale(100), height: scale(200), overflow: 'hidden' },
+  ringInnerLeft: { position: 'absolute', left: 0, width: scale(200), height: scale(200) },
+  ringHalfBlock: { position: 'absolute', left: scale(100), width: scale(100), height: scale(200) },
   ringCenterHole: {
-    position: 'absolute', left: 14, top: 14, width: 172, height: 172,
-    borderRadius: 86, backgroundColor: '#111',
+    position: 'absolute', left: scale(14), top: scale(14), width: scale(172), height: scale(172),
+    borderRadius: scale(86), backgroundColor: '#111',
     justifyContent: 'center', alignItems: 'center',
   },
   timerText: { fontSize: fscale(48), color: '#fff', fontFamily: 'DMMono_400Regular', letterSpacing: 2 },
@@ -465,7 +465,7 @@ const s = StyleSheet.create({
     gap: 20, marginBottom: 20,
   },
   stepBtn: {
-    width: 44, height: 44, borderRadius: 12,
+    width: scale(44), height: scale(44), borderRadius: 12,
     backgroundColor: '#1a1a1a', borderWidth: 1, borderColor: '#333',
     alignItems: 'center', justifyContent: 'center',
   },
@@ -475,7 +475,7 @@ const s = StyleSheet.create({
   customStep: { fontSize: fscale(10), color: '#aaa', fontFamily: 'DMMono_400Regular', marginTop: 2 },
 
   startBtn: {
-    backgroundColor: '#b8f058', borderRadius: 14, paddingVertical: 18, alignItems: 'center',
+    backgroundColor: '#b8f058', borderRadius: 14, paddingVertical: scale(18), alignItems: 'center',
   },
   pauseBtn: { backgroundColor: '#f06060', borderWidth: 0 },
   doneBtn: { backgroundColor: '#2a2a2a', borderWidth: 1, borderColor: '#b8f058' },
@@ -535,5 +535,5 @@ const s = StyleSheet.create({
   statCol: { flex: 1, alignItems: 'center', gap: 4 },
   statNum: { fontSize: fscale(28), color: '#fff', fontFamily: 'DMMono_400Regular', fontWeight: '700' },
   statLbl: { fontSize: fscale(8), color: '#aaa', fontFamily: 'DMMono_400Regular', letterSpacing: 1, textAlign: 'center' },
-  statDivider: { width: 1, height: 40, backgroundColor: '#1a1a1a' },
+  statDivider: { width: 1, height: scale(40), backgroundColor: '#1a1a1a' },
 });

@@ -1158,13 +1158,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#111', borderRadius: 10, borderWidth: 1, borderColor: '#333',
     padding: scale(14), color: '#fff', fontSize: fscale(15),
   },
-  inputMulti: { minHeight: 100, textAlignVertical: 'top' },
+  inputMulti: { minHeight: scale(100), textAlignVertical: 'top' },
 
   energyWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   energyAxisLabel: { fontSize: fscale(9), color: '#666', fontFamily: 'DMMono_400Regular', letterSpacing: 1, width: 28, textAlign: 'center' },
   energyRow: { flex: 1, flexDirection: 'row', gap: 6 },
   energyDot: {
-    flex: 1, height: 48, borderRadius: 8,
+    flex: 1, height: scale(48), borderRadius: 8,
     backgroundColor: '#111', borderWidth: 1, borderColor: '#333',
     justifyContent: 'center', alignItems: 'center',
   },
@@ -1174,7 +1174,7 @@ const styles = StyleSheet.create({
 
   choiceRow: { flexDirection: 'row', gap: 12 },
   choiceBtn: {
-    flex: 1, height: 56, borderRadius: 10,
+    flex: 1, height: scale(56), borderRadius: 10,
     backgroundColor: '#111', borderWidth: 1, borderColor: '#333',
     justifyContent: 'center', alignItems: 'center',
   },
