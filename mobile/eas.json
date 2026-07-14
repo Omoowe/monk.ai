@@ -25,9 +25,7 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "hafeezalliowe@gmail.com",
-        "ascAppId": "",
-        "appleTeamId": ""
+        "appleId": "hafeezalliowe@gmail.com"
       },
       "android": {
         "serviceAccountKeyPath": "./google-play-key.json",

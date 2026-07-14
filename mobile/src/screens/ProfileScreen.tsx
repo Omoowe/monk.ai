@@ -445,7 +445,7 @@ export default function ProfileScreen({ navigation }: Props) {
       setEveningH(newEH); setEveningM(newEM);
     }
     await setNotificationTimes(newMH, newMM, newEH, newEM);
-    if (reminders) await scheduleDailyReminders(newMH, newMM, newEH, newEM);
+    if (reminders) await scheduleDailyReminders(newMH, newMM, newEH, newEM, personality as any);
   };
 
   if (loading) {
@@ -569,6 +569,8 @@ export default function ProfileScreen({ navigation }: Props) {
                 onPress={() => {
                   if (locked) { setPaywallTrigger('personality'); setPaywallVisible(true); return; }
                   setPersonality(coach.id);
+                  // Reschedule with new coach voice if reminders active
+                  if (reminders) scheduleDailyReminders(morningH, morningM, eveningH, eveningM, coach.id as any).catch(() => {});
                   const anim = getCoachAnim(coach.id);
                   anim.setValue(0.97);
                   Animated.spring(anim, { toValue: 1, useNativeDriver: true, damping: 12, stiffness: 250 }).start();
@@ -718,7 +720,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   Alert.alert('Permission Required', 'Enable notifications in Settings to use reminders.');
                   return;
                 }
-                await scheduleDailyReminders(morningH, morningM, eveningH, eveningM);
+                await scheduleDailyReminders(morningH, morningM, eveningH, eveningM, personality as any);
               } else {
                 await cancelDailyReminders();
               }
